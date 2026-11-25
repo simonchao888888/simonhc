@@ -1,7 +1,5 @@
-# 部署到 GitHub Pages（網域 simonhc.com，DNS 在 Cloudflare）
-# main 有新 commit、或每週更新完成後，自動建置並發布
-# 第一次使用：GitHub 專案 Settings → Pages → Source 選「GitHub Actions」
-# 並在 Settings → Secrets and variables → Actions → Variables 新增 SITE_URL（你的網址）
+# 發布網站：建置後推到 gh-pages 分支，由 GitHub Pages 對外提供 simonhc.com
+# main 有新 commit、或每週更新完成後自動執行
 name: Deploy
 on:
   push:
@@ -11,27 +9,28 @@ on:
     types: [completed]
   workflow_dispatch:
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 concurrency: { group: pages, cancel-in-progress: true }
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with: { ref: main }
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
       - run: npm ci
       - run: npm run build
         env:
           SITE_URL: ${{ vars.SITE_URL || 'https://simonhc.com' }}
-      - uses: actions/upload-pages-artifact@v3
-        with: { path: dist }
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: { name: github-pages, url: '${{ steps.d.outputs.page_url }}' }
-    steps:
-      - id: d
-        uses: actions/deploy-pages@v4
+      - name: 推到 gh-pages
+        run: |
+          cd dist
+          echo "simonhc.com" > CNAME
+          touch .nojekyll
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "發布 $(date -u -d '+8 hours' '+%Y-%m-%d %H:%M')"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages
