@@ -1,4 +1,4 @@
-# 發布網站：建置後推到 gh-pages 分支，由 GitHub Pages 對外提供 simonhc.com
+# 發布網站：建置後推到 gh-pages 分支，Cloudflare Worker「simonhc」讀這個分支對外提供 simonhc.com（見 cloudflare/worker.js）
 # main 有新 commit、或每週更新完成後自動執行
 name: Deploy
 on:
@@ -26,7 +26,6 @@ jobs:
       - name: 推到 gh-pages
         run: |
           cd dist
-          echo "simonhc.com" > CNAME
           touch .nojekyll
           git init -q -b gh-pages
           git config user.name "github-actions[bot]"
