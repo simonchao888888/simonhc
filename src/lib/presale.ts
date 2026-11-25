@@ -15,8 +15,10 @@ export interface Row { name: string; r: 'city' | 'county'; dist: string; n: numb
 const B: any = build;
 // 資料管線有產出建案統計時，以管線為準
 export const fromPipeline = !!(B && B.projects && B.projects.length);
-export const asOf: string = fromPipeline ? B.meta.latestDeal : P.asOf;
-export const note: string = B && B.projects ? `建案名稱、起造人、戶數、建照與銷售期間來自內政部預售屋建案備查資料；成交統計與每戶明細依內政部預售屋實價登錄原始資料計算（已扣車位、排除特殊交易），最新成交 ${B.meta.latestDeal}。` : P.note;
+// 預售屋最新簽約日：取每戶明細裡最晚的成交日（住宅成交日期 meta.latestDeal 是中古屋，兩者不同）
+const presaleMax = Object.values(dealsRaw as Record<string, { d: string }[]>).flat().reduce((m, x) => (x.d > m ? x.d : m), '');
+export const asOf: string = fromPipeline ? presaleMax || B.meta.latestDeal : P.asOf;
+export const note: string = B && B.projects ? `建案名稱、起造人、戶數、建照與銷售期間來自內政部預售屋建案備查資料；成交統計與每戶明細依內政部預售屋實價登錄原始資料計算（已扣車位、排除特殊交易），最新簽約 ${presaleMax || B.meta.latestDeal}。` : P.note;
 export const allNote: string = fromPipeline ? '依內政部預售屋實價登錄原始資料計算（新竹市 O、新竹縣 J），近兩年有揭露成交的建案全部列出。' : P.allNote;
 // 內政部資料中無法編碼的字以「?」表示，對應到常用名稱
 export const ALIAS: Record<string, string> = { '森?': '森藴' };
