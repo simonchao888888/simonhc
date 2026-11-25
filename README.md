@@ -82,60 +82,18 @@ order: 10
 
 `.github/workflows/update-data.yml` 在每月 2、12、22 日台灣時間上午 10 點（實價登錄揭露隔天）執行資料管線，有變動就提交，完成後自動觸發重新部署。也可以在 GitHub 的 Actions 頁手動按「Run workflow」。
 
-## 上線前待辦
+## 上線（目前架構）
 
-- [ ] `about.astro` 填入聯絡信箱
-- [ ] 第一次執行 `npm run data`，確認新竹市東區／北區／香山區的中位數出現
-- [ ] 設定 `SITE_URL` 並到 Google Search Console 提交 sitemap
-- [ ] 補齊指南文章（規劃主題：權狀與謄本、看屋驗屋、學區、竹科通勤、管理費、賣屋換屋）
+```
+main 有新 commit（你 Merge、每週更新）
+  → .github/workflows/deploy.yml 建置網站，推到 gh-pages 分支
+  → Cloudflare Worker「simonhc」讀 gh-pages 分支的檔案回給訪客（約 5 分鐘內更新）
+  → https://simonhc.com（www.simonhc.com 會自動轉到這裡）
+```
 
-## 「寄給站長」提問表單（Email）
-
-交流平台的提問表單用 FormSubmit 寄信（免費、不需要後端），設定在 `src/data/community.json` 的 `form`。
-
-1. 第一次有人送出時，FormSubmit 會寄一封「Activate Form」到站長信箱，點一下就啟用（已於 2026/11/24 觸發，請到 simonchao888@gmail.com 收信啟用）。
-2. 啟用後每則提問都會以表格寄到信箱；讀者有填 Email 的話，直接按「回覆」就能回給對方。
-3. 想隱藏信箱：啟用信裡會有一組隨機代碼網址，把 `endpoint` 換成那組網址即可。
-4. 送出後讀者會被帶回 `/community/thanks/`，網址取自 `SITE_URL`，部署時記得設定。
-
-## 自動化內容流程
-
-房市不是每天變動，所以主要流程是**每週一次**（可改成兩週一次）：
-
-| 什麼時候 | 做什麼 | 檔案 |
-|---|---|---|
-| 每週一 07:00 | 一次完成：新聞標題 → 實價登錄（季檔＋每 10 天最新批次，含預售屋每戶成交）→ 租金 → 「新竹房市週報」直接發布 → 新聞判讀草稿開 PR | `weekly.yml`、`scripts/weekly_report.py` |
-| 隨時（開 Issue 加「觀點」標籤） | 用你寫的看法產生判讀草稿，開 PR 並回覆 Issue | `commentary.yml`、`scripts/draft_commentary.py` |
-| 每月 22 日 12:00 | 挑最近成交最多的建案，產生「建案拆解」草稿，開 PR | `case-study.yml`、`scripts/case_study.py` |
-| 需要時手動 | 單獨更新新聞或資料 | `update-news.yml`、`update-data.yml`（Actions 頁面按 Run workflow） |
-
-**改成兩週一次**：Settings → Secrets and variables → Actions → Variables，新增 `UPDATE_EVERY_WEEKS`，值填 `2`。
-**想馬上更新一次**（例如央行理監事會當天）：Actions → Weekly update → Run workflow。
-
-週報只有數字與新聞標題，所以自動發布；每期數字存在 `src/data/snapshots/`，下一期拿來比較漲跌。
-**所有 AI 草稿都不會直接上線**，一律開成 Pull Request，站長審閱、修改後按 Merge 才會發布。
-
-### 第一次設定
-
-1. 到 [Anthropic Console](https://console.anthropic.com/) 申請 API 金鑰。
-2. GitHub 專案 → Settings → Secrets and variables → Actions → New repository secret，名稱 `ANTHROPIC_API_KEY`。
-3. Settings → Actions → General → Workflow permissions，勾選「Allow GitHub Actions to create and approve pull requests」。
-4. 在 Issues → Labels 新增一個叫「觀點」的標籤。
-5. 想換模型：Settings → Variables 新增 `MODEL`（預設 `claude-sonnet-5-5`），並在 `commentary.yml` 的 env 加上 `MODEL: ${{ vars.MODEL }}`。
-
-### 讓判讀更像你
-
-編輯 `editorial/viewpoint.md`：你的立場、常用判斷、語氣、絕對不做的事。每次產生草稿都會把整份檔案交給 AI。
-你在 PR 裡改過的判讀，也可以挑幾則好的補進檔案最後的「判讀範例」，草稿會越來越像你。
-
-### 看到新聞當下記錄想法
-
-用手機 GitHub App 開一個 Issue：標題貼新聞網址，內文寫幾句你的看法，加上「觀點」標籤。
-幾分鐘後會收到 PR 連結，草稿以你的看法為主軸，AI 只負責查證事實、補上新竹數字和潤稿。
-
-## 上線
-
-目前用 **GitHub Pages** 發布（`deploy.yml`），網域 simonhc.com 的 DNS 在 Cloudflare：apex 指向 GitHub Pages 的四個 IP，`www` CNAME 到 `simonchao888888.github.io`。
+- Worker 程式碼：`cloudflare/worker.js`（在 Cloudflare 後台 Workers 和 Pages → simonhc 編輯）
+- 網域：Cloudflare → simonhc Worker → 網域，已綁定 simonhc.com、www.simonhc.com
+- 全部免費：GitHub Actions（公開專案）、Cloudflare Workers 免費方案（每天 10 萬次請求）
 
 ### 備用：改用 Cloudflare Pages
 
