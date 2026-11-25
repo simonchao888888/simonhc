@@ -1,0 +1,78 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import Portrait from '../../components/Portrait.astro';
+import { community as C, founder as F, fill, isTodo } from '../../lib/founder';
+const name = F.name;
+---
+<Base title="新竹房地產知識交流平台" description="新竹縣市買房、預售屋、房貸政策、竹科通勤的交流平台：主題看板、臉書與 YouTube、讀者提問與常見問題。" active="community" crumbs={[['交流平台']]}>
+  <div class="pagehead"><Icon name="bamboo" size={56} /><h1>新竹房地產知識交流平台</h1></div>
+  <p class="lead">買房前最需要的，常常不是更多新聞，而是一個可以問「我這樣想對不對」的地方。這裡依主題分成看板，看到別人的問題，也許剛好就是你的答案。</p>
+
+  <h2>主題看板</h2>
+  <div class="boards">
+    {C.boards.map((b) => (
+      <a class={`c-${b.color}`} href={`/community/${b.slug}/`}>
+        <Icon name={b.icon as any} size={34} />
+        <b>{b.name}</b>
+        <span class="note">{b.desc}</span>
+      </a>
+    ))}
+  </div>
+
+  <section class="band rice">
+    <h2>常被問到的問題</h2>
+    <p class="note">由站長依本站資料整理，數字會隨實價登錄更新。</p>
+    <div class="qa">
+      {C.faq.map(([q, a, href]) => <details><summary>{q}</summary><p>{a}</p><a href={href}>看相關資料</a></details>)}
+    </div>
+  </section>
+
+  <h2>在其他地方找到我們</h2>
+  <div class="chan">
+    {C.channels.map(([kind, title, desc, , href]) => (
+      <div>
+        <div class="note">{kind}</div>
+        <b>{title}</b>
+        <p class="note" style="margin:6px 0 12px">{desc}</p>
+        {isTodo(href) ? <span class="note" set:html={fill(href)} /> : <a class="btn p" href={href} rel="noopener">前往</a>}
+      </div>
+    ))}
+  </div>
+
+  <h2 id="ask">直接問站長</h2>
+  <div class="founder-band">
+    <Portrait size={150} />
+    <form class="askbox" id="askform" method="POST" action={C.form.endpoint}>
+      <p style="margin-top:0">有問題但不想公開發問？寫下來直接寄給站長，我會回信，或整理進「常被問到的問題」。</p>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field" style="margin:0"><label for="f-name">怎麼稱呼你（選填）</label><input id="f-name" name="稱呼" maxlength="40" /></div>
+        <div class="field" style="margin:0"><label for="f-email">回覆用 Email（選填，想收到回覆再填）</label><input id="f-email" name="email" type="email" maxlength="120" /></div>
+      </div>
+      <div class="field"><label for="f-board">問題類別</label><select id="f-board" name="類別">{C.boards.map((b) => <option>{b.name}</option>)}<option>其他</option></select></div>
+      <div class="field"><label for="f-msg">你的問題</label><textarea id="f-msg" name="問題" required minlength="8" maxlength="3000" placeholder="例如：雙薪月收入 18 萬，想在竹北和竹東之間選，該怎麼比較？"></textarea></div>
+      <input type="hidden" name="_subject" value={C.form.subject} />
+      <input type="hidden" name="_template" value="table" />
+      <input type="hidden" name="_captcha" value="false" />
+      <input type="hidden" name="_next" value={new URL('/community/thanks/', Astro.site).href} />
+      <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
+      <button type="submit" id="askbtn">寄給站長</button><span class="ok" id="askok" role="status"></span>
+      <p class="note">請不要寫電話、身分證、門牌地址等個人資料。按下寄出即表示同意把這則問題寄到站長信箱；問題可能經去識別化後公開回答。</p>
+    </form>
+  </div>
+
+  <h2>交流守則</h2>
+  <ol class="art">{C.rules.map((r) => <li>{r}</li>)}</ol>
+  <p class="note">平台由 <span set:html={fill(name)} /> 維護。認識站長：<a href="/about/">關於創辦人</a></p>
+</Base>
+<script>
+  // 送出前檢查；送出中鎖住按鈕避免重複寄送
+  const form = document.getElementById('askform') as HTMLFormElement | null;
+  form?.addEventListener('submit', (e) => {
+    const ok = document.getElementById('askok')!;
+    const msg = (document.getElementById('f-msg') as HTMLTextAreaElement).value.trim();
+    if (msg.length < 8) { e.preventDefault(); ok.textContent = '問題再多寫幾個字，站長比較好回答。'; return; }
+    const btn = document.getElementById('askbtn') as HTMLButtonElement;
+    btn.disabled = true; btn.textContent = '寄送中…'; ok.textContent = '';
+  });
+</script>

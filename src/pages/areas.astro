@@ -1,0 +1,21 @@
+---
+import Icon from '../components/Icon.astro';
+import Base from '../layouts/Base.astro';
+import { dist, districtUrl } from '../lib/data';
+const zones: [string, string, string[]][] = [
+  ['竹科・東區生活圈', '東區、關埔、寶山。離園區最近，關埔重劃區新案 5～6 字頭。', ['east', 'baoshan']],
+  ['竹北・高鐵生活圈', '高鐵特區、縣治、台元。機能、學區最完整，全縣市單價最高。', ['zhubei']],
+  ['竹東・台 68 生活圈', '竹東、芎林、橫山。竹科外溢主要受益區，中古屋親民、預售溢價高。', ['zhudong', 'qionglin', 'hengshan']],
+  ['湖口・新豐工業生活圈', '新竹工業區、湖口、新豐。基期低，留意尖峰通勤時間。', ['hukou', 'xinfeng']],
+  ['新竹舊城・北區生活圈', '城隍廟、火車站、西大路。機能成熟、中古公寓華廈多。', ['north']],
+  ['香山・南竹生活圈', '公道三路開通後到市區 5～10 分鐘，土地開發動能升溫。', ['xiangshan']],
+  ['客家山城・觀光生活圈', '關西、新埔、北埔、峨眉。以透天與農地為主，成交量小。', ['guanxi', 'xinpu', 'beipu', 'emei']],
+];
+---
+<Base title="新竹生活圈" description="用每天要去哪裡來選區域：竹科東區、竹北高鐵、竹東台68、湖口新豐、北區、香山七大新竹生活圈。" active="areas" crumbs={[['生活圈']]}>
+  <div class="pagehead"><Icon name="map" size={56} /><h1>新竹生活圈</h1></div>
+  <p class="lead">用「你每天要去哪裡」來選區域，而不是只看單價。</p>
+  <div class="grid g2">{zones.map(([t, d, ids]) => (
+    <div class="card"><h3 style="margin-top:0">{t}</h3><p>{d}</p><p>{ids.map((i) => <a class="tag" href={districtUrl(dist(i))}>{dist(i).name}{dist(i).used != null ? ` ${dist(i).used} 萬` : ''}</a>)}</p></div>
+  ))}</div>
+</Base>

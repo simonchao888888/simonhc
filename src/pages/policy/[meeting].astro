@@ -1,0 +1,30 @@
+---
+import Base from '../../layouts/Base.astro';
+import Sources from '../../components/Sources.astro';
+import { meetings, fmtDate, type Meeting } from '../../lib/news';
+import { DISCLAIMER } from '../../components/Parts';
+export function getStaticPaths() {
+  return meetings.map((m) => ({ params: { meeting: m.id }, props: { m } }));
+}
+const { m } = Astro.props as { m: Meeting };
+const others = meetings.filter((x) => x.id !== m.id);
+const ld = { '@context': 'https://schema.org', '@type': 'Article', headline: m.title, datePublished: m.date, inLanguage: 'zh-TW', publisher: { '@type': 'Organization', name: '竹房知識站' } };
+---
+<Base title={m.title} description={`${fmtDate(m.date)} 央行理監事會議：${m.rate}；信用管制：${m.credit}。對新竹房市的判讀。`} active="policy" crumbs={[['央行與貸款政策', '/policy/'], [fmtDate(m.date) + ' 理監事會']]} jsonld={ld}>
+  <span class="tag">央行理監事會</span> <span class="date">{fmtDate(m.date)}</span>
+  <h1>{m.title}</h1>
+  <div class="grid g2">
+    <div class="card"><div class="note">政策利率</div><b style="font-size:18px">{m.rate}</b></div>
+    <div class="card"><div class="note">選擇性信用管制</div><b style="font-size:18px">{m.credit}</b></div>
+  </div>
+  <h2>會議重點</h2>
+  <div class="card"><ul>{m.facts.map((f) => <li>{f}</li>)}</ul></div>
+  <h2>判讀</h2>
+  <div class="take">{m.take}</div>
+  <h2>對新竹買方的意義</h2>
+  <div class="act">{m.hsinchu}</div>
+  <Sources list={m.sources} />
+  <h2>其他場次</h2>
+  <p>{others.map((o) => <a class="tag" href={`/policy/${o.id}/`}>{fmtDate(o.date)}</a>)}</p>
+  <Fragment set:html={DISCLAIMER} />
+</Base>

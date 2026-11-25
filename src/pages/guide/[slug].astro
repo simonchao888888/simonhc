@@ -1,0 +1,53 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import { DISCLAIMER } from '../../components/Parts';
+export async function getStaticPaths() {
+  const posts = await getCollection('guide');
+  return posts.map((p) => ({ params: { slug: p.id }, props: { p, posts } }));
+}
+const { p, posts } = Astro.props;
+const { Content, headings } = await render(p);
+const toc = headings.filter((h) => h.depth === 3 && h.text !== '資料來源');
+const mins = Math.max(2, Math.round((p.body ?? '').replace(/[#|\-\s\[\]\(\)]/g, '').length / 450));
+const related = posts.filter((x) => x.id !== p.id && (x.data.category === p.data.category || x.data.tags.some((t) => p.data.tags.includes(t))))
+  .sort((a, b) => Number(b.data.category === p.data.category) - Number(a.data.category === p.data.category) || a.data.order - b.data.order).slice(0, 3);
+const ld = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: p.data.title, description: p.data.description,
+  datePublished: p.data.pubDate.toISOString().slice(0, 10), inLanguage: 'zh-TW',
+  publisher: { '@type': 'Organization', name: '竹房知識站' },
+};
+---
+<Base title={p.data.title} description={p.data.description} crumbs={[['買房指南', '/guide/'], [p.data.category]]} jsonld={ld}>
+  <div class="arthead">
+    <span class={`tag c-${p.data.category}`}>{p.data.category}</span>
+    <h1>{p.data.title}</h1>
+    <p class="lead">{p.data.description}</p>
+    <p class="note">{p.data.pubDate.toISOString().slice(0, 10)} 更新・閱讀約 {mins} 分鐘・Simon 哥</p>
+  </div>
+  <div class:list={['artwrap', { notoc: toc.length < 3 }]}>
+    {toc.length >= 3 && (
+      <aside class="tocwrap">
+        <details class="toc" open>
+          <summary>本文目錄</summary>
+          <ol>{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+        </details>
+      </aside>
+    )}
+    <article class="card art"><Content /></article>
+  </div>
+  <p style="margin-top:12px">{p.data.tags.map((t) => <a class="tag g" href={`/tag/${encodeURIComponent(t)}/`}>#{t}</a>)}</p>
+  {related.length > 0 && <>
+    <h2>接著讀</h2>
+    <div class="pcards">
+      {related.map((x) => (
+        <a class={`pc pc-${x.data.category}`} href={`/guide/${x.id}/`}>
+          <span class={`tag c-${x.data.category}`}>{x.data.category}</span>
+          <b>{x.data.title}</b>
+          <span class="note">{x.data.description}</span>
+        </a>
+      ))}
+    </div>
+  </>}
+  <Fragment set:html={DISCLAIMER} />
+</Base>

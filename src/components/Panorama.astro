@@ -1,0 +1,137 @@
+---
+// 新竹縣市「從海邊到山邊」手繪全景；每個地點標上目前中古屋每坪中位數並連到該區頁面
+import { regions, dist, districtUrl, regionUrl } from '../lib/data';
+const pin = (id: string) => { const d = dist(id); return { name: d.name, v: d.used, href: districtUrl(d) }; };
+const pins = [
+  { x: 200, y: 134, ...pin('xinfeng') },
+  { x: 360, y: 84, ...pin('hukou') },
+  { x: 560, y: 70, name: '新竹市', v: regions.city.used, href: regionUrl('city') },
+  { x: 790, y: 34, ...pin('zhubei') },
+  { x: 1000, y: 112, ...pin('baoshan'), name: '寶山・竹科' },
+  { x: 1200, y: 108, ...pin('zhudong') },
+  { x: 1460, y: 66, ...pin('qionglin') },
+];
+const ink = '#1E2C36', mist = '#DCE5E1', paper = '#FBFAF5', bamboo = '#2F6A4E', wind = '#3F78A8';
+const sand = '#EFE3C8', sage = '#D3E5D6', skyb = '#D2E5F2', persimmon = '#E07A2F', brick = '#A8452E', teal = '#2A8584';
+const facade = [sand, skyb, '#F4F1EA', sage, '#F3DCCB'];
+// 竹科大樓窗格
+const sciWin: string[] = [];
+for (let r = 0; r < 4; r++) for (let c = 0; c < 9; c++) sciWin.push(`M${934 + c * 13} ${290 + r * 13}h8`);
+// 竹北大樓
+const towers = [[700, 196, 34], [742, 168, 30], [780, 150, 36], [824, 182, 28], [858, 214, 26]];
+---
+<div class="pano" role="group" aria-label="新竹縣市從海邊到山邊的插圖，標示各區中古屋每坪中位數">
+<div class="scroll"><svg viewBox="0 0 1600 430" xmlns="http://www.w3.org/2000/svg" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="pSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFDCEF" /><stop offset=".62" stop-color="#EAF2F2" /><stop offset="1" stop-color="#F8EBD8" /></linearGradient>
+    <linearGradient id="pSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7FB2D2" /><stop offset="1" stop-color="#4E86AE" /></linearGradient>
+    <linearGradient id="pFar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9DBBC9" /><stop offset="1" stop-color="#C8D9DA" /></linearGradient>
+    <linearGradient id="pNear" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5E9C7F" /><stop offset="1" stop-color="#3E7A5E" /></linearGradient>
+  </defs>
+  <rect width="1600" height="340" fill="url(#pSky)" />
+  <circle cx="1340" cy="120" r="46" fill="#F6C98E" opacity=".75" />
+  <circle cx="1340" cy="120" r="30" fill="#F2AE66" opacity=".8" />
+  <!-- 九降風：天空的風線 -->
+  <g stroke="#fff" stroke-width="2.2" opacity=".9">
+    <path d="M40 70c120-26 230 22 360-6s220-34 330 4" />
+    <path d="M620 46c90-20 170 14 260-4" />
+    <path d="M90 150c80-14 150 10 230-4" />
+    <path d="M1020 40c110-24 220 18 330-8 60-14 120-8 180 6" />
+    <path d="M1250 150c60-12 120 6 170-4" />
+  </g>
+
+  <!-- 遠山：五峰、尖石 -->
+  <path d="M1180 330 1260 236l40 30 60-96 50 58 46-84 74 104 40-40 50 70 0 52z" fill="url(#pFar)" stroke={ink} stroke-width="1.4" />
+  <path d="M1270 330l70-62 40 22 56-60 48 52 50-34 66 82z" fill="url(#pNear)" stroke={ink} stroke-width="1.2" />
+  <path d="M1336 186l10 12M1412 168l8 10M1458 116l10 14" stroke={ink} stroke-width="1" />
+
+  <!-- 海：南寮、新豐海岸 -->
+  <path d="M0 336c30-6 50 6 80 0s50-6 80 0 40 4 60 0v94H0z" fill="url(#pSea)" />
+  <path d="M220 340c260 8 520-4 800 2s420-2 580 2v88H220z" fill="#DCEBCF" />
+  <path d="M240 372c120 4 220-6 330 0M640 384c140-6 260 6 380 0" stroke="#B9D4A6" stroke-width="2" />
+  <g stroke="#fff" stroke-width="1.6" opacity=".8"><path d="M14 360c14-6 26 6 40 0M80 378c14-6 26 6 40 0M30 398c14-6 26 6 40 0M120 356c14-6 26 6 40 0" /></g>
+  <!-- 風車 -->
+  {[[46, 196], [118, 220], [178, 244]].map(([x, y], i) => (
+    <g stroke={ink} stroke-width="1.6">
+      <path d={`M${x} ${y}V336`} />
+      <path d={`M${x} ${y}l-4 -44M${x} ${y}l40 18M${x} ${y}l-36 26`} transform={`rotate(${i * 22} ${x} ${y})`} />
+      <circle cx={x} cy={y} r="3.5" fill={persimmon} />
+    </g>
+  ))}
+
+  <!-- 地面線 -->
+  <path d="M0 336c180 4 360-6 560 0s420 4 640-2 300 2 400 0" stroke={ink} stroke-width="1.8" />
+
+  <!-- 新豐、湖口：工業區鋸齒屋頂與住家 -->
+  <path d="M232 336v-42h24v-14h20v56M290 336v-30l14 -10 14 10v30" fill={sage} stroke={ink} stroke-width="1.4" />
+  <path d="M330 336v-40l18-14v14l18-14v14l18-14v14l18-14v54z" fill={sand} stroke={ink} stroke-width="1.4" />
+  <path d="M408 336v-26h22v26M436 336v-48h20v48" fill={skyb} stroke={ink} stroke-width="1.4" />
+
+  <!-- 柿子樹（新埔柿餅） -->
+  <path d="M472 336v-26" stroke="#6B4F3A" stroke-width="2" />
+  <circle cx="472" cy="300" r="16" fill="#8DBF8E" stroke={ink} stroke-width="1.2" />
+  {[[464, 296], [478, 292], [470, 306], [482, 304]].map(([x, y]) => <circle cx={x} cy={y} r="3" fill={persimmon} />)}
+  <!-- 新竹市：東門城 -->
+  <g stroke={ink} stroke-width="1.6">
+    <path d="M500 336v-58h120v58" fill="#E9D6BE" />
+    <path d="M506 300h108M506 318h108M530 280v56M590 280v56" stroke="#C9AE8C" stroke-width=".8" />
+    <path d="M540 336v-26a20 20 0 0 1 40 0v26" fill={paper} />
+    <path d="M512 278v-22h96v22" fill={paper} />
+    <path d="M498 258c20-4 40-26 62-30 22 4 42 26 62 30" fill={brick} />
+    <path d="M526 256v-10h68v10" />
+    <path d="M520 246c14-2 26-16 40-18 14 2 26 16 40 18" fill={brick} />
+  </g>
+  <path d="M630 336v-52h26v52M664 336v-30h18v30" fill={sage} stroke={ink} stroke-width="1.3" />
+
+  <!-- 竹北：高鐵特區大樓 -->
+  {towers.map(([x, y, w], i) => (
+    <g stroke={ink} stroke-width="1.4">
+      <path d={`M${x} 336V${y}h${w}V336`} fill={facade[i % facade.length]} />
+      <path d={`M${x + 6} ${y + 14}V326M${x + w - 6} ${y + 14}V326`} stroke-width=".8" opacity=".6" />
+    </g>
+  ))}
+  <!-- 高鐵 -->
+  <path d="M640 312h300" stroke={ink} stroke-width="1.2" />
+  <path d="M660 312v24M720 312v24M780 312v24M840 312v24M900 312v24" stroke={ink} stroke-width="1" />
+  <path d="M676 304h150c18 0 30 4 38 8H676z" fill="#fff" stroke={ink} stroke-width="1.4" />
+  <path d="M690 302h120" stroke={persimmon} stroke-width="2.6" />
+  <path d="M700 308h8M716 308h8M732 308h8M748 308h8M764 308h8M780 308h8" stroke={wind} stroke-width="2" />
+
+  <!-- 竹科：低矮廠房與晶片圖樣 -->
+  <path d="M920 336v-56h132v56" fill="#BFD7EA" stroke={ink} stroke-width="1.5" />
+  <path d={sciWin.join('')} stroke={wind} stroke-width="1.6" />
+  <path d="M1060 336v-34h44v34" fill={sage} stroke={ink} stroke-width="1.4" />
+  <rect x="1070" y="290" width="24" height="14" fill="none" stroke={bamboo} stroke-width="1.2" />
+  <path d="M1074 290v-5M1082 290v-5M1090 290v-5M1074 304v5M1082 304v5M1090 304v5" stroke={bamboo} stroke-width="1" />
+
+  <!-- 頭前溪與橋 -->
+  <path d="M1010 430c40-30 110-46 180-52s120-20 150-42" stroke={teal} stroke-width="16" opacity=".35" />
+  <path d="M1010 430c40-30 110-46 180-52s120-20 150-42" stroke={teal} stroke-width="1.6" />
+  <path d="M1140 378c20-14 60-14 80 0M1140 378v12M1220 378v12M1160 372v18M1180 369v21M1200 372v18" stroke={ink} stroke-width="1.2" />
+
+  <!-- 竹東小鎮 -->
+  <path d="M1150 336v-30l16-12 16 12v30M1190 336v-40h22v40M1218 336v-24l14-10 14 10v24" fill="#F3DCCB" stroke={ink} stroke-width="1.4" />
+
+  <!-- 竹叢 -->
+  {[[1380, 1], [1404, -1], [1424, 1]].map(([x, s]) => (
+    <g stroke={bamboo} stroke-width="2">
+      <path d={`M${x} 336c${s * 2}-40 ${s * 4}-80 ${s * 2}-120`} />
+      <path d={`M${x + s * 3} 300c${s * 12}-6 ${s * 22}-2 ${s * 28}-10M${x + s * 4} 262c${-s * 12}-6 ${-s * 20}-2 ${-s * 26}-10M${x + s * 3} 236c${s * 10}-8 ${s * 18}-6 ${s * 24}-14`} stroke-width="1.4" />
+    </g>
+  ))}
+
+  <!-- 地名與價格 -->
+  {pins.map((p) => (
+    <a href={p.href} aria-label={`${p.name}${p.v ? `，中古屋每坪中位數 ${p.v} 萬` : ''}`}>
+      <path d={`M${p.x} ${p.y + 44}V${Math.min(p.y + 150, 320)}`} stroke={ink} stroke-width="1" stroke-dasharray="2 4" />
+      <g class="pin">
+        <rect x={p.x - 66} y={p.y - 10} width="132" height="54" rx="4" fill="#1D3445" />
+        <rect x={p.x - 66} y={p.y - 10} width="5" height="54" rx="2" fill={persimmon} />
+        <text x={p.x} y={p.y + 12} text-anchor="middle" fill="#fff" font-size="19" font-family="LXGW WenKai TC, serif">{p.name}</text>
+        <text x={p.x} y={p.y + 35} text-anchor="middle" fill="#F6D9A8" font-size="16" font-family="Noto Sans TC, sans-serif">{p.v ? `${p.v} 萬/坪` : '成交少'}</text>
+      </g>
+    </a>
+  ))}
+</svg></div>
+<div class="cap">示意插圖，由西邊海岸到東邊山區；數字為近半年中古屋每坪中位數（已扣車位），點地名看該區。</div>
+</div>

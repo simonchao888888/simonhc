@@ -1,0 +1,42 @@
+---
+import Icon from '../../components/Icon.astro';
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+const posts = (await getCollection('guide')).sort((a, b) => a.data.order - b.data.order);
+const order = ['買房知識', '房貸知識', '稅費與法律', '區域與建設', '房東與投資', '市場分析'];
+const cats = order.filter((c) => posts.some((p) => p.data.category === c));
+const count = (c: string) => posts.filter((p) => p.data.category === c).length;
+const tags = [...new Set(posts.flatMap((p) => p.data.tags))];
+const mins = (b?: string) => Math.max(2, Math.round((b ?? '').replace(/[#|\-\s\[\]\(\)]/g, '').length / 450));
+// 新手照著讀的順序
+const path = ['first-time-buyer', 'read-transactions', 'tech-worker-buying', 'grace-period', 'property-tax-guide', 'house-inspection-checklist']
+  .map((id) => posts.find((p) => p.id === id)).filter(Boolean) as typeof posts;
+---
+<Base title="新竹買房指南" description="針對新竹縣市寫的買房、房貸、稅費、預售屋、學區與市場分析知識。" crumbs={[['買房指南']]}>
+  <div class="pagehead"><Icon name="bamboo" size={56} /><h1>新竹買房指南</h1></div>
+  <p class="lead">針對新竹縣市寫的買房、房貸、稅費與市場知識，共 {posts.length} 篇。第一次來，建議從下面的「新手路線」開始。</p>
+
+  <h2>新手路線：照這個順序讀</h2>
+  <ol class="route">
+    {path.map((p) => <li><a href={`/guide/${p.id}/`}><b>{p.data.title}</b><span class="note">{p.data.description}</span></a></li>)}
+  </ol>
+
+  <h2>全部文章</h2>
+  <div class="filter" data-filter="#glist" role="group" aria-label="依分類篩選">
+    <button type="button" class="on" data-c="all" aria-pressed="true">全部 {posts.length}</button>
+    {cats.map((c) => <button type="button" data-c={c} aria-pressed="false">{c} {count(c)}</button>)}
+  </div>
+  <div class="pcards" id="glist">
+    {posts.map((p) => (
+      <a class={`pc pc-${p.data.category}`} data-c={p.data.category} href={`/guide/${p.id}/`}>
+        <span class={`tag c-${p.data.category}`}>{p.data.category}</span>
+        <b>{p.data.title}</b>
+        <span class="note">{p.data.description}</span>
+        <span class="pmeta">約 {mins(p.body)} 分鐘</span>
+      </a>
+    ))}
+  </div>
+
+  <h2>依主題找</h2>
+  <p>{tags.map((t) => <a class="tag" href={`/tag/${encodeURIComponent(t)}/`}>{t}</a>)}</p>
+</Base>

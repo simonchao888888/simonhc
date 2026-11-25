@@ -1,0 +1,87 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Faq from '../../../components/Faq.astro';
+import TileMap from '../../../components/TileMap.astro';
+import { regions, districts, districtUrl, regionUrl, pct, fmt, type District } from '../../../lib/data';
+import { DISCLAIMER, faqItems, faqLd } from '../../../components/Parts';
+import { featuredByDist, allByDist, f1 } from '../../../lib/presale';
+import { rentDistrict, usable, grossYield, wan } from '../../../lib/rent';
+
+export function getStaticPaths() {
+  return districts.map((d) => ({ params: { region: regions[d.r].slug, district: d.id }, props: { d } }));
+}
+const { d } = Astro.props as { d: District };
+const R = regions[d.r];
+const full = `${R.name}${d.name}`;
+const sib = districts.filter((x) => x.r === d.r && x.id !== d.id && (x.used != null || x.r === 'city'));
+const faq = faqItems(full);
+const fp = featuredByDist(d.name);
+const ap = allByDist(d.name).filter((x) => !fp.some((f) => f.name === x.name)).slice(0, 12);
+const desc = d.used != null
+  ? `${full}近半年中古屋每坪中位數 ${d.used} 萬（${d.n} 筆，已扣車位）${d.presale ? `，預售屋 ${d.presale} 萬` : ''}。區域重點、與${R.name}比較、買房試算。`
+  : `${full}房價行情與區域重點：${d.intro.slice(0, 60)}`;
+const rs = rentDistrict(d.id);
+const rentOk = usable(rs);
+---
+<Base title={`${full}房價行情`} description={desc} active="prices"
+  crumbs={[['查房價', '/region/'], [R.name, regionUrl(d.r)], [d.name]]} jsonld={faqLd(faq)}>
+  <div class="split" style="align-items:center">
+    <div><h1>{full}房價行情</h1><p class="lead">{d.intro}</p></div>
+    <div><TileMap highlight={d.id} small /></div>
+  </div>
+
+  {d.used != null ? (
+    <div class="grid g4">
+      <div class="card"><div class="note">中古屋近半年中位數</div><div class="stat">{d.used}<small> 萬/坪</small></div><div class="note">{d.n} 筆・{d.tier === 'main' ? '主要排行' : '參考區'}</div></div>
+      {d.presale != null && <div class="card"><div class="note">預售屋近半年中位數</div><div class="stat acc">{d.presale}<small> 萬/坪</small></div><div class="note">{d.pn} 筆・溢價 +{pct(d.presale, d.used).toFixed(0)}%</div></div>}
+      {d.avg5m != null && <div class="card"><div class="note">2026 前五月平均單價</div><div class="stat sm">{d.avg5m}<small> 萬/坪</small></div><div class:list={['note', (d.yoy ?? 0) > 0 ? 'up' : 'down']}>較 2025 年 {(d.yoy ?? 0) > 0 ? '+' : ''}{d.yoy}%</div></div>}
+      <div class="card"><div class="note">與{R.name}整體比</div><div class="stat sm">{d.used > R.used ? '+' : ''}{pct(d.used, R.used).toFixed(0)}%</div><div class="note">{R.name}中古 {R.used} 萬/坪</div></div>
+    </div>
+  ) : d.r === 'city' ? (
+    <div class="grid g4">
+      <div class="card"><div class="note">2025 年建物買賣</div><div class="stat">{fmt(d.bld2025)}<small> 棟</small></div>{d.share && <div class="note">占全市約 {d.share}%</div>}</div>
+      {d.land2025 && <div class="card"><div class="note">2025 年土地買賣</div><div class="stat">{fmt(d.land2025)}<small> 筆</small></div><div class="note">高於北區</div></div>}
+      <div class="card"><div class="note">新竹市中古屋（全市）</div><div class="stat">{R.used}<small> 萬/坪</small></div></div>
+      <div class="card"><div class="note">分區中位數</div><div class="stat empty" style="font-size:20px">資料管線上線後顯示</div></div>
+    </div>
+  ) : (
+    <div class="card"><b>近半年樣本：{d.n ?? 0} 筆</b><p class="note">樣本不足 5 筆，中位數沒有代表性，本站不顯示。建議直接查詢內政部實價登錄的單筆成交，並比對同路段、同屋齡物件。</p></div>
+  )}
+
+  {rentOk && <>
+    <h2>{d.name}租金行情</h2>
+    <div class="grid g4">
+      <div class="card"><div class="note">整戶出租月租中位數</div><div class="stat sm">{wan(rs!.apt)}</div><div class="note">{rs!.aptN} 筆</div></div>
+      <div class="card"><div class="note">每坪月租</div><div class="stat sm">{rs!.perPing}<small> 元</small></div><div class="note">含公設面積</div></div>
+      <div class="card"><div class="note">3 房月租</div><div class="stat sm">{wan(rs!.rooms['3'].rent)}</div><div class="note">{rs!.rooms['3'].n} 筆</div></div>
+      <div class="card"><div class="note">毛租金報酬率</div><div class="stat sm acc">{(() => { const y = grossYield(rs!.perPing, d.used); return y == null ? '—' : y.toFixed(1) + '%'; })()}</div><div class="note">對照中古屋單價</div></div>
+    </div>
+    <p class="note">{rs!.aptN < 20 ? '樣本少於 20 筆，僅供參考。' : ''}完整說明見<a href="/rent/">新竹租金行情</a>。</p>
+  </>}
+  {d.points.length > 0 && <><h2>區域重點</h2><div class="card"><ul>{d.points.map((p) => <li>{p}</li>)}</ul></div></>}
+
+
+  {(fp.length > 0 || ap.length > 0) && <>
+    <h2>{d.name}預售建案</h2>
+    {fp.length > 0 && <div class="tw"><table>
+      <tr><th>建案</th><th>建商（起造人）</th><th class="n">戶數</th><th class="n">每坪中位數</th><th>最新成交</th></tr>
+      {fp.map((x) => <tr><td><a href={`/presale/${x.id}/`}>{x.name}</a></td><td>{x.dev || '—'}</td><td class="n">{x.units}</td><td class="n">{x.med != null ? f1(x.med) : (x.max ? `最高 ${f1(x.max)}` : '—')}</td><td class="date">{x.latest}</td></tr>)}
+    </table></div>}
+    {ap.length > 0 && <p class="note" style="margin-top:8px">其他有成交的建案：{ap.map((x) => `${x.name}${x.med ? `（${x.med} 萬）` : ''}`).join('、')}</p>}
+    <p><a href="/presale/#all">看新竹縣市全部預售建案</a></p>
+  </>}
+
+  <h2>買{d.name}之前，先算一下</h2>
+  <div class="grid g3">
+    <a class="card" href="/tools/affordability/"><b>我的收入買得起多少？</b><p class="note">{d.used != null ? `以 ${d.used} 萬/坪、30 坪計，總價約 ${fmt(d.used * 30)} 萬（不含車位）` : '用收入反推總價上限'}</p></a>
+    <a class="card" href="/tools/mortgage-payment/"><b>房貸月付金</b><p class="note">寬限期結束後月付金會跳升多少</p></a>
+    <a class="card" href="/guide/read-transactions/"><b>怎麼讀實價登錄</b><p class="note">避開車位、親友交易等陷阱</p></a>
+  </div>
+
+  {sib.length > 0 && <>
+    <h2>{R.name}其他行政區</h2>
+    <p>{sib.map((x) => <a class="tag" href={districtUrl(x)}>{x.name}{x.used != null ? ` ${x.used} 萬` : ''}</a>)}</p>
+  </>}
+  <Faq items={faq} />
+  <Fragment set:html={DISCLAIMER} />
+</Base>

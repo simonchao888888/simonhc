@@ -1,0 +1,76 @@
+---
+import Base from '../../../layouts/Base.astro';
+import DistrictTable from '../../../components/DistrictTable.astro';
+import Faq from '../../../components/Faq.astro';
+import { regions, districts, districtUrl, pct, fmt, type RegionKey } from '../../../lib/data';
+import { trendSvg, DISCLAIMER, faqItems, faqLd } from '../../../components/Parts';
+
+export function getStaticPaths() {
+  return (Object.keys(regions) as RegionKey[]).map((key) => ({ params: { region: regions[key].slug }, props: { key } }));
+}
+const { key } = Astro.props as { key: RegionKey };
+const R = regions[key];
+const ds = districts.filter((d) => d.r === key);
+const ranked = ds.filter((d) => d.used != null).sort((a, b) => b.used! - a.used!);
+const low = ds.filter((d) => d.used == null);
+const mains = ranked.filter((d) => d.tier === 'main');
+const hi = ranked[0], lo = (mains.length ? mains : ranked).at(-1), vol = [...ranked].sort((a, b) => b.n! - a.n!)[0];
+const premium = ranked.filter((d) => d.presale != null).sort((a, b) => b.presale! / b.used! - a.presale! / a.used!);
+const faq = faqItems(R.name);
+const desc = `${R.name}近半年中古屋每坪中位數 ${R.used} 萬、預售屋 ${R.presale} 萬。各行政區房價排行、預售與中古價差、近 8 季趨勢一次看。`;
+---
+<Base title={`${R.name}房價行情`} description={desc} active="prices" crumbs={[['查房價', '/region/'], [R.name]]} jsonld={faqLd(faq)}>
+  <h1>{R.name}房價行情</h1>
+  <div class="grid g4">
+    <div class="card"><div class="note">中古屋近半年中位數</div><div class="stat">{R.used}<small> 萬/坪</small></div><div class="note">{fmt(R.usedN)} 筆・已扣車位</div></div>
+    <div class="card"><div class="note">預售屋近半年中位數</div><div class="stat acc">{R.presale}<small> 萬/坪</small></div><div class="note">{fmt(R.presaleN)} 筆</div></div>
+    <div class="card"><div class="note">預售較中古</div><div class="stat up">+{pct(R.presale, R.used).toFixed(0)}%</div><div class="note">兩者不可直接比較</div></div>
+  </div>
+
+  {ranked.length > 0 && hi && lo && vol && <>
+    <h2>各區決策摘要</h2>
+    <div class="grid g3">
+      <a class="card" href={districtUrl(hi)}><div class="note">單價最高</div><b>{hi.name}</b><div class="stat sm">{hi.used}<small> 萬/坪</small></div></a>
+      <a class="card" href={districtUrl(lo)}><div class="note">主要區中最親民</div><b>{lo.name}</b><div class="stat sm">{lo.used}<small> 萬/坪</small></div></a>
+      <a class="card" href={districtUrl(vol)}><div class="note">交易量最大</div><b>{vol.name}</b><div class="stat sm">{vol.n}<small> 筆</small></div></a>
+    </div>
+    <h2>主要排行與參考區</h2>
+    <DistrictTable rows={ranked} />
+  </>}
+
+  {key === 'city' && ranked.length === 0 && <>
+    <h2>三區概況</h2>
+    <div class="grid g3">
+      {ds.map((d) => (
+        <a class="card" href={districtUrl(d)}><b>{d.name}</b><div class="stat sm">{fmt(d.bld2025)}<small> 棟</small></div>
+        <div class="note">2025 年建物買賣{d.share ? `，占全市約 ${d.share}%` : ''}{d.land2025 ? `；土地交易 ${fmt(d.land2025)} 筆` : ''}</div></a>
+      ))}
+    </div>
+    <p class="note">分區中位數將由實價登錄資料管線計算後自動上線。</p>
+  </>}
+
+  {low.length > 0 && key === 'county' && <>
+    <h3>樣本不足（不排名）</h3>
+    <p>{low.map((d, i) => <>{i > 0 && '、'}<a href={districtUrl(d)}>{d.name}</a>（{d.n ?? 0} 筆）</>)}</p>
+  </>}
+
+  <h2>預售屋與中古屋價差</h2>
+  <div class="tw"><table>
+    <tr><th>範圍</th><th class="n">中古</th><th class="n">預售</th><th class="n">預售溢價</th><th class="n">樣本（中古/預售）</th></tr>
+    {premium.map((d) => <tr><td>{d.name}</td><td class="n">{d.used}</td><td class="n">{d.presale}</td><td class="n up">+{pct(d.presale!, d.used!).toFixed(1)}%</td><td class="n">{d.n} / {d.pn}</td></tr>)}
+    <tr><td><b>{R.name}全區</b></td><td class="n">{R.used}</td><td class="n">{R.presale}</td><td class="n up">+{pct(R.presale, R.used).toFixed(1)}%</td><td class="n">{R.usedN} / {R.presaleN}</td></tr>
+  </table></div>
+
+  <h2>近幾季中古屋價格趨勢</h2>
+  <div class="card"><Fragment set:html={trendSvg(R.trend)} /><p class="note">{R.trendNote}</p></div>
+  <details style="margin-top:10px"><summary>看表格</summary>
+    <div class="tw"><table><tr><th>季度</th><th class="n">揭露筆數</th><th class="n">每坪中位數（萬，已扣車位）</th></tr>
+      {R.trend.map((t) => <tr><td>{t[0]}</td><td class="n">{fmt(t[1])}</td><td class="n">{t[2]}</td></tr>)}
+    </table></div>
+  </details>
+
+  <Faq items={faq} />
+  <h2>下一步</h2>
+  <p><a class="tag" href="/tools/affordability/">算我的負擔能力</a><a class="tag" href="/guide/read-transactions/">怎麼讀實價登錄</a><a class="tag" href="/presale/">{R.name}預售行情</a></p>
+  <Fragment set:html={DISCLAIMER} />
+</Base>

@@ -1,0 +1,5 @@
+---
+interface Props { list: [string, string][] }
+const { list } = Astro.props;
+---
+<div class="src">資料來源：{list.map(([n, u]) => <a href={u} rel="nofollow noopener" target="_blank">{n}</a>)}</div>

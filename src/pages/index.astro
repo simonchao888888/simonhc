@@ -1,0 +1,164 @@
+---
+import Base from '../layouts/Base.astro';
+import Panorama from '../components/Panorama.astro';
+import TileMap from '../components/TileMap.astro';
+import Icon from '../components/Icon.astro';
+import { getCollection } from 'astro:content';
+import { regions, districts, districtUrl, regionUrl, meta } from '../lib/data';
+import { news, policyRate, mortgageRates, fmtDate } from '../lib/news';
+import { featured, f1 } from '../lib/presale';
+import { DISCLAIMER } from '../components/Parts';
+import Portrait from '../components/Portrait.astro';
+import { founder as F, community as C, fill } from '../lib/founder';
+const c = regions.city, k = regions.county;
+const zb = districts.find((d) => d.id === 'zhubei')!;
+const zd = districts.find((d) => d.id === 'zhudong')!;
+const pingZb = Math.round(1500 / zb.used!), pingZd = Math.round(1500 / zd.used!);
+const rate = mortgageRates.filter((r) => r[1] != null).at(-1)!;
+// 價格尺：中古（實心）與預售（空心）
+const rows = [
+  { name: '新竹市', used: c.used, pre: c.presale, href: regionUrl('city') },
+  ...districts.filter((d) => d.r === 'county' && d.used != null && d.tier !== 'low').sort((a, b) => b.used! - a.used!)
+    .map((d) => ({ name: d.name, used: d.used!, pre: d.presale ?? null, href: districtUrl(d) })),
+];
+const top = Math.ceil(Math.max(...rows.map((r) => Math.max(r.used, r.pre ?? 0))) / 10) * 10;
+const pct = (v: number) => (v / top) * 100;
+const latestNews = news.slice(0, 4);
+const active = featured.filter((p) => p.status.startsWith('2026')).slice(0, 7);
+const latestWeekly = (await getCollection('weekly')).sort((a, b) => b.id.localeCompare(a.id))[0];
+const posts = (await getCollection('guide')).sort((a, b) => a.data.order - b.data.order);
+// 首頁挑 6 篇：新手入門、稅、區域、學區、竹科、最新建案拆解
+const pickIds = ['first-time-buyer', 'property-tax-guide', 'hsinchu-development', 'school-district', 'tech-worker-buying'];
+const latestCase = posts.filter((p) => p.id.startsWith('case-')).sort((a, b) => b.id.localeCompare(a.id))[0];
+const picks = [...pickIds.map((id) => posts.find((p) => p.id === id)!).filter(Boolean), ...(latestCase ? [latestCase] : [])];
+const ld = { '@context': 'https://schema.org', '@type': 'WebSite', name: '竹房知識站', url: Astro.site?.href, inLanguage: 'zh-TW' };
+---
+<Base title="竹房知識站" description={`新竹縣市房價行情與買房知識。新竹市中古屋每坪中位數 ${c.used} 萬、新竹縣 ${k.used} 萬；竹北、東區、竹東、湖口各區行情、預售建案成交明細與房貸試算。`} jsonld={ld}>
+  <div class="skyband">
+  <section class="hero">
+    <div>
+      <h1>新竹的房子，<br />一區一區看清楚。</h1>
+      <p class="lead">同樣一千五百萬，在竹北大約買 {pingZb} 坪，到竹東可以買到 {pingZd} 坪左右。這裡把內政部實價登錄整理成各區看得懂的數字，再配上房貸試算和政策解讀。</p>
+      <div class="hsearch" data-hero-search>
+        <button type="button" class="hs-box" data-search-open><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM20 20l-4.8-4.8" /></svg><span>找區域、建案、建商或買房問題</span></button>
+        <div class="hs-pop"><span>常找：</span>{['竹北市', '新竹市', '竹東鎮', '寬限期', '房屋稅', '學區'].map((q) => <button type="button" data-q={q}>{q}</button>)}</div>
+      </div>
+      <a class="btn p" href="/tools/affordability/">算算我買得起哪一區</a><a class="btn s" href="/region/">看各區房價</a>
+    </div>
+    <div class="facts">
+      <a href={regionUrl('city')}><div class="k">新竹市 中古屋</div><div class="v">{c.used}<small> 萬/坪</small></div></a>
+      <a href={regionUrl('county')}><div class="k">新竹縣 中古屋</div><div class="v">{k.used}<small> 萬/坪</small></div></a>
+      <a href={districtUrl(zb)}><div class="k">竹北 預售屋</div><div class="v">{zb.presale}<small> 萬/坪</small></div></a>
+      <a href="/policy/"><div class="k">五大銀行房貸利率（{rate[0].replace('-', '/')}）</div><div class="v">{rate[1]}<small> %</small></div></a>
+    </div>
+  </section>
+  <p class="note" style="margin:10px 0 0">實價登錄最新成交 {meta.latestDeal}，資料每旬更新。</p>
+
+  <Panorama />
+  </div>
+
+  <section class="sec">
+  <h2>你現在想知道的是</h2>
+  <div class="intent">
+    <a href="/guide/first-time-buyer/"><Icon name="house" /><b>第一次買房</b><span class="note">竹科首購的預算怎麼抓、選哪一區</span><em>看首購指南</em></a>
+    <a href="/tools/mortgage-payment/"><Icon name="calc" /><b>房貸要繳多少</b><span class="note">寬限期前後的月付金差多少</span><em>開始試算</em></a>
+    <a href="/presale/"><Icon name="crane" /><b>預售屋值不值</b><span class="note">每個建案的樓層、坪數、車位價</span><em>查預售建案</em></a>
+    <a href="/rent/"><Icon name="key" /><b>租還是買</b><span class="note">各區月租和租金報酬率</span><em>看租金行情</em></a>
+    <a href="/guide/school-district/"><Icon name="map" /><b>學區房</b><span class="note">總量管制、設籍時間怎麼排</span><em>讀學區指南</em></a>
+    <a href="/policy/"><Icon name="vane" /><b>政策風向</b><span class="note">央行、房貸成數、青安 3.0</span><em>看最新政策</em></a>
+  </div>
+  </section>
+
+  <section class="band bamboo">
+  <h2>一把尺量完各區房價</h2>
+  <div class="split">
+    <div class="ruler">
+      <div class="legend"><span><i></i>中古屋</span><span><i class="pre"></i>預售屋</span><span>近半年每坪中位數，萬元</span></div>
+      {rows.map((r) => (
+        <a class="row" href={r.href}>
+          <span class="nm">{r.name}</span>
+          <span class="track">
+            {r.pre != null && <span class="link" style={`left:${pct(Math.min(r.used, r.pre))}%;width:${Math.abs(pct(r.pre) - pct(r.used))}%`}></span>}
+            <span class="dot" style={`left:${pct(r.used)}%`}></span>
+            {r.pre != null && <span class="dot pre" style={`left:${pct(r.pre)}%`}></span>}
+          </span>
+          <span class="val"><b>{r.used}</b>{r.pre != null ? ` / ${r.pre}` : ''}</span>
+        </a>
+      ))}
+      <div class="scale"><span></span><div><span>0</span><span>{top / 2}</span><span>{top}</span></div><span></span></div>
+    </div>
+    <div>
+      <TileMap />
+      <p class="note">點任一格進入該區：中古、預售行情與當地建案。</p>
+    </div>
+  </div>
+  </section>
+
+  <section class="band sky">
+  <h2>這幾週的房市與政策</h2>
+  {latestWeekly && (
+    <a class="wk-home" href={`/weekly/${latestWeekly.id}/`}>
+      <span class="tag">本週更新</span>
+      <span><b>{latestWeekly.data.title}</b><span class="note">{latestWeekly.data.description}</span></span>
+    </a>
+  )}
+  <div class="split">
+    <div class="dlist">
+      {latestNews.map((n) => {
+        const [y, m, d] = n.date.split('-');
+        return <a href={`/news/${n.id}/`}><div class="when"><b>{+m}/{+d}</b>{y} <span class={`k-${n.cat}`}>{n.cat}</span></div><div><h3>{n.title}</h3><div class="note">{n.take.slice(0, 70)}…</div></div></a>;
+      })}
+      <p><a href="/news/">全部新聞判讀</a></p>
+    </div>
+    <div>
+      <div class="out">
+        <div class="note">央行政策利率</div>
+        <div class="big">{policyRate.discount}%</div>
+        <div class="kv"><span>已連續維持</span><b>{policyRate.freezeCount} 季</b></div>
+        <div class="kv"><span>第 2 戶房貸成數上限</span><b>7 成，無寬限期</b></div>
+        <div class="kv"><span>青安 3.0 新竹總價上限</span><b>2,500 萬</b></div>
+        <div class="kv"><span>下一次理監事會</span><b>12 月中旬</b></div>
+      </div>
+      <p><a href="/policy/">看信用管制與青安條件</a></p>
+    </div>
+  </div>
+  </section>
+
+  <section class="band persimmon">
+  <h2>還在賣的預售案</h2>
+  <p class="lead">2026 年仍有成交的主要建案，單價已扣除車位。點進去可以看每一戶的樓層、坪數和車位價格。</p>
+  <div class="tw"><table>
+    <tr><th>建案</th><th>區域</th><th>起造人</th><th class="n">每坪中位數</th><th class="n">成交</th><th>最近一筆</th></tr>
+    {active.map((p) => <tr><td><a href={`/presale/${p.id}/`}><b>{p.name}</b></a></td><td>{p.dist || '新竹市'}</td><td class="note">{p.dev || '—'}</td><td class="n"><b>{f1(p.med)}</b> 萬</td><td class="n">{p.n} 筆</td><td class="date">{p.latest}</td></tr>)}
+  </table></div>
+  <p><a href="/presale/">全部預售建案</a></p>
+  </section>
+
+  <section class="band sky">
+    <h2>寫這個網站的人</h2>
+    <div class="founder-band">
+      <Portrait size={150} />
+      <div>
+        <p style="font-family:var(--hand);font-size:22px;margin:0 0 6px">{F.tagline}</p>
+        <p class="note" style="font-size:15px;max-width:40em" set:html={fill(F.intro[0].slice(0, 90)) + '…'} />
+        <a class="btn s" href="/about/">認識創辦人</a><a class="btn p" href="/community/">到交流平台發問</a>
+      </div>
+    </div>
+    <h3 style="margin-top:30px">大家正在聊</h3>
+    <p>{C.boards.map((b) => <a class="tag" href={`/community/${b.slug}/`}>{b.name}</a>)}</p>
+  </section>
+
+  <section class="sec">
+  <div class="sechead"><h2>慢慢讀的買房筆記</h2><a href="/guide/">全部 {posts.length} 篇指南</a></div>
+  <div class="pcards">
+    {picks.map((p) => (
+      <a class={`pc pc-${p.data.category}`} href={`/guide/${p.id}/`}>
+        <span class={`tag c-${p.data.category}`}>{p.data.category}</span>
+        <b>{p.data.title}</b>
+        <span class="note">{p.data.description}</span>
+      </a>
+    ))}
+  </div>
+  </section>
+  <Fragment set:html={DISCLAIMER} />
+</Base>

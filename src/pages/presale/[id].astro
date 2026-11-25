@@ -1,0 +1,82 @@
+---
+import Base from '../../layouts/Base.astro';
+import Sources from '../../components/Sources.astro';
+import DealsSection from '../../components/DealsSection.astro';
+import { featured, pipelineOnly, dealsFor, hasRealDeals, rName, statusClass, districtIdOf, f1, type Project } from '../../lib/presale';
+import { regions, districts, districtUrl, pct } from '../../lib/data';
+import { DISCLAIMER } from '../../components/Parts';
+export function getStaticPaths() {
+  const extra = pipelineOnly.map((x) => ({
+    id: x.id, name: x.name, r: x.r, dist: x.dist, dev: x.dev ?? '', addr: '', units: 0, permit: '', sales: '',
+    med: x.med, min: x.min ?? null, max: x.max ?? null, medTotal: x.medTotal ?? null, rooms: '', n: x.n, latest: x.latest ?? '',
+    status: (x.latest ?? '') >= '2026' ? '2026 仍有成交' : '近期無新成交', note: '', sources: [['內政部實價登錄', 'https://lvr.land.moi.gov.tw/']],
+  }));
+  return [...featured, ...extra].map((p) => ({ params: { id: p.id }, props: { p } }));
+}
+const { p } = Astro.props as { p: Project };
+const R = regions[p.r];
+const did = p.dist ? districtIdOf(p.dist) : undefined;
+const D = did ? districts.find((d) => d.id === did) : undefined;
+const where = `${rName(p.r)}${p.dist}`;
+const sameArea = featured.filter((x) => x.id !== p.id && (p.dist ? x.dist === p.dist : x.r === p.r)).slice(0, 6);
+const sameDev = p.dev ? featured.filter((x) => x.id !== p.id && x.dev === p.dev) : [];
+const usedRef = D?.used ?? (p.r === 'city' ? R.used : undefined);
+const deals = dealsFor(p.name, p.r, p.dist || undefined);
+const qOk = p.medTotal != null ? p.medTotal <= 2500 : null;
+const desc = `${p.name}（${where}）預售屋實價登錄：${p.med ? `每坪中位數 ${p.med} 萬、` : ''}${p.max ? `最高 ${p.max} 萬/坪，` : ''}建商（起造人）${p.dev || '—'}，${p.units} 戶。`;
+---
+<Base title={`${p.name}實價登錄｜${where}預售屋`} description={desc} active="presale" crumbs={[['預售行情', '/presale/'], [p.name]]}>
+  <span class={statusClass(p.status)}>{p.status}</span> <span class="tag g">{where}</span>
+  <h1>{p.name}</h1>
+  <p class="lead">{p.dev ? `建商（起造人）：${p.dev}` : '起造人：來源未完整顯示'}・{p.addr}</p>
+
+  <div class="grid g4">
+    <div class="card"><div class="note">每坪成交中位數</div><div class="stat acc">{f1(p.med)}<small> 萬/坪</small></div><div class="note">已扣車位</div></div>
+    <div class="card"><div class="note">最低～最高單價</div><div class="stat sm">{f1(p.min)}～{f1(p.max)}<small> 萬/坪</small></div></div>
+    <div class="card"><div class="note">中位總價</div><div class="stat sm">{p.medTotal ? p.medTotal.toLocaleString() : '—'}<small> 萬</small></div>{qOk != null && <div class="note">{qOk ? '在青安 3.0 新竹 2,500 萬上限內' : '超過青安 3.0 新竹 2,500 萬上限'}</div>}</div>
+    <div class="card"><div class="note">實價登錄揭露</div><div class="stat sm">{p.n}<small> 筆</small></div><div class="note">最新成交 {p.latest}</div></div>
+  </div>
+
+  <h2>建案資料</h2>
+  <div class="tw"><table>
+    <tr><td style="width:28%"><b>建案名稱</b></td><td>{p.name}</td></tr>
+    <tr><td><b>起造人（建照登記名義人）</b></td><td>{p.dev || '—'}</td></tr>
+    <tr><td><b>位置</b></td><td>{where}・{p.addr}</td></tr>
+    {p.units > 0 && <tr><td><b>總戶數</b></td><td>{p.units} 戶</td></tr>}
+    {p.permit && <tr><td><b>建照核發</b></td><td>{p.permit}</td></tr>}
+    {p.sales && <tr><td><b>銷售期間（備查）</b></td><td>{p.sales}</td></tr>}
+    {p.rooms && <tr><td><b>成交房型</b></td><td>{p.rooms}</td></tr>}
+  </table></div>
+  {p.note && <div class="warn">{p.note}</div>}
+
+  {deals.length > 0 ? <DealsSection deals={deals} name={p.name} /> : <>
+    <h2 id="deals">成交明細與拆分</h2>
+    <div class="card">
+      <p><b>每一戶的棟別、樓層、坪數與車位價格拆分</b>，會在資料管線讀入內政部預售屋實價登錄原始資料後自動顯示於此（含車位價格統計、樓層單價、銷控推估與全部成交明細）。</p>
+      {!hasRealDeals && <p><a href="/presale/sample/">先看明細版面示範（模擬資料）</a></p>}
+    </div>
+  </>}
+
+  {p.med != null && usedRef != null && <>
+    <h2>和周邊比一比</h2>
+    <div class="grid g3">
+      <div class="card"><div class="note">{D ? D.name : R.name}中古屋中位數</div><div class="stat sm">{usedRef}<small> 萬/坪</small></div><div class="note">本案較中古 <b class="up">+{pct(p.med, usedRef).toFixed(0)}%</b></div></div>
+      {D?.presale != null && <div class="card"><div class="note">{D.name}預售屋中位數</div><div class="stat sm acc">{D.presale}<small> 萬/坪</small></div><div class="note">本案較區域預售 {p.med >= D.presale ? '+' : ''}{pct(p.med, D.presale).toFixed(0)}%</div></div>}
+      {p.r === 'city' && <div class="card"><div class="note">新竹市預售中位數</div><div class="stat sm acc">{R.presale}<small> 萬/坪</small></div><div class="note">本案較全市預售 {p.med >= R.presale ? '+' : ''}{pct(p.med, R.presale).toFixed(0)}%</div></div>}
+    </div>
+  </>}
+
+  {sameDev.length > 0 && <><h2>{p.dev}其他建案</h2><p>{sameDev.map((x) => <a class="tag" href={`/presale/${x.id}/`}>{x.name}</a>)}</p></>}
+  {sameArea.length > 0 && <><h2>{p.dist || rName(p.r)}其他預售建案</h2>
+    <div class="grid g3">{sameArea.map((x) => <a class="card" href={`/presale/${x.id}/`}><b>{x.name}</b><div class="note">{x.dev || '—'}</div><div class="stat sm acc">{f1(x.med)}<small> 萬/坪</small></div></a>)}</div></>}
+
+  <h2>下一步</h2>
+  <p>
+    {D && <a class="tag" href={districtUrl(D)}>{D.name}房價行情</a>}
+    <a class="tag" href="/tools/mortgage-payment/">交屋時月付金試算</a>
+    <a class="tag" href="/presale/#projects">回建案總覽</a>
+  </p>
+  <Sources list={p.sources} />
+  <p class="note">實價登錄僅揭露已申報成交，預售屋簽約後 30 日內申報；實際售價、剩餘戶數請以建商現場資訊為準。</p>
+  <Fragment set:html={DISCLAIMER} />
+</Base>

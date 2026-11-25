@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+export async function getStaticPaths() {
+  const posts = await getCollection('guide');
+  const tags = [...new Set(posts.flatMap((p) => p.data.tags))];
+  return tags.map((tag) => ({ params: { tag }, props: { tag, posts: posts.filter((p) => p.data.tags.includes(tag)) } }));
+}
+const { tag, posts } = Astro.props;
+---
+<Base title={`${tag}｜新竹買房知識`} description={`新竹縣市「${tag}」相關的買房知識文章，共 ${posts.length} 篇。`} active="guide" crumbs={[['買房指南', '/guide/'], [`#${tag}`]]}>
+  <h1>#{tag}</h1>
+  <div class="grid g3">{posts.map((p) => (
+    <a class="card" href={`/guide/${p.id}/`}><span class="tag">{p.data.category}</span><h3 style="margin:6px 0">{p.data.title}</h3><p class="note">{p.data.description}</p></a>
+  ))}</div>
+</Base>

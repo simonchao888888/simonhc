@@ -1,0 +1,82 @@
+# 每週房市更新：新聞、實價登錄（含預售屋每戶成交）、租金、週報，一次完成
+#
+# 1. 抓這一期的政策與市場新聞標題
+# 2. 下載實價登錄（季檔＋每 10 天的最新批次），重新計算各區行情、預售建案明細、租金
+# 3. 產生「新竹房市週報」：和上一期比較數字變化（只有數字與事實，直接發布）
+# 4. 依站長觀點產生 3 則新聞判讀草稿 → 開 PR，站長審閱後 Merge 才發布
+#
+# 想改成兩週一次：Settings → Secrets and variables → Actions → Variables
+# 新增 UPDATE_EVERY_WEEKS = 2（遇到單數週會自動跳過）
+name: Weekly update
+on:
+  schedule:
+    - cron: '0 23 * * 0'   # UTC 週日 23:00 = 台灣週一 07:00
+  workflow_dispatch:
+    inputs:
+      days: { description: '這一期涵蓋幾天（7＝週報、14＝雙週報，留空依設定）', required: false }
+permissions:
+  contents: write
+  pull-requests: write
+concurrency: { group: weekly, cancel-in-progress: false }
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+    steps:
+      - name: 判斷這週要不要更新
+        id: when
+        env:
+          EVERY: ${{ vars.UPDATE_EVERY_WEEKS }}
+          IN_DAYS: ${{ github.event.inputs.days }}
+        run: |
+          every="${EVERY:-1}"
+          week=$(date -u -d '+8 hours' +%V)
+          run=true
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$every" = "2" ] && [ $((10#$week % 2)) -eq 1 ]; then run=false; fi
+          days="${IN_DAYS:-$((every * 7))}"
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+          echo "days=$days" >> "$GITHUB_OUTPUT"
+          echo "第 $week 週，每 $every 週更新一次 → run=$run，涵蓋 $days 天"
+      - uses: actions/checkout@v4
+        if: steps.when.outputs.run == 'true'
+      - uses: actions/setup-python@v5
+        if: steps.when.outputs.run == 'true'
+        with: { python-version: '3.12' }
+      - name: 1. 抓政策與市場新聞標題
+        if: steps.when.outputs.run == 'true'
+        run: python3 scripts/fetch_news.py src/data/news_feed.json
+      - name: 2. 實價登錄與預售屋成交
+        if: steps.when.outputs.run == 'true'
+        run: python3 scripts/build_data.py --out src/data/build.json
+      - name: 2. 租金行情
+        if: steps.when.outputs.run == 'true'
+        run: python3 scripts/build_rent.py --out src/data/rent.json
+      - name: 3. 產生週報
+        if: steps.when.outputs.run == 'true'
+        run: python3 scripts/weekly_report.py --days ${{ steps.when.outputs.days }}
+      - name: 3. 發布數據與週報
+        if: steps.when.outputs.run == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data src/content/weekly
+          git diff --cached --quiet && { echo "沒有變動"; exit 0; }
+          git commit -m "weekly: 新竹房市更新 $(date -u -d '+8 hours' +%Y-%m-%d)"
+          git push
+      - name: 4. 新聞判讀草稿
+        id: draft
+        if: steps.when.outputs.run == 'true' && env.HAS_KEY == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python3 scripts/draft_commentary.py --count 3 --days ${{ steps.when.outputs.days }}
+      - name: 4. 開 PR 給站長審閱
+        if: steps.when.outputs.run == 'true' && hashFiles('commentary_pr.md') != ''
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: commentary/weekly-${{ github.run_id }}
+          title: '本期新聞判讀草稿：請審閱'
+          body-path: commentary_pr.md
+          add-paths: src/data/news.json
+          commit-message: 'news: 本期新聞判讀草稿'
+          labels: 判讀草稿

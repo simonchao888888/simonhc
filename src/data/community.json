@@ -1,0 +1,168 @@
+{
+ "_說明": "交流平台設定。討論區使用 Giscus（GitHub Discussions，免費）：到 https://giscus.app 依步驟取得 repo、repoId、categoryId 後填入，討論區就會在每個看板頁啟用。LINE、Facebook 等網址填好後按鈕才會出現。",
+ "giscus": {
+  "repo": "",
+  "repoId": "",
+  "category": "General",
+  "categoryId": ""
+ },
+ "channels": [
+  [
+   "Facebook",
+   "Simon Chao 臉書",
+   "賽門每天的房市觀察與買房踩雷提醒，可以直接留言或私訊提問。",
+   "facebook",
+   "https://www.facebook.com/simonchao888/"
+  ],
+  [
+   "YouTube",
+   "Simon 房產頻道",
+   "房市新聞與買房實戰的影片解說。",
+   "youtube",
+   "https://www.youtube.com/@simonhouse168"
+  ]
+ ],
+ "boards": [
+  {
+   "slug": "first-home",
+   "name": "首購與預算",
+   "desc": "第一次買房、頭期款怎麼存、收入能負擔到哪裡。",
+   "color": "bamboo",
+   "icon": "house",
+   "links": [
+    [
+     "收入負擔能力試算",
+     "/tools/affordability/"
+    ],
+    [
+     "竹科首購族：預算怎麼抓",
+     "/guide/first-time-buyer/"
+    ]
+   ]
+  },
+  {
+   "slug": "presale",
+   "name": "預售屋與建案",
+   "desc": "建案比較、樓層與車位價格、議價經驗、交屋與驗屋。",
+   "color": "persimmon",
+   "icon": "crane",
+   "links": [
+    [
+     "預售建案總覽",
+     "/presale/"
+    ],
+    [
+     "依建商查建案",
+     "/developer/"
+    ]
+   ]
+  },
+  {
+   "slug": "resale",
+   "name": "中古屋與看屋",
+   "desc": "看屋筆記、屋況與管理、社區比較、開價與成交差距。",
+   "color": "sky",
+   "icon": "map",
+   "links": [
+    [
+     "各區房價",
+     "/region/"
+    ],
+    [
+     "怎麼讀實價登錄",
+     "/guide/read-transactions/"
+    ]
+   ]
+  },
+  {
+   "slug": "loan-policy",
+   "name": "房貸與政策",
+   "desc": "銀行利率、成數與寬限期、青安 3.0、央行理監事會。",
+   "color": "rice",
+   "icon": "vane",
+   "links": [
+    [
+     "央行與貸款政策",
+     "/policy/"
+    ],
+    [
+     "房貸月付金試算",
+     "/tools/mortgage-payment/"
+    ]
+   ]
+  },
+  {
+   "slug": "commute",
+   "name": "竹科通勤與生活圈",
+   "desc": "上下班路線、塞車時段、各區生活機能與學區。",
+   "color": "teal",
+   "icon": "map",
+   "links": [
+    [
+     "新竹生活圈",
+     "/areas/"
+    ]
+   ]
+  },
+  {
+   "slug": "trade-up",
+   "name": "換屋與出售",
+   "desc": "先買後賣或先賣後買、第二戶貸款、房地合一稅。",
+   "color": "brick",
+   "icon": "key",
+   "links": [
+    [
+     "新聞：第二戶成數放寬至 7 成",
+     "/policy/cbc-2026q3/"
+    ]
+   ]
+  },
+  {
+   "slug": "landlord",
+   "name": "房東與租屋",
+   "desc": "竹科周邊租屋需求、租金行情、出租管理。",
+   "color": "sky",
+   "icon": "doc",
+   "links": [
+    [
+     "在新竹當房東",
+     "/guide/landlord/"
+    ]
+   ]
+  }
+ ],
+ "faq": [
+  [
+   "預算 1,500 萬左右，在新竹可以看哪些區？",
+   "以近半年中古屋每坪中位數換算（不含車位），竹北大約 29 坪、新竹市區約 42 坪、湖口與新豐約 52～53 坪、竹東約 59 坪。先決定通勤範圍，再看坪數，會比先看單價有效率。",
+   "/tools/affordability/"
+  ],
+  [
+   "現在買預售屋好，還是中古屋好？",
+   "兩者價差在新竹特別大，竹東、芎林的預售單價約是中古屋的兩倍。預售適合能等 2～4 年交屋、重視屋況與公設的人；中古屋適合想馬上入住、預算有限的人。先到建案頁看每一戶的實際成交，再決定。",
+   "/presale/"
+  ],
+  [
+   "竹科工程師可以申請青安 3.0 嗎？",
+   "要同時符合：未滿 50 歲、個人年所得 200 萬元以下、房屋總價（新竹縣市）2,500 萬元以下。分紅較高的人要特別注意所得條件，夫妻可評估由符合資格的一方申貸，實際認定以承貸銀行為準。",
+   "/policy/#qingan"
+  ],
+  [
+   "已經有一間房，想換大一點，貸款能貸幾成？",
+   "2026 年 9 月起，自然人第 2 戶房貸成數上限為 7 成，而且不能有寬限期。若打算先買後賣，第一個月就要開始本息攤還，建議先用試算工具抓月付金。",
+   "/tools/mortgage-payment/"
+  ]
+ ],
+ "rules": [
+  "互相尊重，對事不對人。",
+  "引用數字請附來源，方便大家查證。",
+  "不張貼個人資料：電話、身分證、門牌號碼與私人對話截圖都不行。",
+  "禁止業配與帶看招攬；建商、代銷、房仲發言請表明身分。",
+  "這裡是交流，不是投資建議；重大決定請再諮詢專業人員。"
+ ],
+ "form": {
+  "_說明": "讀者提問表單寄信服務（FormSubmit，免費、免後端）。第一次送出後到信箱點「Activate Form」即啟用；啟用信中會提供一組隨機代碼網址，換掉下面的 endpoint 就能隱藏你的 Email。",
+  "endpoint": "https://formsubmit.co/simonchao888@gmail.com",
+  "subject": "【竹房知識站】讀者提問"
+ }
+}

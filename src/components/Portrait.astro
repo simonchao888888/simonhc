@@ -1,0 +1,23 @@
+---
+// 創辦人肖像：有 public/founder.jpg 用照片，沒有就用手繪插畫占位
+import { photo, founder } from '../lib/founder';
+interface Props { size?: number }
+const { size = 280 } = Astro.props;
+---
+{photo ? (
+  <img class="portrait" src={`/${photo}`} width={size} height={Math.round(size * 1.2)} alt={`${founder.name.replace(/[〔〕]/g, '')}的照片`} style={`width:${size}px;height:${Math.round(size * 1.2)}px;object-fit:cover`} />
+) : (
+  <svg class="portrait" width={size} height={Math.round(size * 1.2)} viewBox="0 0 240 288" role="img" aria-label="創辦人照片位置（請放入 public/founder.jpg）" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect width="240" height="288" rx="10" fill="#DDEBF4" />
+    <circle cx="186" cy="62" r="26" fill="#F6C98E" opacity=".8" />
+    <path d="M14 70c30-8 54 6 84-2M120 44c26-6 48 4 72-2" stroke="#fff" stroke-width="3" />
+    <g stroke="#2F6A4E" stroke-width="3"><path d="M26 288V120M44 288V140" /><path d="M26 170c12-6 22-4 32-12M44 200c-12-6-22-4-30-12M26 230c12-4 20-2 28-8" stroke-width="2" /></g>
+    <path d="M60 288c4-52 28-76 60-76s56 24 60 76z" fill="#1D3445" />
+    <path d="M104 214l16 24 16-24" stroke="#F5F6F1" stroke-width="3" />
+    <circle cx="120" cy="150" r="40" fill="#F1D7C2" stroke="#1E2C36" stroke-width="2.5" />
+    <path d="M80 146c2-30 22-42 42-42 22 0 38 14 38 40-10-6-24-16-30-26-12 12-30 22-50 28z" fill="#1E2C36" />
+    <path d="M106 158h4M130 158h4M112 176c6 4 12 4 18 0" stroke="#1E2C36" stroke-width="2.5" />
+    <rect x="66" y="252" width="108" height="26" rx="4" fill="#F5F6F1" opacity=".92" />
+    <text x="120" y="270" text-anchor="middle" font-size="13" fill="#566670" font-family="Noto Sans TC, sans-serif">照片待放入</text>
+  </svg>
+)}

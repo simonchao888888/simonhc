@@ -1,0 +1,64 @@
+# 依站長觀點自動產生新聞判讀草稿 → 開 PR 給站長審閱，Merge 後自動發布
+#
+# 三種觸發方式
+# 1. 每週更新（weekly.yml）會自動呼叫這裡的腳本挑出本期新聞
+# 2. 開 Issue 並加上「觀點」標籤：標題放新聞網址或標題，內文寫你的看法
+#    （手機上用 GitHub App 就能開，適合看到新聞當下記錄想法）
+# 3. Actions 頁面手動執行：可指定網址與看法，央行理監事會當天用這個
+#
+# 需要在 repo Settings → Secrets 設定 ANTHROPIC_API_KEY
+name: News commentary
+on:
+  issues:
+    types: [opened, labeled]
+  workflow_dispatch:
+    inputs:
+      url: { description: '新聞網址或標題（留空＝自動挑選）', required: false }
+      note: { description: '你的看法（選填）', required: false }
+      count: { description: '自動挑選則數', required: false, default: '3' }
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+jobs:
+  draft:
+    if: github.event_name != 'issues' || contains(github.event.issue.labels.*.name, '觀點')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: 產生判讀草稿
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          IN_URL: ${{ github.event.inputs.url }}
+          IN_NOTE: ${{ github.event.inputs.note }}
+          IN_COUNT: ${{ github.event.inputs.count }}
+        run: |
+          if [ "${{ github.event_name }}" = "issues" ]; then
+            printf '%s' "$ISSUE_BODY" > /tmp/note.txt
+            python3 scripts/draft_commentary.py --url "$ISSUE_TITLE" --note-file /tmp/note.txt
+          elif [ -n "$IN_URL$IN_NOTE" ]; then
+            python3 scripts/draft_commentary.py --url "$IN_URL" --note "$IN_NOTE"
+          else
+            python3 scripts/draft_commentary.py --count "${IN_COUNT:-3}"
+          fi
+      - name: 開 PR
+        id: pr
+        if: hashFiles('commentary_pr.md') != ''
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: commentary/${{ github.run_id }}
+          title: '判讀草稿 ${{ github.run_id }}：請審閱'
+          body-path: commentary_pr.md
+          add-paths: |
+            src/data/news.json
+            src/data/news_feed.json
+          commit-message: 'news: 新聞判讀草稿'
+          labels: 判讀草稿
+      - name: 回覆 Issue
+        if: github.event_name == 'issues' && steps.pr.outputs.pull-request-url
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: gh issue comment ${{ github.event.issue.number }} --body "草稿好了：${{ steps.pr.outputs.pull-request-url }}　審閱後按 Merge 就會發布。"

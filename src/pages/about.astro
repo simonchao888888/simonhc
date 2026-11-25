@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import Portrait from '../components/Portrait.astro';
+import { founder as F, fill, isTodo, photo } from '../lib/founder';
+const name = F.name.replace(/[〔〕]/g, '');
+const { _說明, ...Fx } = F as any; const hasTodo = JSON.stringify(Fx).includes('〔');
+const contacts = ([['Email', F.contact.email], ['Facebook', F.contact.facebook], ['Instagram', F.contact.instagram], ['YouTube', F.contact.youtube], ['個人網站', F.contact.website]] as [string, string | undefined][]).filter((c): c is [string, string] => !!c[1]);
+const ld = { '@context': 'https://schema.org', '@type': 'AboutPage', mainEntity: { '@type': 'Person', name: 'Simon Chao', alternateName: 'Simon 哥', jobTitle: F.title, description: F.tagline, homeLocation: '新竹市', sameAs: [F.contact.facebook, F.contact.instagram, F.contact.website] } };
+---
+<Base title={`關於創辦人${isTodo(F.name) ? '' : `｜${F.name}`}`} description={`${F.title}。${F.tagline}`} active="about" crumbs={[['關於創辦人']]} jsonld={ld}>
+  {hasTodo && <div class="warn">黃底的〔〕是待填欄位，請在 <code>src/data/founder.json</code> 改成你的資料{!photo && <>；照片放 <code>public/founder.jpg</code> 就會自動換上</>}。</div>}
+
+  <section class="founder">
+    <div>
+      <Portrait />
+      <div class="sig" set:html={fill(F.name)} />
+      <div class="role">{F.title}</div>
+    </div>
+    <div class="say">
+      <h1>{F.tagline}</h1>
+      {F.intro.map((p) => <p set:html={fill(p)} />)}
+      <div class="contact">
+        {contacts.map(([k, v]) => isTodo(v)
+          ? <span>{k}：<mark class="todo">待填</mark></span>
+          : <a href={k === 'Email' ? `mailto:${v}` : v} rel="noopener">{k}{k === 'Email' ? `：${v}` : ''}</a>)}
+      </div>
+    </div>
+  </section>
+
+  <h2>我寫這個網站的原則</h2>
+  <div class="pcols">
+    {F.principles.map(([t, d]) => <div><b>{t}</b><span set:html={fill(d)} /></div>)}
+  </div>
+
+  {F.credentials.length > 0 && <>
+    <h2>背景與經歷</h2>
+    <ul class="art">{F.credentials.map((c) => <li set:html={fill(c)} />)}</ul>
+  </>}
+
+  <h2>我正在做的事</h2>
+  <div class="doing">
+    {F.doing.map(([t, d, href]) => isTodo(href)
+      ? <div><b>{t}</b><p class="note" style="margin:6px 0 0">{d}</p><p class="note" style="margin:6px 0 0" set:html={fill(href)} /></div>
+      : <a href={href}><b>{t}</b><p class="note" style="margin:6px 0 0">{d}</p></a>)}
+  </div>
+
+  <section class="band sky">
+    <h2>一起聊新竹的房子</h2>
+    <p class="lead">我也在經營「新竹房地產知識交流平台」：依主題分看板，首購、預售、房貸政策、竹科通勤都有。你看到的問題，很可能別人也正在煩惱。</p>
+    <a class="btn p" href="/community/">進入交流平台</a>
+  </section>
+</Base>

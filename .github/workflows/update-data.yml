@@ -1,0 +1,26 @@
+# 實價登錄每月 1、11、21 日揭露；隔天台灣時間上午 10 點自動抓資料、重算、提交
+# 提交後會觸發 deploy.yml 重新發布網站
+# 已改由 weekly.yml 每週執行；這裡保留手動執行
+name: Update data
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: 下載實價登錄並計算新竹縣市統計
+        run: python3 scripts/build_data.py --out src/data/build.json
+      - name: 計算新竹縣市租金行情
+        run: python3 scripts/build_rent.py --out src/data/rent.json
+      - name: 有變動才提交
+        run: |
+          git config user.name "data-bot"
+          git config user.email "data-bot@users.noreply.github.com"
+          git add src/data/build.json src/data/presale_deals.json src/data/rent.json
+          git diff --cached --quiet || git commit -m "data: 更新實價登錄 $(date +%F)"
+          git push

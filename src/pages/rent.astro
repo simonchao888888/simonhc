@@ -1,0 +1,59 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { regions } from '../lib/data';
+import { rentRegion, rentMeta, yieldRows, wan, seasonLabel, rentDistrict } from '../lib/rent';
+const c = rentRegion('city'), k = rentRegion('county');
+const rows = yieldRows();
+const zb = rentDistrict('zhubei')!;
+const roomsLabel: Record<string, string> = { '1': '1 房', '2': '2 房', '3': '3 房', '4+': '4 房以上' };
+const skewed = Object.entries((await import('../data/rent.json')).districts).filter(([, v]: any) => v.skewed).map(([id]) => id);
+const period = `${seasonLabel(rentMeta.seasons[0])}～${seasonLabel(rentMeta.seasons[rentMeta.seasons.length - 1])}`;
+---
+<Base title="新竹租金行情" description={`新竹縣市住宅租金中位數：新竹市整戶出租月租 ${wan(c.apt)}、每坪 ${c.perPing} 元；新竹縣 ${wan(k.apt)}、每坪 ${k.perPing} 元。依房數、套房、各鄉鎮整理，附毛租金報酬率。`} active="rent" crumbs={[['查房價', '/region/'], ['租金行情']]}>
+  <div class="pagehead"><Icon name="key" size={56} /><h1>新竹租金行情</h1></div>
+  <p class="lead">用內政部實價登錄的租賃資料，整理新竹縣市住宅的月租中位數。資料期間 {period}，最新租約 {rentMeta.latest}。</p>
+
+  <div class="grid g4">
+    <div class="card"><div class="note">新竹市整戶出租月租</div><div class="stat">{wan(c.apt)}</div><div class="note">每坪 {c.perPing} 元／{c.aptN} 筆</div></div>
+    <div class="card"><div class="note">新竹縣整戶出租月租</div><div class="stat">{wan(k.apt)}</div><div class="note">每坪 {k.perPing} 元／{k.aptN} 筆</div></div>
+    <div class="card"><div class="note">竹北 3 房月租</div><div class="stat acc">{wan(zb.rooms['3'].rent)}</div><div class="note">{zb.rooms['3'].n} 筆</div></div>
+    <div class="card"><div class="note">套房月租（市／縣）</div><div class="stat sm">{wan(c.suite)}／{wan(k.suite)}</div><div class="note">獨立套房與分租套房</div></div>
+  </div>
+
+  <h2>依房數看月租</h2>
+  <p class="note">住宅大樓、華廈、公寓的整戶出租，月租已扣除車位租金。</p>
+  <div class="tw"><table>
+    <tr><th>房數</th><th class="n">新竹市</th><th class="n">筆數</th><th class="n">新竹縣</th><th class="n">筆數</th><th class="n">竹北市</th><th class="n">筆數</th></tr>
+    {(['1', '2', '3', '4+'] as const).map((r) => (
+      <tr><td>{roomsLabel[r]}</td><td class="n">{wan(c.rooms[r].rent)}</td><td class="n">{c.rooms[r].n}</td><td class="n">{wan(k.rooms[r].rent)}</td><td class="n">{k.rooms[r].n}</td><td class="n">{wan(zb.rooms[r].rent)}</td><td class="n">{zb.rooms[r].n}</td></tr>
+    ))}
+  </table></div>
+  <p class="note">透天厝整棟出租月租中位數：新竹市 {wan(c.house)}（{c.houseN} 筆）、新竹縣 {wan(k.house)}（{k.houseN} 筆）。</p>
+
+  <h2>各區租金與毛租金報酬率</h2>
+  <p>毛租金報酬率 = 每坪月租 × 12 ÷ 每坪中古屋單價。這是還沒扣管理費、稅、空租期和修繕的數字，實際淨報酬會更低。</p>
+  <div class="tw"><table>
+    <tr><th>區域</th><th class="n">整戶筆數</th><th class="n">每坪月租（元）</th><th class="n">3 房月租</th><th class="n">中古屋單價（萬/坪）</th><th class="n">毛租金報酬率</th></tr>
+    {rows.map((x) => (
+      <tr><td><a href={x.href}>{x.name}</a>{x.tier === 'ref' && <span class="note">（樣本少）</span>}</td><td class="n">{x.n}</td><td class="n">{x.perPing ?? '—'}</td><td class="n">{wan(x.three)}</td><td class="n">{x.used ?? '—'}</td><td class="n">{x.y == null ? '—' : x.y.toFixed(1) + '%'}</td></tr>
+    ))}
+  </table></div>
+  <p class="note">新竹市的實價登錄沒有分東區、北區、香山區，所以只能看全市。{skewed.length > 0 && '關西鎮的租約多為少數企業整批包租，每坪租金明顯偏高，不列入比較。'}樣本少於 20 筆的鄉鎮請只當參考。</p>
+
+  <h2>怎麼用這些數字</h2>
+  <div class="grid g3">
+    <div class="card"><h3 style="margin-top:0">想當房東</h3><p>毛報酬率 2% 上下，代表新竹的房子大多「租金付不起房貸」。買來出租，主要是賭增值，不是賺租金。先用<a href="/tools/rent-vs-buy/">租還是買試算</a>算清楚。</p></div>
+    <div class="card"><h3 style="margin-top:0">還在租還是買之間</h3><p>同一區 3 房的月租和房貸月付差多少？差額存下來 10 年能存多少？這比「租金都在幫房東繳房貸」更值得算。</p></div>
+    <div class="card"><h3 style="margin-top:0">竹科外派、短期工作</h3><p>新竹市和竹北的套房、2 房租約最多，是租屋市場的主流產品。看<a href="/guide/landlord/">在新竹當房東</a>了解出租稅負與管理。</p></div>
+  </div>
+
+  <h2>計算方式</h2>
+  <ul class="note">
+    <li>資料：內政部實價登錄租賃案件（新竹市 o_lvr_land_c、新竹縣 j_lvr_land_c），每季更新。</li>
+    <li>只算住宅：住宅大樓、華廈、公寓、透天厝、套房；排除店面、辦公、廠辦、工廠。</li>
+    <li>排除親友、員工等特殊關係租約；每坪租金偏離全縣（市）中位數太多的整戶租約也排除。</li>
+    <li>每坪月租以建物總面積（含公設）計算，與本站中古屋單價的計算基礎一致。</li>
+    <li>樣本少於 5 筆不公布中位數。</li>
+  </ul>
+</Base>

@@ -1,0 +1,44 @@
+---
+// 新竹縣市行政區磚塊示意圖（相對位置，非實際比例），依中古屋每坪中位數上色
+import { districts, districtUrl, regions } from '../lib/data';
+interface Props { highlight?: string; small?: boolean }
+const { highlight, small = false } = Astro.props;
+// [id, col, row]
+const pos: [string, number, number][] = [
+  ['xinfeng', 1, 0], ['hukou', 2, 0], ['xinpu', 3, 0], ['guanxi', 4, 0],
+  ['zhubei', 1, 1], ['qionglin', 3, 1], ['hengshan', 4, 1],
+  ['north', 0, 2], ['east', 1, 2], ['baoshan', 2, 2], ['zhudong', 3, 2], ['jianshi', 5, 2],
+  ['xiangshan', 0, 3], ['beipu', 2, 3], ['emei', 3, 3], ['wufeng', 4, 3],
+];
+const S = 96, G = 6;
+const vals = districts.map((d) => d.used ?? (d.r === 'city' ? regions.city.used : null)).filter((x): x is number => x != null);
+const mn = Math.min(...vals), mx = Math.max(...vals);
+const color = (v: number | null | undefined) => {
+  if (v == null) return '#E9EEEB';
+  const t = (v - mn) / (mx - mn || 1);
+  // 稻金 → 竹綠 → 深藍墨：低價暖、高價深
+  const stops = [[246, 231, 190], [143, 190, 150], [47, 106, 78], [29, 52, 69]];
+  const x = t * (stops.length - 1), i = Math.min(Math.floor(x), stops.length - 2), f = x - i;
+  return `rgb(${stops[i].map((c, k) => Math.round(c + (stops[i + 1][k] - c) * f)).join(',')})`;
+};
+const tiles = pos.map(([id, c, r]) => {
+  const d = districts.find((x) => x.id === id)!;
+  const v = d.used ?? null;
+  const shown = v ?? (d.r === 'city' ? regions.city.used : null);
+  return { d, x: c * (S + G), y: r * (S + G), v, fill: color(shown), dark: shown != null && (shown - mn) / (mx - mn || 1) > 0.45, cityAvg: v == null && d.r === 'city' };
+});
+const W = 6 * (S + G), H = 4 * (S + G);
+---
+<div class="tilemap">
+<svg viewBox={`-4 -4 ${W + 8} ${H + 8}`} role="img" aria-label="新竹縣市各行政區中古屋每坪中位數示意圖" style={small ? 'max-width:340px' : ''}>
+  {tiles.map((t) => (
+    <a href={districtUrl(t.d)}>
+      <rect x={t.x} y={t.y} width={S} height={S} rx="4" fill={t.fill} stroke={t.d.id === highlight ? '#B53B2C' : t.d.r === 'city' ? '#4E7EA6' : '#C9D3CE'} stroke-width={t.d.id === highlight ? 3 : t.d.r === 'city' ? 1.6 : 1} stroke-dasharray={t.d.r === 'city' ? '4 3' : ''} />
+      <text x={t.x + 10} y={t.y + 26} font-size="17" font-family="LXGW WenKai TC, serif" fill={t.dark ? '#fff' : '#1E2C36'}>{t.d.name}</text>
+      {!small && <text x={t.x + 10} y={t.y + S - 14} font-size="20" font-weight="700" font-family="LXGW WenKai TC, serif" fill={t.dark ? '#fff' : '#1E2C36'}>{t.v != null ? t.v : t.cityAvg ? '' : '—'}</text>}
+      {!small && t.cityAvg && <text x={t.x + 10} y={t.y + S - 14} font-size="11" fill={t.dark ? '#E6F0EA' : '#566670'}>市區合計 {regions.city.used}</text>}
+    </a>
+  ))}
+</svg>
+{!small && <div class="scalebar">{mn} 萬<span></span>{mx} 萬／坪・虛線框為新竹市（實價登錄未分區，以全市數字上色）・示意位置，非實際比例</div>}
+</div>

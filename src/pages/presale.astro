@@ -1,0 +1,111 @@
+---
+import Icon from '../components/Icon.astro';
+import Base from '../layouts/Base.astro';
+import { regions, districts, districtUrl, presaleNews, pct } from '../lib/data';
+import { featured, all, asOf, note, allNote, rName, statusClass, f1, pageIdOf, hasRealDeals } from '../lib/presale';
+import { DISCLAIMER } from '../components/Parts';
+const rows = districts.filter((d) => d.presale != null && d.used != null).sort((a, b) => b.presale! - a.presale!);
+const active = featured.filter((p) => p.status.startsWith('2026'));
+const dists = [...new Set(all.map((p) => p.dist || rName(p.r)))];
+---
+<Base title="新竹縣市預售屋建案與實價登錄" description={`新竹縣市預售建案一覽：建案名稱、建商（起造人）、戶數、銷售期間、實價登錄每坪中位數與最高最低價。目前 2026 年仍有成交的主要建案 ${active.length} 個。`} active="presale" crumbs={[['預售行情']]}>
+  <div class="pagehead"><Icon name="crane" size={56} /><h1>新竹縣市預售屋建案與行情</h1></div>
+  <p class="lead">建案名稱、建商、戶數、銷售期間與實價登錄成交行情一次看。預售屋與中古屋分開統計，單價已扣除車位。</p>
+  <p class="note">實價登錄最新揭露：{asOf}</p>
+
+  <div class="grid g4">
+    <div class="card"><div class="note">新竹市預售近半年中位數</div><div class="stat acc">{regions.city.presale}<small> 萬/坪</small></div><div class="note">{regions.city.presaleN} 筆</div></div>
+    <div class="card"><div class="note">新竹縣預售近半年中位數</div><div class="stat acc">{regions.county.presale}<small> 萬/坪</small></div><div class="note">{regions.county.presaleN} 筆</div></div>
+    <div class="card"><div class="note">2026 年仍有成交的主要建案</div><div class="stat">{active.length}<small> 個</small></div><div class="note">見下方建案總覽</div></div>
+    <div class="card"><div class="note">收錄建案（有揭露成交）</div><div class="stat">{all.length}<small> 個</small></div><div class="note">新竹縣 + 新竹市</div></div>
+  </div>
+
+  <h2 id="projects">主要建案總覽</h2>
+  <p class="note">{note}</p>
+  <p>點建案名稱可看建案資料、行情比較與<b>每戶成交明細（棟別、樓層、坪數、車位價格拆分）</b>。{!hasRealDeals && <a href="/presale/sample/">先看明細版面示範</a>}</p>
+  <div class="filter" id="pf">
+    <button class="on" data-f="all">全部</button>
+    <button data-f="active">2026 仍有成交</button>
+    <button data-f="city">新竹市</button>
+    <button data-f="county">新竹縣</button>
+  </div>
+  <div class="tw"><table id="pt">
+    <tr><th>建案</th><th>區域</th><th>建商（起造人）</th><th class="n">戶數</th><th class="n">每坪中位數</th><th class="n">最低～最高</th><th class="n">中位總價</th><th class="n">揭露</th><th>最新成交</th><th>狀態</th></tr>
+    {featured.map((p) => (
+      <tr data-r={p.r} data-a={p.status.startsWith('2026') ? '1' : '0'}>
+        <td><a href={`/presale/${p.id}/`}><b>{p.name}</b></a></td>
+        <td>{p.dist || rName(p.r)}</td>
+        <td>{p.dev || '—'}</td>
+        <td class="n">{p.units}</td>
+        <td class="n"><b>{f1(p.med)}</b></td>
+        <td class="n">{f1(p.min)}～{f1(p.max)}</td>
+        <td class="n">{p.medTotal ? `${p.medTotal.toLocaleString()} 萬` : '—'}</td>
+        <td class="n">{p.n}</td>
+        <td class="date">{p.latest}</td>
+        <td><span class={statusClass(p.status)}>{p.status}</span></td>
+      </tr>
+    ))}
+  </table></div>
+  <p class="note">單位：萬元/坪（已扣車位）。「起造人」為建照登記名義人，信託或建經案可能是建築經理公司，不一定是實際建商。「近期無新成交」可能已完銷或銷售趨緩，以建商公告為準。</p>
+
+  <h2 id="all">新竹縣市預售建案完整名單</h2>
+  <p class="note">{allNote}</p>
+  <div class="field" style="max-width:420px"><input id="q" type="search" placeholder="搜尋建案名稱或行政區，例如：竹北、富宇" /></div>
+  <div class="filter" id="df">
+    <button class="on" data-d="all">全部區域</button>
+    {dists.map((d) => <button data-d={d}>{d}</button>)}
+  </div>
+  <div class="tw"><table id="at">
+    <tr><th>建案</th><th>縣市</th><th>行政區</th><th class="n">揭露筆數</th><th class="n">每坪中位數（萬）</th>{all.some((p) => p.dev) && <th>起造人</th>}</tr>
+    {all.map((p) => {
+      const id = pageIdOf(p.name, p.r, p.dist || undefined);
+      return <tr data-d={p.dist || rName(p.r)} data-s={`${p.name} ${p.dist} ${p.dev ?? ''}`}>
+        <td>{id ? <a href={`/presale/${id}/`}>{p.name}</a> : p.name}</td>
+        <td>{rName(p.r)}</td><td>{p.dist || '—'}</td><td class="n">{p.n}</td><td class="n">{f1(p.med)}</td>
+        {all.some((x) => x.dev) && <td>{p.dev ?? '—'}</td>}
+      </tr>;
+    })}
+  </table></div>
+  <p class="note">中位數為「—」者：交易多為未分離車位、無隔間或特殊交易，不納入單價統計。</p>
+
+  <h2>新竹縣各區預售中位數</h2>
+  <div class="tw"><table>
+    <tr><th>行政區</th><th class="n">預售 萬/坪</th><th class="n">樣本</th><th class="n">中古 萬/坪</th><th class="n">溢價</th></tr>
+    {rows.map((d) => <tr><td><a href={districtUrl(d)}>{d.name}</a></td><td class="n"><b>{d.presale}</b></td><td class="n">{d.pn}</td><td class="n">{d.used}</td><td class="n up">+{pct(d.presale!, d.used!).toFixed(0)}%</td></tr>)}
+  </table></div>
+
+  <h2>2025～2026 新竹預售市場重點數字</h2>
+  <div class="grid g3">{presaleNews.map((x) => <div class="card"><div class="note">{x.t}</div><div class="stat sm acc">{x.v}</div><div class="note">{x.d}</div></div>)}</div>
+
+  <h2>買預售屋前的檢查清單</h2>
+  <div class="card art"><ol>
+    <li><b>比中古價差</b>：先想清楚你付的溢價買到了什麼（屋齡、公設、建材、學區），轉售時這段溢價不一定拿得回來。</li>
+    <li><b>查建商與建照</b>：到內政部預售屋備查與建管系統核對建照號碼、起造人與履約保證方式；起造人是建經公司時，要問清楚實際建商。</li>
+    <li><b>看議價率</b>：新竹市 2025Q4 香山區平均議價率約 6.4%，北區約 3.3%，開價不等於成交價。</li>
+    <li><b>算交屋時的貸款</b>：預售交屋可能在 2～4 年後，屆時利率與成數未必與今天相同，請用<a href="/tools/mortgage-payment/">試算工具</a>抓保守值；總價超過 2,500 萬不能用青安 3.0。</li>
+    <li><b>注意轉售限制</b>：預售屋紅單與換約轉售受平均地權條例限制，不要以短期轉手為前提購買。</li>
+  </ol></div>
+  <p><a class="tag" href="/developer/">依建商查建案</a><a class="tag" href="/policy/#qingan">青安 3.0 新竹條件</a></p>
+  <Fragment set:html={DISCLAIMER} />
+</Base>
+<script>
+  const pf = document.querySelectorAll<HTMLButtonElement>('#pf button');
+  pf.forEach((b) => b.addEventListener('click', () => {
+    pf.forEach((x) => x.classList.toggle('on', x === b));
+    const f = b.dataset.f;
+    document.querySelectorAll<HTMLTableRowElement>('#pt tr[data-r]').forEach((r) => {
+      r.style.display = f === 'all' || (f === 'active' && r.dataset.a === '1') || r.dataset.r === f ? '' : 'none';
+    });
+  }));
+  let dSel = 'all';
+  const q = document.getElementById('q') as HTMLInputElement;
+  const apply = () => {
+    const s = q.value.trim();
+    document.querySelectorAll<HTMLTableRowElement>('#at tr[data-d]').forEach((r) => {
+      r.style.display = (dSel === 'all' || r.dataset.d === dSel) && (!s || (r.dataset.s || '').includes(s)) ? '' : 'none';
+    });
+  };
+  const df = document.querySelectorAll<HTMLButtonElement>('#df button');
+  df.forEach((b) => b.addEventListener('click', () => { df.forEach((x) => x.classList.toggle('on', x === b)); dSel = b.dataset.d!; apply(); }));
+  q.addEventListener('input', apply);
+</script>

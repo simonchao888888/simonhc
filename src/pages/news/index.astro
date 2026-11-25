@@ -1,0 +1,48 @@
+---
+import Icon from '../../components/Icon.astro';
+import Base from '../../layouts/Base.astro';
+import Sources from '../../components/Sources.astro';
+import { news, cats, feedData, fmtDate, newsUpdated } from '../../lib/news';
+---
+<Base title="新竹房市新聞與判讀" description="央行理監事會、房貸利率、青安貸款與新竹房市新聞，每則附上對新竹買方的判讀與建議做法。" active="news" crumbs={[['新聞判讀']]}>
+  <div class="pagehead"><Icon name="doc" size={56} /><h1>新竹房市新聞與判讀</h1></div>
+  <p class="lead">不只轉貼新聞：每則都說明「這代表什麼」與「新竹買方可以怎麼做」。政策細節請看<a href="/policy/">央行與貸款政策</a>，重要日期看<a href="/calendar/">更新日曆</a>。</p>
+  <p class="note">判讀更新：{fmtDate(newsUpdated)}</p>
+
+  <div class="filter" id="filter">
+    <button class="on" data-c="all">全部</button>
+    {cats.map((c) => <button data-c={c}>{c}</button>)}
+  </div>
+
+  <div class="dlist" id="list">
+    {news.map((n) => (
+      <article data-c={n.cat}>
+        <div class="when"><b>{+n.date.split('-')[1]}/{+n.date.split('-')[2]}</b>{n.date.split('-')[0]}<br /><span class={`tag c-${n.cat}`}>{n.cat}</span></div>
+        <div>
+        <h3><a href={`/news/${n.id}/`} style="color:var(--ink);text-decoration:none">{n.title}</a></h3>
+        <p>{n.summary}</p>
+        <div class="take"><b>判讀：</b>{n.take}</div>
+        <div class="act"><b>怎麼做：</b>{n.action}</div>
+        <Sources list={n.sources} />
+        </div>
+      </article>
+    ))}
+  </div>
+
+  <h2>自動彙整：最新相關報導</h2>
+  {feedData.items.length > 0 ? <>
+    <p class="note">每週自動整理「新竹房市、央行、房貸利率、青安」相關新聞標題（{feedData.updated} 更新），尚未經本站判讀，請點原文閱讀。</p>
+    <div class="card"><ul class="feed">{feedData.items.slice(0, 30).map((f) => (
+      <li><span class="tag g">{f.topic}</span> <a href={f.link} rel="nofollow noopener" target="_blank">{f.title}</a> <span class="date">{f.source}・{f.date}</span></li>
+    ))}</ul></div>
+  </> : <p class="note">網站部署後，每週更新時會把最新報導整理在這裡。</p>}
+</Base>
+<script>
+  const btns = document.querySelectorAll<HTMLButtonElement>('#filter button');
+  btns.forEach((b) => b.addEventListener('click', () => {
+    btns.forEach((x) => x.classList.toggle('on', x === b));
+    document.querySelectorAll<HTMLElement>('#list article').forEach((a) => {
+      a.style.display = b.dataset.c === 'all' || a.dataset.c === b.dataset.c ? '' : 'none';
+    });
+  }));
+</script>

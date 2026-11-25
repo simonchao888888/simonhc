@@ -1,0 +1,68 @@
+---
+import Icon from '../../components/Icon.astro';
+import Base from '../../layouts/Base.astro';
+import Sources from '../../components/Sources.astro';
+import { policyRate as P, meetings, controls, mortgageRates, mortgageNote, qingan, watch, fmtDate, newsUpdated } from '../../lib/news';
+import { lineSvg, DISCLAIMER } from '../../components/Parts';
+const ratePts = mortgageRates.filter((r) => r[1] != null).map((r) => [r[0].replace('-', '/'), r[1]] as [string, number]);
+const sharePts = mortgageRates.filter((r) => r[2] != null).map((r) => [r[0].replace('-', '/'), r[2]] as [string, number]);
+const latest = ratePts.at(-1)!;
+---
+<Base title="央行與房貸政策追蹤" description={`央行政策利率 ${P.discount}%（連 ${P.freezeCount} 凍）、選擇性信用管制現況、五大銀行房貸利率、青安 3.0 新竹縣市條件與每季理監事會議判讀。`} active="policy" crumbs={[['央行與貸款政策']]}>
+  <div class="pagehead"><Icon name="vane" size={56} /><h1>央行與房貸政策追蹤</h1></div>
+  <p class="lead">政策利率、信用管制、房貸利率與青安條件，一頁看懂對新竹買方的影響。每次理監事會議後更新判讀。</p>
+  <p class="note">最後更新：{fmtDate(newsUpdated)}</p>
+
+  <div class="grid g4">
+    <div class="card"><div class="note">央行重貼現率</div><div class="stat">{P.discount}%</div><div class="note">連 {P.freezeCount} 季未調整</div></div>
+    <div class="card"><div class="note">五大銀行房貸利率</div><div class="stat acc">{latest[1]}%</div><div class="note">{latest[0]} 新承做平均</div></div>
+    <div class="card"><div class="note">第 2 戶房貸成數上限</div><div class="stat">7 成</div><div class="note">無寬限期（2026/9 起）</div></div>
+    <div class="card"><div class="note">青安 3.0 新竹總價上限</div><div class="stat">2,500<small> 萬</small></div><div class="note">2026/8/1～2029/7/31</div></div>
+  </div>
+  <div class="warn"><b>下一次理監事會議：</b>{P.nextMeeting}。觀察重點：是否升息（已有 2 位理事連續主張升息）、第 2 戶以上成數是否再調整、不動產貸款集中度變化。</div>
+
+  <h2>理監事會議時間軸</h2>
+  <div class="tl">{meetings.map((m) => (
+    <div class="card">
+      <span class="date">{fmtDate(m.date)}</span>
+      <h3 style="margin:4px 0 8px"><a href={`/policy/${m.id}/`} style="color:var(--ink)">{m.title}</a></h3>
+      <div class="kv"><span>利率</span><b>{m.rate}</b></div>
+      <div class="kv"><span>信用管制</span><b style="text-align:right;max-width:70%">{m.credit}</b></div>
+      <div class="take"><b>對新竹的意義：</b>{m.hsinchu}</div>
+      <a href={`/policy/${m.id}/`}>看完整判讀</a>
+    </div>
+  ))}</div>
+
+  <h2>目前選擇性信用管制（購屋相關）</h2>
+  <div class="tw"><table>
+    <tr><th>貸款類型</th><th>最高成數</th><th>寬限期</th><th>說明</th></tr>
+    {controls.map((c) => <tr><td>{c[0]}</td><td><b>{c[1]}</b></td><td>{c[2]}</td><td class="note">{c[3]}</td></tr>)}
+  </table></div>
+  <p class="note">「高價住宅」門檻依央行規定（各縣市不同）；首購族實際成數仍依銀行審核個人條件。</p>
+
+  <h2>五大銀行新承做房貸利率</h2>
+  <div class="card"><Fragment set:html={lineSvg(ratePts, 3, '五大銀行新承做房貸利率')} /><p class="note">{mortgageNote}</p></div>
+  {sharePts.length > 1 && <>
+    <h3>新青安占新承做房貸比重（%）</h3>
+    <div class="card"><Fragment set:html={lineSvg(sharePts, 1, '新青安占比')} /></div>
+  </>}
+
+  <h2 id="qingan">青安 3.0：新竹買方重點</h2>
+  <div class="tw"><table>
+    <tr><th colspan="2">申辦期間：{qingan.period}</th></tr>
+    {qingan.rules.map((r) => <tr><td style="width:30%"><b>{r[0]}</b></td><td>{r[1]}</td></tr>)}
+  </table></div>
+  <div class="take"><b>判讀：</b>{qingan.take}</div>
+  <p class="note">{qingan.old}</p>
+  <Sources list={qingan.sources} />
+
+  <h2>房市政策行事曆：什麼時候看什麼</h2>
+  <div class="tw"><table>
+    <tr><th>資料</th><th>公布時間</th><th>看什麼</th></tr>
+    {watch.map((w) => <tr><td><b>{w[0]}</b></td><td>{w[1]}</td><td class="note">{w[2]}</td></tr>)}
+  </table></div>
+
+  <h2>延伸</h2>
+  <p><a class="tag" href="/news/">新竹房市新聞判讀</a><a class="tag" href="/tools/mortgage-payment/">利率變動試算</a><a class="tag" href="/guide/grace-period/">寬限期要不要用</a></p>
+  <Fragment set:html={DISCLAIMER} />
+</Base>

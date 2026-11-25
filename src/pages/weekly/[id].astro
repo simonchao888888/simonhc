@@ -1,0 +1,29 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import { DISCLAIMER } from '../../components/Parts';
+export async function getStaticPaths() {
+  const all = (await getCollection('weekly')).sort((a, b) => a.id.localeCompare(b.id));
+  return all.map((r, i) => ({ params: { id: r.id }, props: { r, prev: all[i - 1], next: all[i + 1] } }));
+}
+const { r, prev, next } = Astro.props;
+const { Content, headings } = await render(r);
+const toc = headings.filter((h) => h.depth === 3);
+---
+<Base title={r.data.title} description={r.data.description} crumbs={[['房市週報', '/weekly/'], [r.id]]}>
+  <div class="arthead">
+    <span class="tag c-市場分析">{r.data.cadence}</span>
+    <h1>{r.data.title}</h1>
+    <p class="note">資料期間 {r.data.period}・程式依公開資料自動整理</p>
+  </div>
+  <div class="artwrap">
+    <aside class="tocwrap"><details class="toc" open><summary>本期目錄</summary><ol>{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol></details></aside>
+    <article class="card art"><Content /></article>
+  </div>
+  <p class="wk-nav">
+    {prev ? <a href={`/weekly/${prev.id}/`}>上一期：{prev.id}</a> : <span></span>}
+    <a href="/weekly/">全部週報</a>
+    {next ? <a href={`/weekly/${next.id}/`}>下一期：{next.id}</a> : <span></span>}
+  </p>
+  <Fragment set:html={DISCLAIMER} />
+</Base>

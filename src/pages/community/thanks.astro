@@ -1,0 +1,14 @@
+---
+import Base from '../../layouts/Base.astro';
+import Portrait from '../../components/Portrait.astro';
+---
+<Base title="問題已寄出" description="你的問題已寄給站長。" active="community" crumbs={[['交流平台', '/community/'], ['已寄出']]}>
+  <div class="founder-band" style="margin-top:20px">
+    <Portrait size={150} />
+    <div>
+      <h1 style="margin-top:0">收到了，謝謝你的問題。</h1>
+      <p class="lead">問題已經寄到站長信箱。有留 Email 的話，我會盡快回信；也可能把它整理進交流平台的「常被問到的問題」。</p>
+      <a class="btn p" href="/community/">回交流平台</a><a class="btn s" href="/region/">看各區房價</a>
+    </div>
+  </div>
+</Base>

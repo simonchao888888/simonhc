@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+import { developers, rName, f1 } from '../lib/presale';
+---
+<Base title="新竹建商與預售建案" description="依建商（起造人）查新竹縣市預售建案：富宇、大陸建設、春福、益展、協勝等建商在新竹的建案與實價登錄行情。" active="presale" crumbs={[['預售行情', '/presale/'], ['查建商']]}>
+  <h1>依建商查新竹預售建案</h1>
+  <p class="lead">以建照登記的「起造人」整理。起造人可能是建築經理公司或關係企業，與廣告上的品牌建商名稱不一定相同。</p>
+  <div class="grid g2">{developers.map(([dev, ps]) => (
+    <div class="card">
+      <h3 style="margin-top:0">{dev} <span class="note">（{ps.length} 案）</span></h3>
+      <div class="tw"><table>
+        <tr><th>建案</th><th>區域</th><th class="n">萬/坪</th><th>最新成交</th></tr>
+        {ps.map((p) => <tr><td><a href={`/presale/${p.id}/`}>{p.name}</a></td><td>{p.dist || rName(p.r)}</td><td class="n">{p.med != null ? f1(p.med) : (p.max ? `最高 ${f1(p.max)}` : '—')}</td><td class="date">{p.latest}</td></tr>)}
+      </table></div>
+    </div>
+  ))}</div>
+</Base>

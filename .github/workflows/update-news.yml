@@ -1,0 +1,21 @@
+# 每天台灣時間早上 7 點自動彙整新竹房市、央行、房貸利率、青安相關新聞標題
+# 已改由 weekly.yml 每週執行；這裡保留手動執行
+name: Update news
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: python3 scripts/fetch_news.py src/data/news_feed.json
+      - run: |
+          git config user.name "news-bot"
+          git config user.email "news-bot@users.noreply.github.com"
+          git add src/data/news_feed.json
+          git diff --cached --quiet || git commit -m "news: 自動彙整 $(date +%F)"
+          git push

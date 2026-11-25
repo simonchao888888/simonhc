@@ -1,0 +1,50 @@
+---
+import Base from '../../layouts/Base.astro';
+import { TOOLS, type Tool } from '../../lib/tools';
+import { districts, regions } from '../../lib/data';
+export function getStaticPaths() {
+  return TOOLS.map((t) => ({ params: { tool: t.slug }, props: { slug: t.slug } }));
+}
+const { slug } = Astro.props as { slug: string };
+const tool = TOOLS.find((t) => t.slug === slug) as Tool;
+// 區域行情選單：由資料自動產生
+const areaOpts: [string, string][] = [
+  ...districts.filter((d) => d.used != null && d.tier === 'main').sort((a, b) => b.used! - a.used!).map((d) => [String(d.used), `${d.name} 中古 ${d.used} 萬/坪`] as [string, string]),
+  [String(regions.city.used), `新竹市全市 中古 ${regions.city.used} 萬/坪`],
+  [String(regions.county.used), `新竹縣全縣 中古 ${regions.county.used} 萬/坪`],
+  [String(regions.city.presale), `新竹市 預售 ${regions.city.presale} 萬/坪`],
+  ...districts.filter((d) => d.presale != null && d.tier === 'main').map((d) => [String(d.presale), `${d.name} 預售 ${d.presale} 萬/坪`] as [string, string]),
+];
+---
+<Base title={tool.t} description={`${tool.d}免費線上試算，資料只在你的瀏覽器計算。`} active="tools" crumbs={[['試算工具', '/tools/'], [tool.t]]}>
+  <h1>{tool.t}</h1>
+  <p class="lead">{tool.d}</p>
+  <div class="grid g2">
+    <form class="card" data-tool={tool.slug}>
+      {tool.f.map((f) => {
+        const opts = f.v === 'AREA' ? areaOpts : f.opts;
+        return opts
+          ? <div class="field"><label>{f.l}</label><select name={f.n}>{opts.map((o) => <option value={o[0]} selected={o[0] === String(f.v)}>{o[1]}</option>)}</select></div>
+          : <div class="field"><label>{f.l}</label><input type="number" step="any" name={f.n} value={f.v} /></div>;
+      })}
+    </form>
+    <div class="out" id="out"><noscript>請開啟 JavaScript 以使用試算。</noscript></div>
+  </div>
+  <p class="note" style="margin-top:14px">試算結果為簡化估算，實際條件以銀行核貸與各項稅費核定為準。</p>
+  <h2>其他工具</h2>
+  <p>{TOOLS.filter((t) => t.slug !== slug).map((t) => <a class="tag" href={`/tools/${t.slug}/`}>{t.t}</a>)}</p>
+</Base>
+<script>
+  import { TOOLS } from '../../lib/tools';
+  const form = document.querySelector<HTMLFormElement>('form[data-tool]')!;
+  const tool = TOOLS.find((t) => t.slug === form.dataset.tool)!;
+  const out = document.getElementById('out')!;
+  const run = () => {
+    const v: Record<string, number> = {};
+    new FormData(form).forEach((x, k) => (v[k] = parseFloat(String(x)) || 0));
+    out.innerHTML = tool.calc(v);
+  };
+  form.addEventListener('input', run);
+  form.addEventListener('submit', (e) => e.preventDefault());
+  run();
+</script>

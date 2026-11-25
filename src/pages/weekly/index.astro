@@ -1,0 +1,34 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { getCollection } from 'astro:content';
+const reports = (await getCollection('weekly')).sort((a, b) => b.id.localeCompare(a.id));
+const [latest, ...older] = reports;
+---
+<Base title="新竹房市週報" description="每週整理新竹縣市實價登錄、預售屋成交、租金、央行與房貸政策和市場新聞，數字和上一期比較。" crumbs={[['房市週報']]}>
+  <div class="pagehead"><Icon name="doc" size={56} /><h1>新竹房市週報</h1></div>
+  <p class="lead">房市不是每天都在變，所以本站每週整理一次：實價登錄有什麼新成交、預售屋哪些建案在賣、各區房價和上一期比有沒有變，以及這段時間的政策與市場新聞。</p>
+
+  {latest ? <>
+    <a class="wk-latest" href={`/weekly/${latest.id}/`}>
+      <span class="tag">最新一期・{latest.data.period}</span>
+      <b>{latest.data.title}</b>
+      <ul>{latest.data.highlights.map((h) => <li>{h}</li>)}</ul>
+      <em>看完整{latest.data.cadence}</em>
+    </a>
+    {older.length > 0 && <>
+      <h2>過去各期</h2>
+      <div class="dlist">
+        {older.map((r) => <a href={`/weekly/${r.id}/`}><span class="date">{r.id}</span><div><b>{r.data.title}</b><span class="note">{r.data.description}</span></div></a>)}
+      </div>
+    </>}
+  </> : <p class="note">第一期週報會在下一次自動更新後出現。</p>}
+
+  <h2>週報怎麼產生</h2>
+  <ul class="note">
+    <li>每週一早上自動下載內政部實價登錄（含每 10 天揭露的最新批次）、重新計算各區行情與預售建案成交。</li>
+    <li>數字和上一期比較，標出漲跌與新出現的建案；新聞只列標題並連到原文。</li>
+    <li>站長的觀點與新聞判讀另外審閱後發布在<a href="/news/">新聞判讀</a>。</li>
+    <li>重要日期請看<a href="/calendar/">更新日曆</a>。</li>
+  </ul>
+</Base>

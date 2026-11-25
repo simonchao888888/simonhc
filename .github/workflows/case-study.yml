@@ -1,0 +1,41 @@
+# 每月 22 日（實價登錄 21 日揭露、隔天資料更新後）自動產生「建案拆解」草稿 → 開 PR
+# 站長在 PR 裡補上「Simon 怎麼看」段落後 Merge 即發布
+name: Monthly case study
+on:
+  schedule:
+    - cron: '0 4 22 * *'   # UTC 04:00 = 台灣 12:00
+  workflow_dispatch:
+    inputs:
+      name: { description: '指定建案名稱（留空＝自動挑最近成交最多的）', required: false }
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  case:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: 產生建案拆解
+        id: gen
+        env: { NAME: '${{ github.event.inputs.name }}' }
+        run: |
+          if [ -n "$NAME" ]; then f=$(python3 scripts/case_study.py --name "$NAME"); else f=$(python3 scripts/case_study.py); fi
+          echo "file=$f" >> "$GITHUB_OUTPUT"
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: case-study/${{ github.run_id }}
+          title: '本月建案拆解草稿：請補上觀點'
+          body: |
+            程式已經算好數字，檔案在 `${{ steps.gen.outputs.file }}`。
+            請在檔案最後把 `<!-- 站長觀點 … -->` 那行換成：
+
+            ```
+            ### Simon 怎麼看
+            你的看法……
+            ```
+
+            確認後按 Merge 就會發布。
+          commit-message: 'guide: 建案拆解草稿'
+          labels: 建案拆解

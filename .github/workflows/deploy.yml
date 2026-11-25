@@ -1,0 +1,31 @@
+# 備用：部署到 GitHub Pages（正式站用 Cloudflare Pages 自動部署，所以這裡改成只能手動執行）
+# 第一次使用：GitHub 專案 Settings → Pages → Source 選「GitHub Actions」
+# 並在 Settings → Secrets and variables → Actions → Variables 新增 SITE_URL（你的網址）
+name: Deploy
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency: { group: pages, cancel-in-progress: true }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run build
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: dist }
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: '${{ steps.d.outputs.page_url }}' }
+    steps:
+      - id: d
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,49 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import N from '../data/news.json';
+
+// 從建置當天往後排 100 天的固定事件；央行會議日期以 news.json 的 nextMeeting 文字為準
+const today = new Date(Date.now() + 8 * 3600e3); // 台灣時間
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+const end = new Date(today.getTime() + 100 * 864e5);
+type Ev = { d: string; what: string; site: string; kind: 'data' | 'policy' | 'tax' | 'school' | 'content' };
+const ev: Ev[] = [];
+for (let t = new Date(today); t <= end; t = new Date(t.getTime() + 864e5)) {
+  const day = t.getUTCDate(), m = t.getUTCMonth() + 1, y = t.getUTCFullYear();
+  if ([1, 11, 21].includes(day)) ev.push({ d: iso(t), what: '內政部實價登錄揭露新一批成交', site: '下一次週更新時納入週報', kind: 'data' });
+  if (day === 22) ev.push({ d: iso(t), what: '五大銀行新承做房貸利率公布（約 20～25 日）', site: '更新房貸利率走勢；產生本月「建案拆解」草稿', kind: 'policy' });
+  if (day === 1 && m === 1) ev.push({ d: iso(t), what: '新年度房屋稅、地價稅新制與門檻生效', site: '更新稅費文章與自住門檻', kind: 'tax' });
+  if (m === 3 && day === 1) ev.push({ d: iso(t), what: '國中小新生登記陸續開始', site: '更新學區房文章，提醒總量管制學校的設籍規定', kind: 'school' });
+  if (m === 3 && day === 22) ev.push({ d: `${y}-03-22`, what: '新竹市房屋稅自住優惠稅率申請截止（當年 5 月房屋稅適用）', site: '提前兩週發提醒', kind: 'tax' });
+  if (m === 5 && day === 1) ev.push({ d: iso(t), what: '房屋稅開徵（5/1～5/31）', site: '發「收到房屋稅單先看這三件事」', kind: 'tax' });
+  if (m === 11 && day === 1) ev.push({ d: iso(t), what: '地價稅開徵（11/1～11/30）', site: '發自用住宅 2‰ 稅率提醒', kind: 'tax' });
+}
+const kindName = { data: '實價登錄', policy: '央行與利率', tax: '稅務', school: '學區', content: '本站內容' };
+const weekly = [
+  ['每週一 07:00', '房市週更新：整理這一週的政策與市場新聞、下載最新實價登錄（含預售屋每戶成交）與租金，發布「新竹房市週報」'],
+  ['每週一（同一次）', '從本週新聞挑重點，依站長觀點產生判讀草稿，送站長審閱後發布'],
+  ['每月 22 日', '自動挑出最近成交最多的建案，產生「建案拆解」草稿'],
+  ['理監事會當天', '手動觸發一次判讀草稿，站長補上觀點後當天發布'],
+];
+---
+<Base title="新竹房市更新日曆" description="實價登錄、央行理監事會、五大銀行房貸利率、房屋稅與地價稅、學區登記，新竹買方該注意的日期，以及本站每次會更新什麼。" active="news" crumbs={[['新聞判讀', '/news/'], ['更新日曆']]}>
+  <div class="pagehead"><Icon name="doc" size={56} /><h1>新竹房市更新日曆</h1></div>
+  <p class="lead">這些日期一到，市場就有新數字。這裡列出接下來 100 天的重要日期，以及本站在那一天會做什麼。</p>
+
+  <div class="card" style="margin-bottom:24px">
+    <b>下一次央行理監事會：</b>{N.policyRate.nextMeeting}。會後當天發布判讀，重點看政策利率、第 2 戶成數與不動產貸款集中度。
+  </div>
+
+  <div class="tw"><table>
+    <tr><th>日期</th><th>類別</th><th>發生什麼</th><th>本站會做什麼</th></tr>
+    {ev.map((e) => <tr><td class="date" style="white-space:nowrap">{e.d}</td><td style="white-space:nowrap"><span class="tag">{kindName[e.kind]}</span></td><td>{e.what}</td><td class="note">{e.site}</td></tr>)}
+  </table></div>
+
+  <h2>本站的固定更新節奏</h2>
+  <div class="tw"><table>
+    {weekly.map(([w, x]) => <tr><td style="white-space:nowrap"><b>{w}</b></td><td>{x}</td></tr>)}
+  </table></div>
+  <p class="note">判讀草稿由程式產生，一律經過站長審閱、補上自己的觀點後才會發布。日期以各機關公告為準。</p>
+  <p><a href="/news/">看最新新聞判讀</a>　<a href="/policy/">央行政策與利率</a>　<a href="/rent/">租金行情</a></p>
+</Base>

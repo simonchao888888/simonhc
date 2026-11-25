@@ -1,0 +1,40 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { community as C, giscusOn, fill, isTodo } from '../../lib/founder';
+export function getStaticPaths() {
+  return C.boards.map((b) => ({ params: { board: b.slug }, props: { b } }));
+}
+const { b } = Astro.props as { b: (typeof C.boards)[number] };
+const others = C.boards.filter((x) => x.slug !== b.slug);
+const fb = C.channels.find((c) => c[3] === 'facebook');
+---
+<Base title={`${b.name}｜新竹房地產交流`} description={`新竹${b.name}討論看板：${b.desc}`} active="community" crumbs={[['交流平台', '/community/'], [b.name]]}>
+  <div class={`c-${b.color}`} style="padding:22px 24px;border-radius:8px">
+    <div class="pagehead"><Icon name={b.icon as any} size={52} /><div><h1 style="margin:0">{b.name}</h1><p class="lead" style="margin:4px 0 0">{b.desc}</p></div></div>
+  </div>
+
+  <h2>發問前可以先看</h2>
+  <p>{b.links.map(([t, h]) => <a class="tag" href={h}>{t}</a>)}</p>
+
+  <h2>討論區</h2>
+  {giscusOn ? (
+    <div class="giscus"></div>
+  ) : (
+    <div class="warn">
+      討論區會在網站部署並設定 Giscus（GitHub Discussions）後啟用，留言需要登入 GitHub。
+      在那之前，歡迎到{fb ? <a href={fb[4]}>Simon 的臉書</a> : '交流平台'}留言交流，或用<a href="/community/#ask">「直接問站長」</a>寄信提問。
+    </div>
+  )}
+  <p class="note">發言前請看<a href="/community/">交流守則</a>：不留個資、不業配、引用數字附來源。</p>
+
+  <h2>其他看板</h2>
+  <p>{others.map((o) => <a class="tag" href={`/community/${o.slug}/`}>{o.name}</a>)}</p>
+
+  {giscusOn && (
+    <script is:inline src="https://giscus.app/client.js"
+      data-repo={C.giscus.repo} data-repo-id={C.giscus.repoId} data-category={C.giscus.category} data-category-id={C.giscus.categoryId}
+      data-mapping="pathname" data-strict="1" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top"
+      data-theme="light" data-lang="zh-TW" data-loading="lazy" crossorigin="anonymous" async></script>
+  )}
+</Base>

@@ -1,0 +1,20 @@
+---
+import { districtUrl, type District } from '../lib/data';
+interface Props { rows: District[] }
+const { rows } = Astro.props;
+const hasYoy = rows.some((d) => d.yoy != null);
+---
+<div class="tw"><table>
+  <tr><th>行政區</th><th class="n">中古 每坪中位數（萬）</th><th class="n">樣本</th><th class="n">預售 每坪中位數（萬）</th>{hasYoy && <th class="n">2026 前五月年變動</th>}<th>級別</th></tr>
+  {rows.map((d) => (
+    <tr>
+      <td><a href={districtUrl(d)}>{d.name}</a></td>
+      <td class="n"><b>{d.used ?? '—'}</b></td>
+      <td class="n">{d.n}</td>
+      <td class="n">{d.presale ?? '—'}</td>
+      {hasYoy && <td class:list={['n', { up: (d.yoy ?? 0) > 0, down: (d.yoy ?? 0) < 0 }]}>{d.yoy != null ? `${d.yoy > 0 ? '+' : ''}${d.yoy}%` : '—'}</td>}
+      <td>{d.tier === 'main' ? <span class="tag">主要排行</span> : <span class="tag o">參考</span>}</td>
+    </tr>
+  ))}
+</table></div>
+<p class="note">主要排行：近半年 ≥20 筆；參考：5～19 筆；不足 5 筆不排名。{hasYoy && '年變動為房仲業依實價登錄計算之平均單價，與中位數口徑不同，僅供看方向。'}</p>

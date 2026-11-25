@@ -1,0 +1,28 @@
+---
+import Base from '../../layouts/Base.astro';
+import Sources from '../../components/Sources.astro';
+import { news, fmtDate, type NewsItem } from '../../lib/news';
+import { DISCLAIMER } from '../../components/Parts';
+export function getStaticPaths() {
+  return news.map((n) => ({ params: { id: n.id }, props: { n } }));
+}
+const { n } = Astro.props as { n: NewsItem };
+const others = news.filter((x) => x.id !== n.id).slice(0, 4);
+const ld = { '@context': 'https://schema.org', '@type': 'Article', headline: n.title, description: n.summary, datePublished: n.date, inLanguage: 'zh-TW', publisher: { '@type': 'Organization', name: '竹房知識站' } };
+---
+<Base title={n.title} description={n.summary.slice(0, 120)} active="news" crumbs={[['新聞判讀', '/news/'], [n.cat]]} jsonld={ld}>
+  <span class={`tag c-${n.cat}`}>{n.cat}</span> <span class="date">{fmtDate(n.date)}</span>
+  <h1>{n.title}</h1>
+  <div class="card art">
+    <h3 style="margin-top:0">發生什麼事</h3><p>{n.summary}</p>
+    <div class="take"><b>判讀：</b>{n.take}</div>
+    <div class="act"><b>新竹買方怎麼做：</b>{n.action}</div>
+    {n.link && <p><a href={n.link}>看完整政策說明</a></p>}
+    <Sources list={n.sources} />
+  </div>
+  <h2>試算一下</h2>
+  <p><a class="tag" href="/tools/mortgage-payment/">房貸月付金</a><a class="tag" href="/tools/affordability/">收入負擔能力</a><a class="tag" href="/policy/">目前信用管制與青安條件</a></p>
+  <h2>其他新聞判讀</h2>
+  <div class="grid g2">{others.map((o) => <a class="card" href={`/news/${o.id}/`}><span class="date">{fmtDate(o.date)}</span><h3 style="margin:4px 0">{o.title}</h3></a>)}</div>
+  <Fragment set:html={DISCLAIMER} />
+</Base>

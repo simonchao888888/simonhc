@@ -1,0 +1,80 @@
+---
+import { analyze, f1, type Deal } from '../lib/presale';
+interface Props { deals: Deal[]; name: string }
+const { deals, name } = Astro.props;
+const A = analyze(deals);
+const w = (v: number | null | undefined, d = 1) => (v == null ? '—' : v.toLocaleString('zh-TW', { maximumFractionDigits: d, minimumFractionDigits: d }));
+const roomTypes = [...new Set(deals.map((d) => d.rooms.split('房')[0] + '房'))].sort();
+const upRange = [A.upMin ?? 0, A.upMax ?? 1];
+const heat = (v: number | null) => {
+  if (v == null) return '#f3f1ec';
+  const t = (v - upRange[0]) / Math.max(upRange[1] - upRange[0], 0.01);
+  return `rgba(15,110,100,${(0.12 + t * 0.6).toFixed(2)})`;
+};
+---
+<h2 id="deals">成交明細與拆分</h2>
+<div class="grid g4">
+  <div class="card"><div class="note">揭露成交</div><div class="stat sm">{A.n}<small> 筆</small></div><div class="note">{A.cancel > 0 ? `其中解約 ${A.cancel} 筆` : '無解約紀錄'}</div></div>
+  <div class="card"><div class="note">單價（扣車位）中位數</div><div class="stat sm acc">{w(A.upMed)}<small> 萬/坪</small></div><div class="note">{w(A.upMin)}～{w(A.upMax)}</div></div>
+  <div class="card"><div class="note">房屋坪數（扣車位）中位數</div><div class="stat sm">{w(A.netMed)}<small> 坪</small></div><div class="note">總價中位數 {w(A.totalMed, 0)} 萬</div></div>
+  <div class="card"><div class="note">車位成交</div><div class="stat sm">{A.parkN}<small> 個</small></div><div class="note">{A.ptypes[0] ? `${A.ptypes[0].type} 中位數 ${w(A.ptypes[0].med, 0)} 萬` : '—'}</div></div>
+</div>
+
+<h3>車位價格拆分</h3>
+{A.ptypes.length > 0 ? <div class="tw"><table>
+  <tr><th>車位類別</th><th class="n">成交數</th><th class="n">價格中位數</th><th class="n">最低～最高</th><th class="n">面積中位數</th></tr>
+  {A.ptypes.map((t) => <tr><td>{t.type || '未標示'}</td><td class="n">{t.n}</td><td class="n"><b>{w(t.med, 0)} 萬</b></td><td class="n">{w(t.min, 0)}～{w(t.max, 0)} 萬</td><td class="n">{w(t.area, 2)} 坪</td></tr>)}
+</table></div> : <p class="note">無可拆分的車位價格。</p>}
+{A.unsplit > 0 && <p class="note">另有 {A.unsplit} 筆「車位未分離」：車位價格含在總價內、無法拆分，這些交易不納入單價統計。</p>}
+
+<h3>各房型坪數與總價</h3>
+<div class="tw"><table>
+  <tr><th>房型</th><th class="n">成交數</th><th class="n">房屋坪數（扣車位）</th><th class="n">房屋總價（扣車位）</th><th class="n">含車位總價</th><th class="n">單價（扣車位）</th></tr>
+  {A.rooms.map((r) => <tr><td>{r.r}</td><td class="n">{r.n}</td><td class="n">{w(r.net)} 坪</td><td class="n">{w(r.house, 0)} 萬</td><td class="n">{w(r.total, 0)} 萬</td><td class="n">{w(r.up)} 萬</td></tr>)}
+</table></div>
+<p class="note">以中位數呈現。坪數已扣除車位面積；含公設的權狀坪數請見下方明細「權狀坪數」欄。</p>
+
+<h3>樓層單價</h3>
+<div class="tw"><table>
+  <tr><th>樓層</th><th class="n">成交數</th><th class="n">單價中位數</th><th class="n">最低～最高</th></tr>
+  {A.floors.map((x) => <tr><td>{x.f > 0 ? `${x.f} 樓` : `地下 ${-x.f} 樓`}</td><td class="n">{x.n}</td><td class="n"><b>{w(x.med)}</b></td><td class="n">{w(x.min)}～{w(x.max)}</td></tr>)}
+</table></div>
+
+{A.grid.rows.length > 0 && <>
+  <h3>銷控推估（依已揭露成交）</h3>
+  <p class="note">依棟別與樓層排列：格子內為該層已揭露成交戶數與單價中位數（萬/坪，扣車位），顏色越深單價越高；空白代表尚無揭露成交，不代表未售。滑鼠移到格子上可看戶別。</p>
+  <div class="tw"><table class="grid-t">
+    <tr><th>樓層</th>{A.grid.cols.map((c) => <th>{c === '—' ? '未標示' : `${c} 棟`}</th>)}</tr>
+    {A.grid.rows.map((r) => <tr><td><b>{r.f}F</b></td>{r.cells.map((c) => <td style={`background:${heat(c?.up ?? null)}`} title={c ? c.units : ''}>{c ? <>{c.n} 戶<br /><small>{w(c.up)}</small></> : ''}</td>)}</tr>)}
+  </table></div>
+</>}
+
+<h3>全部成交明細</h3>
+<div class="filter" data-deal-filter>
+  <button class="on" data-r="all">全部</button>
+  {roomTypes.map((r) => <button data-r={r}>{r}</button>)}
+</div>
+<div class="tw"><table class="deals">
+  <tr><th>簽約日</th><th>棟及號</th><th>樓層</th><th>格局</th><th class="n">權狀坪數</th><th class="n">車位坪數</th><th class="n">房屋坪數</th><th class="n">主建物</th><th class="n">總價</th><th class="n">車位價</th><th class="n">房屋價</th><th class="n">單價</th><th>車位</th><th>備註</th></tr>
+  {deals.map((d) => (
+    <tr data-r={d.rooms.split('房')[0] + '房'} style={d.cancel ? 'opacity:.55' : ''}>
+      <td class="date">{d.d}</td><td>{d.unit || '—'}</td><td>{d.fn ?? d.floor}{d.tf ? `/${d.tf}` : ''}</td><td>{d.rooms}</td>
+      <td class="n">{w(d.area, 2)}</td><td class="n">{d.parea ? w(d.parea, 2) : '—'}</td><td class="n">{w(d.net, 2)}</td><td class="n">{d.main ? w(d.main, 2) : '—'}</td>
+      <td class="n"><b>{w(d.total, 0)}</b></td><td class="n">{d.pprice == null ? '未分離' : d.pprice ? w(d.pprice, 0) : '—'}</td><td class="n">{w(d.house, 0)}</td><td class="n">{d.up != null ? w(d.up) : '—'}</td>
+      <td>{d.ptype ? `${d.ptype}${d.pcount > 1 ? `×${d.pcount}` : ''}` : '無'}{d.parks.length > 0 && d.parks[0][3] ? `（${d.parks.map((p) => p[3]).join('、')}）` : ''}</td>
+      <td class="note">{[d.cancel && `解約：${d.cancel}`, d.note].filter(Boolean).join('；')}</td>
+    </tr>
+  ))}
+</table></div>
+<p class="note">金額單位：萬元；面積單位：坪。單價 =（總價 − 車位價）÷（權狀坪數 − 車位坪數）。灰色列為已解約。資料來源：內政部預售屋實價登錄（{name}）。</p>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-deal-filter]').forEach((box) => {
+    const btns = box.querySelectorAll<HTMLButtonElement>('button');
+    const table = box.nextElementSibling!.querySelector('table')!;
+    btns.forEach((b) => b.addEventListener('click', () => {
+      btns.forEach((x) => x.classList.toggle('on', x === b));
+      table.querySelectorAll<HTMLTableRowElement>('tr[data-r]').forEach((r) => { r.style.display = b.dataset.r === 'all' || r.dataset.r === b.dataset.r ? '' : 'none'; });
+    }));
+  });
+</script>
