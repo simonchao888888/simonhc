@@ -1,8 +1,14 @@
-# 備用：部署到 GitHub Pages（正式站用 Cloudflare Pages 自動部署，所以這裡改成只能手動執行）
+# 部署到 GitHub Pages（網域 simonhc.com，DNS 在 Cloudflare）
+# main 有新 commit、或每週更新完成後，自動建置並發布
 # 第一次使用：GitHub 專案 Settings → Pages → Source 選「GitHub Actions」
 # 並在 Settings → Secrets and variables → Actions → Variables 新增 SITE_URL（你的網址）
 name: Deploy
 on:
+  push:
+    branches: [main]
+  workflow_run:            # 每週更新是機器人 push，不會觸發 push 事件，所以在它跑完後發布
+    workflows: [Weekly update, Update data, Update news]
+    types: [completed]
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,7 +25,7 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          SITE_URL: ${{ vars.SITE_URL }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://simonhc.com' }}
       - uses: actions/upload-pages-artifact@v3
         with: { path: dist }
   deploy:

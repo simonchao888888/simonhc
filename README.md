@@ -133,7 +133,11 @@ order: 10
 用手機 GitHub App 開一個 Issue：標題貼新聞網址，內文寫幾句你的看法，加上「觀點」標籤。
 幾分鐘後會收到 PR 連結，草稿以你的看法為主軸，AI 只負責查證事實、補上新竹數字和潤稿。
 
-## 上線（Cloudflare Pages）
+## 上線
+
+目前用 **GitHub Pages** 發布（`deploy.yml`），網域 simonhc.com 的 DNS 在 Cloudflare：apex 指向 GitHub Pages 的四個 IP，`www` CNAME 到 `simonchao888888.github.io`。
+
+### 備用：改用 Cloudflare Pages
 
 Cloudflare Pages 連結 GitHub 後，每次 main 有新的 commit（包含每週自動更新、你 Merge 的判讀）都會自動重新建置發布，不需要其他設定。
 
