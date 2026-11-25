@@ -4,7 +4,7 @@ import Panorama from '../components/Panorama.astro';
 import TileMap from '../components/TileMap.astro';
 import Icon from '../components/Icon.astro';
 import { getCollection } from 'astro:content';
-import { regions, districts, districtUrl, regionUrl, meta } from '../lib/data';
+import { regions, districts, districtUrl, regionUrl, meta, latestRelease, nextRelease, md } from '../lib/data';
 import { news, policyRate, mortgageRates, fmtDate } from '../lib/news';
 import { featured, f1 } from '../lib/presale';
 import { DISCLAIMER } from '../components/Parts';
@@ -25,6 +25,8 @@ const top = Math.ceil(Math.max(...rows.map((r) => Math.max(r.used, r.pre ?? 0)))
 const pct = (v: number) => (v / top) * 100;
 const latestNews = news.slice(0, 4);
 const active = featured.filter((p) => p.status.startsWith('2026')).slice(0, 7);
+import PD from '../data/presale_deals.json';
+const presaleLatest = Object.values(PD as Record<string, { d: string }[]>).flat().reduce((m, x) => (x.d > m ? x.d : m), '');
 const latestWeekly = (await getCollection('weekly')).sort((a, b) => b.id.localeCompare(a.id))[0];
 const posts = (await getCollection('guide')).sort((a, b) => a.data.order - b.data.order);
 // 首頁挑 6 篇：新手入門、稅、區域、學區、竹科、最新建案拆解
@@ -52,7 +54,7 @@ const ld = { '@context': 'https://schema.org', '@type': 'WebSite', name: '竹房
       <a href="/policy/"><div class="k">五大銀行房貸利率（{rate[0].replace('-', '/')}）</div><div class="v">{rate[1]}<small> %</small></div></a>
     </div>
   </section>
-  <p class="note" style="margin:10px 0 0">實價登錄最新成交 {meta.latestDeal}，資料每旬更新。</p>
+  <p class="note" style="margin:10px 0 0">已收錄內政部 {md(latestRelease())} 公布的實價登錄（最新住宅成交 {md(meta.latestDeal)}、預售屋簽約 {md(presaleLatest)}）；下一批 {md(nextRelease())} 公布，本站隔天自動更新。<a href="/sources/#lag">為什麼有時間落差？</a></p>
 
   <Panorama />
   </div>

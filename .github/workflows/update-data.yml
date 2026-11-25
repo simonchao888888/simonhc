@@ -1,8 +1,10 @@
 # 實價登錄每月 1、11、21 日揭露；隔天台灣時間上午 10 點自動抓資料、重算、提交
 # 提交後會觸發 deploy.yml 重新發布網站
-# 已改由 weekly.yml 每週執行；這裡保留手動執行
+# 週報仍由 weekly.yml 每週一產生；這裡只負責在內政部公布後第一時間更新數字
 name: Update data
 on:
+  schedule:
+    - cron: '0 2 2,12,22 * *'   # UTC 02:00 = 台灣 10:00，內政部 1、11、21 日公布的隔天
   workflow_dispatch:
 permissions:
   contents: write

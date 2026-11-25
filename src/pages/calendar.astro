@@ -11,7 +11,7 @@ type Ev = { d: string; what: string; site: string; kind: 'data' | 'policy' | 'ta
 const ev: Ev[] = [];
 for (let t = new Date(today); t <= end; t = new Date(t.getTime() + 864e5)) {
   const day = t.getUTCDate(), m = t.getUTCMonth() + 1, y = t.getUTCFullYear();
-  if ([1, 11, 21].includes(day)) ev.push({ d: iso(t), what: '內政部實價登錄揭露新一批成交', site: '下一次週更新時納入週報', kind: 'data' });
+  if ([1, 11, 21].includes(day)) ev.push({ d: iso(t), what: '內政部實價登錄揭露新一批成交', site: '隔天上午自動更新各區行情、預售建案明細與租金；下一次週報整理變化', kind: 'data' });
   if (day === 22) ev.push({ d: iso(t), what: '五大銀行新承做房貸利率公布（約 20～25 日）', site: '更新房貸利率走勢；產生本月「建案拆解」草稿', kind: 'policy' });
   if (day === 1 && m === 1) ev.push({ d: iso(t), what: '新年度房屋稅、地價稅新制與門檻生效', site: '更新稅費文章與自住門檻', kind: 'tax' });
   if (m === 3 && day === 1) ev.push({ d: iso(t), what: '國中小新生登記陸續開始', site: '更新學區房文章，提醒總量管制學校的設籍規定', kind: 'school' });
@@ -21,6 +21,7 @@ for (let t = new Date(today); t <= end; t = new Date(t.getTime() + 864e5)) {
 }
 const kindName = { data: '實價登錄', policy: '央行與利率', tax: '稅務', school: '學區', content: '本站內容' };
 const weekly = [
+  ['每月 2、12、22 日 10:00', '內政部公布實價登錄的隔天，自動更新各區行情、預售屋每戶成交與租金'],
   ['每週一 07:00', '房市週更新：整理這一週的政策與市場新聞、下載最新實價登錄（含預售屋每戶成交）與租金，發布「新竹房市週報」'],
   ['每週一（同一次）', '從本週新聞挑重點，依站長觀點產生判讀草稿，送站長審閱後發布'],
   ['每月 22 日', '自動挑出最近成交最多的建案，產生「建案拆解」草稿'],

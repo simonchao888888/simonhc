@@ -34,6 +34,26 @@ if (B) {
 }
 
 export const meta: { synced: string; latestDeal: string; note: string } = D.meta;
+
+// 內政部每月 1、11、21 日公布一批；回推同步當天以前最近一次的公布日
+export function latestRelease(synced = meta.synced) {
+  const d = new Date(synced + 'T00:00:00Z');
+  for (let i = 0; i < 12; i++) {
+    if ([1, 11, 21].includes(d.getUTCDate())) return d.toISOString().slice(0, 10);
+    d.setUTCDate(d.getUTCDate() - 1);
+  }
+  return synced;
+}
+export function nextRelease(synced = meta.synced) {
+  const d = new Date(synced + 'T00:00:00Z');
+  for (let i = 0; i < 12; i++) {
+    d.setUTCDate(d.getUTCDate() + 1);
+    if ([1, 11, 21].includes(d.getUTCDate())) return d.toISOString().slice(0, 10);
+  }
+  return '';
+}
+export const md = (iso: string) => (iso ? `${Number(iso.slice(5, 7))}/${Number(iso.slice(8, 10))}` : '');
+export const LAG_NOTE = '依法成交（預售屋為簽約）後 30 天內申報，內政部每 10 天公布一批，所以公布的成交日期通常比今天晚 3～6 週。';
 export const regions: Record<RegionKey, Region> = D.regions;
 export const districts: District[] = D.districts;
 export const presaleNews: { t: string; v: string; d: string }[] = D.presaleNews;

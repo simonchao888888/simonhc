@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { meta, fromPipeline } from '../lib/data';
+import { meta, latestRelease, nextRelease, LAG_NOTE, fromPipeline } from '../lib/data';
 ---
 <Base title="資料來源與更新方式" description="竹房知識站的資料來源、統計口徑（扣除車位、排除特殊交易、樣本門檻）與更新頻率。" active="sources" crumbs={[['資料來源']]}>
   <h1>資料來源與更新方式</h1>
@@ -23,6 +23,7 @@ import { meta, fromPipeline } from '../lib/data';
     </ul>
     <h3>更新頻率</h3>
     <p>實價登錄每月 1、11、21 日揭露；本站每週一自動下載最新一批、重新計算並發布<a href="/weekly/">房市週報</a>。</p>
-    <p>資料庫同步：{meta.synced}・最新成交揭露：{meta.latestDeal}</p>
+    <p>最近同步：{meta.synced}（已收錄內政部 {latestRelease()} 公布的資料）・資料內最新住宅成交：{meta.latestDeal}・下一批公布：{nextRelease()}</p>
+    <p id="lag"><b>為什麼成交日期比今天晚？</b>{LAG_NOTE}這是法規造成的落差，不是資料沒更新；同一筆成交，房仲業者的內部資料可能比實價登錄早幾週看到。</p>
   </div>
 </Base>
