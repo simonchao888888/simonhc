@@ -1,246 +1,223 @@
 {
  "meta": {
   "seasons": [
-   "114S4",
    "115S1",
    "115S2",
-   "115S3"
+   "115S3",
+   "B20261001",
+   "B20261011",
+   "B20261021",
+   "B20261101",
+   "B20261111",
+   "CUR"
   ],
-  "latest": "2026-08-10",
+  "latest": "2026-10-10",
   "note": "由 build_rent.py 依內政部實價登錄租賃資料計算；只含住宅，排除特殊關係租約，皆為中位數。"
  },
  "regions": {
   "city": {
-   "aptN": 651,
-   "apt": 20000,
+   "aptN": 603,
+   "apt": 20200,
    "perPing": 620,
    "rooms": {
     "1": {
-     "n": 18,
-     "rent": 16400
+     "n": 12,
+     "rent": 17000
     },
     "2": {
-     "n": 148,
-     "rent": 18000
+     "n": 134,
+     "rent": 18200
+    },
+    "3": {
+     "n": 382,
+     "rent": 20400
+    },
+    "4+": {
+     "n": 75,
+     "rent": 32900
+    }
+   },
+   "suiteN": 709,
+   "suite": 9000,
+   "houseN": 56,
+   "house": 25500
+  },
+  "county": {
+   "aptN": 703,
+   "apt": 19700,
+   "perPing": 589,
+   "rooms": {
+    "1": {
+     "n": 21,
+     "rent": 15000
+    },
+    "2": {
+     "n": 230,
+     "rent": 19000
     },
     "3": {
      "n": 404,
      "rent": 20000
     },
     "4+": {
-     "n": 81,
-     "rent": 32000
+     "n": 45,
+     "rent": 32500
     }
    },
-   "suiteN": 768,
-   "suite": 9000,
-   "houseN": 52,
-   "house": 25000
-  },
-  "county": {
-   "aptN": 721,
-   "apt": 20000,
-   "perPing": 590,
-   "rooms": {
-    "1": {
-     "n": 17,
-     "rent": 15000
-    },
-    "2": {
-     "n": 228,
-     "rent": 18800
-    },
-    "3": {
-     "n": 419,
-     "rent": 20000
-    },
-    "4+": {
-     "n": 56,
-     "rent": 32800
-    }
-   },
-   "suiteN": 444,
-   "suite": 11000,
-   "houseN": 107,
-   "house": 22000
+   "suiteN": 421,
+   "suite": 10800,
+   "houseN": 115,
+   "house": 23000
   }
  },
  "districts": {
-  "zhubei": {
-   "aptN": 336,
-   "apt": 25000,
-   "perPing": 634,
-   "rooms": {
-    "1": {
-     "n": 13,
-     "rent": 16400
-    },
-    "2": {
-     "n": 103,
-     "rent": 22400
-    },
-    "3": {
-     "n": 184,
-     "rent": 26100
-    },
-    "4+": {
-     "n": 35,
-     "rent": 37500
-    }
-   },
-   "suiteN": 275,
-   "suite": 13000,
-   "houseN": 23,
-   "house": 27600,
-   "skewed": false
-  },
-  "zhudong": {
-   "aptN": 110,
+  "hukou": {
+   "aptN": 165,
    "apt": 17000,
-   "perPing": 520,
+   "perPing": 540,
    "rooms": {
     "1": {
-     "n": 1,
+     "n": 3,
      "rent": null
     },
     "2": {
-     "n": 22,
-     "rent": 16200
+     "n": 64,
+     "rent": 16500
     },
     "3": {
-     "n": 77,
+     "n": 96,
      "rent": 17000
     },
     "4+": {
-     "n": 10,
-     "rent": 18600
+     "n": 2,
+     "rent": null
     }
    },
-   "suiteN": 6,
-   "suite": 6800,
-   "houseN": 17,
-   "house": 15000,
+   "suiteN": 97,
+   "suite": 6500,
+   "houseN": 37,
+   "house": 20000,
+   "skewed": false
+  },
+  "zhubei": {
+   "aptN": 322,
+   "apt": 25000,
+   "perPing": 645,
+   "rooms": {
+    "1": {
+     "n": 16,
+     "rent": 19000
+    },
+    "2": {
+     "n": 107,
+     "rent": 24000
+    },
+    "3": {
+     "n": 171,
+     "rent": 26600
+    },
+    "4+": {
+     "n": 25,
+     "rent": 37800
+    }
+   },
+   "suiteN": 249,
+   "suite": 12600,
+   "houseN": 25,
+   "house": 28400,
    "skewed": false
   },
   "xinfeng": {
-   "aptN": 88,
+   "aptN": 85,
    "apt": 18000,
-   "perPing": 602,
+   "perPing": 568,
    "rooms": {
     "1": {
      "n": 1,
      "rent": null
     },
     "2": {
-     "n": 30,
+     "n": 26,
      "rent": 18000
     },
     "3": {
-     "n": 49,
-     "rent": 18500
+     "n": 50,
+     "rent": 18200
     },
     "4+": {
      "n": 8,
      "rent": 15000
     }
    },
-   "suiteN": 48,
+   "suiteN": 47,
    "suite": 7800,
-   "houseN": 20,
-   "house": 22000,
+   "houseN": 23,
+   "house": 25000,
    "skewed": false
   },
-  "baoshan": {
+  "qionglin": {
    "aptN": 6,
-   "apt": 19500,
-   "perPing": 601,
+   "apt": 15000,
+   "perPing": 428,
    "rooms": {
     "1": {
      "n": 0,
      "rent": null
     },
     "2": {
+     "n": 2,
+     "rent": null
+    },
+    "3": {
+     "n": 3,
+     "rent": null
+    },
+    "4+": {
      "n": 1,
      "rent": null
-    },
-    "3": {
-     "n": 5,
-     "rent": 18000
-    },
-    "4+": {
-     "n": 0,
-     "rent": null
     }
    },
-   "suiteN": 6,
-   "suite": 16500,
-   "houseN": 6,
-   "house": 48000,
-   "skewed": false
-  },
-  "hukou": {
-   "aptN": 157,
-   "apt": 17000,
-   "perPing": 552,
-   "rooms": {
-    "1": {
-     "n": 2,
-     "rent": null
-    },
-    "2": {
-     "n": 63,
-     "rent": 16500
-    },
-    "3": {
-     "n": 90,
-     "rent": 17000
-    },
-    "4+": {
-     "n": 2,
-     "rent": null
-    }
-   },
-   "suiteN": 95,
-   "suite": 6500,
-   "houseN": 35,
-   "house": 20000,
-   "skewed": false
-  },
-  "xinpu": {
-   "aptN": 19,
-   "apt": 23000,
-   "perPing": 503,
-   "rooms": {
-    "1": {
-     "n": 0,
-     "rent": null
-    },
-    "2": {
-     "n": 6,
-     "rent": 20500
-    },
-    "3": {
-     "n": 13,
-     "rent": 23000
-    },
-    "4+": {
-     "n": 0,
-     "rent": null
-    }
-   },
-   "suiteN": 1,
-   "suite": null,
-   "houseN": 3,
+   "suiteN": 16,
+   "suite": 13000,
+   "houseN": 1,
    "house": null,
    "skewed": false
   },
+  "zhudong": {
+   "aptN": 103,
+   "apt": 17000,
+   "perPing": 504,
+   "rooms": {
+    "1": {
+     "n": 1,
+     "rent": null
+    },
+    "2": {
+     "n": 23,
+     "rent": 17000
+    },
+    "3": {
+     "n": 71,
+     "rent": 17000
+    },
+    "4+": {
+     "n": 8,
+     "rent": 18600
+    }
+   },
+   "suiteN": 4,
+   "suite": null,
+   "houseN": 19,
+   "house": 15000,
+   "skewed": false
+  },
   "guanxi": {
-   "aptN": 27,
+   "aptN": 28,
    "apt": 35000,
    "perPing": 943,
    "rooms": {
     "1": {
-     "n": 21,
+     "n": 22,
      "rent": 35000
     },
     "2": {
@@ -262,21 +239,21 @@
    "house": null,
    "skewed": true
   },
-  "qionglin": {
-   "aptN": 4,
-   "apt": null,
-   "perPing": null,
+  "baoshan": {
+   "aptN": 6,
+   "apt": 23000,
+   "perPing": 600,
    "rooms": {
     "1": {
      "n": 0,
      "rent": null
     },
     "2": {
-     "n": 2,
+     "n": 1,
      "rent": null
     },
     "3": {
-     "n": 1,
+     "n": 4,
      "rent": null
     },
     "4+": {
@@ -284,9 +261,37 @@
      "rent": null
     }
    },
-   "suiteN": 13,
-   "suite": 13000,
-   "houseN": 1,
+   "suiteN": 6,
+   "suite": 16500,
+   "houseN": 6,
+   "house": 50000,
+   "skewed": false
+  },
+  "xinpu": {
+   "aptN": 15,
+   "apt": 22000,
+   "perPing": 497,
+   "rooms": {
+    "1": {
+     "n": 0,
+     "rent": null
+    },
+    "2": {
+     "n": 6,
+     "rent": 22900
+    },
+    "3": {
+     "n": 9,
+     "rent": 21000
+    },
+    "4+": {
+     "n": 0,
+     "rent": null
+    }
+   },
+   "suiteN": 1,
+   "suite": null,
+   "houseN": 2,
    "house": null,
    "skewed": false
   },
@@ -340,7 +345,7 @@
      "rent": null
     }
    },
-   "suiteN": 0,
+   "suiteN": 1,
    "suite": null,
    "houseN": 0,
    "house": null,
