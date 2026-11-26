@@ -1,0 +1,90 @@
+---
+import { volume, BULK_AREA, type VolBar } from '../lib/presale';
+const { months, quarters, excluded } = volume;
+const yi = (v: number) => v / 10000; // 萬 → 億
+const fmt = (v: number) => (v >= 100 ? v.toFixed(0) : v.toFixed(1));
+
+function chart(bars: VolBar[], id: string) {
+  const H = 240, top = 18, bottom = 34, left = 40;
+  const slot = Math.max(30, Math.min(110, Math.floor(1000 / bars.length)));
+  const W = left + slot * bars.length + 8;
+  const max = Math.max(...bars.map((b) => Math.max(yi(b.city), yi(b.county))), 1);
+  const step = max > 60 ? 20 : max > 30 ? 10 : 5;
+  const ymax = Math.ceil(max / step) * step;
+  const y = (v: number) => top + (H - top - bottom) * (1 - v / ymax);
+  const bw = Math.min(26, slot * 0.34);
+  const ticks = Array.from({ length: ymax / step + 1 }, (_, i) => i * step);
+  let prevYear = '';
+  return { id, W, H, ticks, y, bw, slot, left, bottom, bars: bars.map((b, i) => {
+    const x = left + slot * i + slot / 2;
+    const yr = b.k.slice(0, 4); const showYear = yr !== prevYear; prevYear = yr;
+    return { ...b, x, showYear, yr };
+  }) };
+}
+const charts = [chart(quarters, 'q'), chart(months, 'm')];
+const sum = (bs: VolBar[], r: 'city' | 'county') => bs.reduce((s, b) => s + b[r], 0);
+---
+{months.length > 0 && (
+<section class="pvol" id="volume">
+  <h2>預售屋成交總金額：新竹市 vs 新竹縣</h2>
+  <div class="pvol-bar">
+    <div class="filter" id="pvf" role="group" aria-label="切換統計期間">
+      <button class="on" data-v="q" aria-pressed="true">按季</button>
+      <button data-v="m" aria-pressed="false">按月</button>
+    </div>
+    <div class="pvol-key"><span><i class="c"></i>新竹市</span><span><i class="k"></i>新竹縣</span><span><i class="p"></i>未完整（仍在申報期）</span></div>
+  </div>
+  {charts.map((c) => (
+    <div class="pvol-wrap" data-view={c.id} hidden={c.id !== 'q'}>
+      <svg viewBox={`0 0 ${c.W} ${c.H}`} width={c.W} height={c.H} role="img" aria-label={c.id === 'q' ? '每季預售屋成交總金額長條圖' : '每月預售屋成交總金額長條圖'}>
+        {c.ticks.map((t) => <g class="gy"><line x1={c.left} x2={c.W} y1={c.y(t)} y2={c.y(t)} /><text x={c.left - 6} y={c.y(t) + 4}>{t}</text></g>)}
+        <text class="unit" x={2} y={10}>億元</text>
+        {c.bars.map((b) => (
+          <g class:list={['b', { partial: b.partial }]} tabindex="0">
+            <title>{`${b.k}${b.partial ? '（未完整）' : ''}\n新竹市 ${fmt(yi(b.city))} 億（${b.cityN} 戶）\n新竹縣 ${fmt(yi(b.county))} 億（${b.countyN} 戶）`}</title>
+            <rect class="c" x={b.x - c.bw - 1} y={c.y(yi(b.city))} width={c.bw} height={Math.max(0, c.y(0) - c.y(yi(b.city)))} rx="2" />
+            <rect class="k" x={b.x + 1} y={c.y(yi(b.county))} width={c.bw} height={Math.max(0, c.y(0) - c.y(yi(b.county)))} rx="2" />
+            <text class="xl" x={b.x} y={c.H - c.bottom + 15}>{b.label}</text>
+            {c.id === 'm' && b.showYear && <text class="yl" x={b.x} y={c.H - c.bottom + 30}>{b.yr}</text>}
+          </g>
+        ))}
+      </svg>
+    </div>
+  ))}
+  <p class="note">依內政部預售屋實價登錄「簽約日」加總每戶總價（含車位），排除解約與單筆 {BULK_AREA} 坪以上的整棟、廠辦交易（目前 {excluded} 筆）。最新一個月／一季還在 30 天申報期內，之後幾批公布會再往上補。滑過或點長條可看金額與戶數。</p>
+  <details class="pvol-t"><summary>看數字表</summary>
+    <div class="tw"><table>
+      <tr><th>期間</th><th class="n">新竹市（億）</th><th class="n">戶數</th><th class="n">新竹縣（億）</th><th class="n">戶數</th></tr>
+      {[...quarters].reverse().map((b) => <tr><td>{b.k}{b.partial && '（未完整）'}</td><td class="n">{fmt(yi(b.city))}</td><td class="n">{b.cityN}</td><td class="n">{fmt(yi(b.county))}</td><td class="n">{b.countyN}</td></tr>)}
+    </table></div>
+  </details>
+</section>
+)}
+<script>
+  const vb = document.querySelectorAll<HTMLButtonElement>('#pvf button');
+  vb.forEach((b) => b.addEventListener('click', () => {
+    vb.forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); });
+    document.querySelectorAll<HTMLElement>('.pvol-wrap').forEach((w) => { w.hidden = w.dataset.view !== b.dataset.v; });
+    toEnd();
+  }));
+  // 手機寬度不夠時，預設捲到最新期間
+  const toEnd = () => document.querySelectorAll<HTMLElement>('.pvol-wrap').forEach((w) => { w.scrollLeft = w.scrollWidth; });
+  toEnd();
+</script>
+<style>
+  .pvol-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+  .pvol-key{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--sub)}
+  .pvol-key i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  .pvol-key i.c{background:var(--wind)} .pvol-key i.k{background:var(--persimmon)}
+  .pvol-key i.p{background:var(--sub);opacity:.45}
+  .pvol-wrap{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:10px 8px 4px;-webkit-overflow-scrolling:touch}
+  .pvol-wrap svg{display:block;max-width:none}
+  .gy line{stroke:var(--line);stroke-width:1} .gy text,.unit{font-size:11px;fill:var(--sub);text-anchor:end}
+  .unit{text-anchor:start}
+  rect.c{fill:var(--wind)} rect.k{fill:var(--persimmon)}
+  .b.partial rect{opacity:.45}
+  .b:hover rect,.b:focus rect{filter:brightness(.88)} .b:focus{outline:none}
+  .b:focus-visible rect{stroke:var(--ink);stroke-width:1.5}
+  .xl{font-size:11px;fill:var(--ink);text-anchor:middle} .yl{font-size:10px;fill:var(--sub);text-anchor:middle}
+  .pvol-t{margin:6px 0 4px} .pvol-t summary{cursor:pointer;color:var(--acc);font-size:14px}
+</style>

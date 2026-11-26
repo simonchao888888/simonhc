@@ -5,6 +5,7 @@ import { regions, districts, districtUrl, presaleNews, pct } from '../lib/data';
 import { latestRelease, nextRelease, md, LAG_NOTE } from '../lib/data';
 import { featured, all, asOf, note, allNote, rName, statusClass, f1, pageIdOf, hasRealDeals } from '../lib/presale';
 import { DISCLAIMER } from '../components/Parts';
+import PresaleVolume from '../components/PresaleVolume.astro';
 const rows = districts.filter((d) => d.presale != null && d.used != null).sort((a, b) => b.presale! - a.presale!);
 const active = featured.filter((p) => p.status.startsWith('2026'));
 const dists = [...new Set(all.map((p) => p.dist || rName(p.r)))];
@@ -20,6 +21,8 @@ const dists = [...new Set(all.map((p) => p.dist || rName(p.r)))];
     <div class="card"><div class="note">2026 年仍有成交的主要建案</div><div class="stat">{active.length}<small> 個</small></div><div class="note">見下方建案總覽</div></div>
     <div class="card"><div class="note">收錄建案（有揭露成交）</div><div class="stat">{all.length}<small> 個</small></div><div class="note">新竹縣 + 新竹市</div></div>
   </div>
+
+  <PresaleVolume />
 
   <h2 id="projects">主要建案總覽</h2>
   <p class="note">{note}</p>

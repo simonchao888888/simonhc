@@ -101,3 +101,45 @@ export function analyze(deals: Deal[]) {
   return { n: deals.length, live: live.length, cancel: deals.length - live.length, upMed: med(ups), upMin: ups.length ? Math.min(...ups) : null, upMax: ups.length ? Math.max(...ups) : null,
     netMed: med(live.map((d) => d.net)), totalMed: med(live.map((d) => d.total)), parkN: parks.length, ptypes, unsplit, floors, rooms, grid, latest: deals[0]?.d };
 }
+
+// 預售屋成交總金額（依簽約月份／季度加總，新竹市 vs 新竹縣）
+// 排除：解約、單筆 500 坪以上（整棟、廠辦等大宗交易，會讓單月暴衝）
+// 起點：資料最早月份 +2 個月（最前面兩個月只收到部分批次，不完整）
+// 最新簽約月份與其所在季度：仍在 30 天申報期內，標示「未完整」
+export interface VolBar { k: string; label: string; city: number; county: number; cityN: number; countyN: number; partial: boolean }
+export const BULK_AREA = 500;
+export const volume = (() => {
+  const mm = new Map<string, { city: number; county: number; cityN: number; countyN: number }>();
+  let excluded = 0, earliest = '9999';
+  for (const [k, list] of Object.entries(DEALS)) {
+    const r = k.startsWith('city|') ? 'city' : 'county';
+    for (const x of list) {
+      if (x.d < earliest) earliest = x.d;
+      if (x.cancel) continue;
+      if ((x.area || 0) >= BULK_AREA) { excluded++; continue; }
+      const m = x.d.slice(0, 7);
+      const o = mm.get(m) || { city: 0, county: 0, cityN: 0, countyN: 0 };
+      o[r] += x.total || 0; o[`${r}N` as 'cityN'] += 1;
+      mm.set(m, o);
+    }
+  }
+  if (!mm.size) return { months: [] as VolBar[], quarters: [] as VolBar[], excluded, start: '' };
+  const addM = (ym: string, n: number) => { const y = +ym.slice(0, 4), m = +ym.slice(5, 7) - 1 + n; return `${y + Math.floor(m / 12)}-${String((m % 12) + 1).padStart(2, '0')}`; };
+  const start = addM(earliest.slice(0, 7), 2), last = presaleMax.slice(0, 7);
+  const months: VolBar[] = [];
+  for (let m = start; m <= last; m = addM(m, 1)) {
+    const o = mm.get(m) || { city: 0, county: 0, cityN: 0, countyN: 0 };
+    months.push({ k: m, label: `${+m.slice(5)}月`, ...o, partial: m === last });
+  }
+  const qOf = (m: string) => `${m.slice(0, 4)}Q${Math.ceil(+m.slice(5) / 3)}`;
+  const qm = new Map<string, VolBar & { cnt: number }>();
+  for (const b of months) {
+    const q = qOf(b.k);
+    const o = qm.get(q) || { k: q, label: `${q.slice(2, 4)}Q${q.slice(5)}`, city: 0, county: 0, cityN: 0, countyN: 0, partial: false, cnt: 0 };
+    o.city += b.city; o.county += b.county; o.cityN += b.cityN; o.countyN += b.countyN; o.cnt++; o.partial ||= b.partial;
+    qm.set(q, o);
+  }
+  // 只留下三個月都在範圍內的季度（最新一季例外，標示未完整）
+  const quarters = [...qm.values()].filter((q) => q.cnt === 3 || q.partial).map(({ cnt, ...q }) => ({ ...q, partial: q.partial || cnt < 3 }));
+  return { months, quarters, excluded, start };
+})();
