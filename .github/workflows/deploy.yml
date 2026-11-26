@@ -23,6 +23,12 @@ jobs:
       - run: npm run build
         env:
           SITE_URL: ${{ vars.SITE_URL || 'https://simonhc.com' }}
+      - name: 保留上一版的樣式與程式檔（瀏覽器若還暫存舊網頁，舊網頁要用的檔案仍然讀得到）
+        run: |
+          git fetch -q --depth 1 origin gh-pages || exit 0
+          mkdir -p dist/_astro
+          git archive FETCH_HEAD _astro | tar -x -C /tmp && cp -n /tmp/_astro/* dist/_astro/ || true
+          ls dist/_astro | wc -l
       - name: 推到 gh-pages
         run: |
           cd dist
