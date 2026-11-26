@@ -138,6 +138,8 @@ footer b{color:var(--ink);font-family:var(--hand);font-size:17px}
 .pano svg{display:block;width:100%;height:auto}
 .pano .cap{position:absolute;left:20px;bottom:10px;font-size:12px;color:var(--sub)}
 .pano a{cursor:pointer}
+.pano-age{margin:0;padding:12px 20px 0;align-items:center}
+.pano-age .note{margin-right:4px}
 .pano a:hover .pin rect{fill:var(--bamboo)}
 .pano a:focus-visible .pin rect{fill:var(--wind)}
 

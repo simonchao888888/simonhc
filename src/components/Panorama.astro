@@ -1,11 +1,15 @@
 ---
 // 新竹縣市「從海邊到山邊」手繪全景；每個地點標上目前中古屋每坪中位數並連到該區頁面
-import { regions, dist, districtUrl, regionUrl } from '../lib/data';
-const pin = (id: string) => { const d = dist(id); return { name: d.name, v: d.used, href: districtUrl(d) }; };
-const pins = [
+import { regions, dist, districtUrl, regionUrl, AGE_LABEL, type AgeBands } from '../lib/data';
+// 每個地點帶全部屋齡與四個屋齡區間的中位數，上方按鈕切換
+const bands = (v?: number | null, a?: AgeBands) => ({ all: v ?? null, ...Object.fromEntries(AGE_LABEL.map(([k]) => [k, a?.[k]?.med ?? null])) }) as Record<string, number | null>;
+const pin = (id: string) => { const d = dist(id); return { name: d.name, b: bands(d.used, d.ages), href: districtUrl(d) }; };
+const MODES: [string, string][] = [['all', '全部屋齡'], ...AGE_LABEL.map(([k, l]) => [k, `屋齡 ${l}`] as [string, string])];
+const txt = (v: number | null) => (v != null ? `${v.toFixed(1)} 萬/坪` : '成交少');
+const pins: { x: number; y: number; name: string; b: Record<string, number | null>; href: string }[] = [
   { x: 200, y: 134, ...pin('xinfeng') },
   { x: 360, y: 84, ...pin('hukou') },
-  { x: 560, y: 70, name: '新竹市', v: regions.city.used, href: regionUrl('city') },
+  { x: 560, y: 70, name: '新竹市', b: bands(regions.city.used, regions.city.ages), href: regionUrl('city') },
   { x: 790, y: 34, ...pin('zhubei') },
   { x: 1000, y: 112, ...pin('baoshan'), name: '寶山・竹科' },
   { x: 1200, y: 108, ...pin('zhudong') },
@@ -21,6 +25,10 @@ for (let r = 0; r < 4; r++) for (let c = 0; c < 9; c++) sciWin.push(`M${934 + c 
 const towers = [[700, 196, 34], [742, 168, 30], [780, 150, 36], [824, 182, 28], [858, 214, 26]];
 ---
 <div class="pano" role="group" aria-label="新竹縣市從海邊到山邊的插圖，標示各區中古屋每坪中位數">
+<div class="filter pano-age" role="group" aria-label="切換屋齡">
+  <span class="note">中古屋近半年每坪中位數：</span>
+  {MODES.map(([k, l], i) => <button type="button" class:list={{ on: i === 0 }} data-age={k} aria-pressed={i === 0 ? 'true' : 'false'}>{l}</button>)}
+</div>
 <div class="scroll"><svg viewBox="0 0 1600 430" xmlns="http://www.w3.org/2000/svg" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <defs>
     <linearGradient id="pSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFDCEF" /><stop offset=".62" stop-color="#EAF2F2" /><stop offset="1" stop-color="#F8EBD8" /></linearGradient>
@@ -122,16 +130,28 @@ const towers = [[700, 196, 34], [742, 168, 30], [780, 150, 36], [824, 182, 28], 
 
   <!-- 地名與價格 -->
   {pins.map((p) => (
-    <a href={p.href} aria-label={`${p.name}${p.v ? `，中古屋每坪中位數 ${p.v} 萬` : ''}`}>
-      <path d={`M${p.x} ${p.y + 44}V${Math.min(p.y + 150, 320)}`} stroke={ink} stroke-width="1" stroke-dasharray="2 4" />
+    <a href={p.href} aria-label={`${p.name}，中古屋（全部屋齡）每坪中位數 ${p.b.all ?? '—'} 萬`}>
+      <path d={`M${p.x} ${p.y + 62}V${Math.min(p.y + 150, 320)}`} stroke={ink} stroke-width="1" stroke-dasharray="2 4" />
       <g class="pin">
-        <rect x={p.x - 66} y={p.y - 10} width="132" height="54" rx="4" fill="#1D3445" />
-        <rect x={p.x - 66} y={p.y - 10} width="5" height="54" rx="2" fill={persimmon} />
+        <rect x={p.x - 70} y={p.y - 10} width="140" height="72" rx="4" fill="#1D3445" />
+        <rect x={p.x - 70} y={p.y - 10} width="5" height="72" rx="2" fill={persimmon} />
         <text x={p.x} y={p.y + 12} text-anchor="middle" fill="#fff" font-size="19" font-family="LXGW WenKai TC, serif">{p.name}</text>
-        <text x={p.x} y={p.y + 35} text-anchor="middle" fill="#F6D9A8" font-size="16" font-family="Noto Sans TC, sans-serif">{p.v ? `${p.v} 萬/坪` : '成交少'}</text>
+        <text class="pv" x={p.x} y={p.y + 35} text-anchor="middle" fill="#F6D9A8" font-size="16" font-family="Noto Sans TC, sans-serif"
+          {...Object.fromEntries(Object.entries(p.b).map(([k, v]) => [`data-${k}`, txt(v)]))}>{txt(p.b.all)}</text>
+        <text class="pl" x={p.x} y={p.y + 54} text-anchor="middle" fill="#B9C9D2" font-size="12" font-family="Noto Sans TC, sans-serif">中古・全部屋齡</text>
       </g>
     </a>
   ))}
 </svg></div>
-<div class="cap">示意插圖，由西邊海岸到東邊山區；數字為近半年中古屋每坪中位數（已扣車位），點地名看該區。</div>
+<div class="cap">示意插圖，由西邊海岸到東邊山區；數字為近半年中古屋每坪中位數（已扣車位），屋齡 = 成交日 − 建築完成日，「成交少」表示該屋齡不到 5 筆。點地名看該區，<a href="/region/#age">看各區屋齡完整表</a>。</div>
+<script>
+  const pb = document.querySelectorAll<HTMLButtonElement>('.pano-age button');
+  const LBL: Record<string, string> = { all: '中古・全部屋齡', '0-10': '屋齡 10 年內', '11-20': '屋齡 11～20 年', '21-30': '屋齡 21～30 年', '31+': '屋齡 30 年以上' };
+  pb.forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.age!;
+    pb.forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); });
+    document.querySelectorAll<SVGTextElement>('.pano .pv').forEach((t) => { t.textContent = t.getAttribute(`data-${k}`); });
+    document.querySelectorAll<SVGTextElement>('.pano .pl').forEach((t) => { t.textContent = LBL[k]; });
+  }));
+</script>
 </div>
