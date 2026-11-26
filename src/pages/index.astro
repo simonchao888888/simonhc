@@ -154,7 +154,7 @@ const ld = { '@context': 'https://schema.org', '@type': 'WebSite', '@id': new UR
             <Photo id={z.img} ratio={i === 0 ? '16/10' : '3/2'} sizes={i === 0 ? '(max-width: 700px) 100vw, 600px' : '(max-width: 700px) 50vw, 300px'} note={z.imgNote} label={z.name} nested />
             <div class="bd">
               <div class="nm"><b>{z.name}</b><span class="pr">{zoneStats[z.id]?.used ?? '—'}<small>萬/坪</small></span></div>
-              <span class="per">{zoneStats[z.id]?.used != null ? `${d.name}・依路段歸類 ${zoneStats[z.id].n} 筆` : `近半年僅 ${zoneStats[z.id]?.n ?? 0} 筆，樣本不足`}</span>
+              <span class="per">{zoneStats[z.id]?.used != null ? `${d.name}・近一年依路段歸類 ${zoneStats[z.id].n} 筆` : `近一年僅 ${zoneStats[z.id]?.n ?? 0} 筆，樣本不足`}</span>
               <span class="zf">{z.feature}</span>
               <span class="tr">交通：{z.transit}</span>
             </div>

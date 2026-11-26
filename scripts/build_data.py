@@ -513,12 +513,13 @@ def main():
             "tier": "main" if n >= 20 else "ref" if n >= 5 else "low",
         }
 
-    # 14 個生活圈（依門牌路名歸類；少於 10 筆不給中位數）
+    # 14 個生活圈（依門牌路名歸類；樣本較少，取近一年、少於 20 筆不給中位數）
     out["zones"] = {}
+    zsince = latest - timedelta(days=365)
     for z in sorted({x[0] for x in zdeals}):
-        xs = [x for x in zdeals if x[0] == z and x[2] >= since]
+        xs = [x for x in zdeals if x[0] == z and x[2] >= zsince]
         v = [x[3] for x in xs]
-        out["zones"][z] = {"used": med(v) if len(v) >= 10 else None, "n": len(v),
+        out["zones"][z] = {"used": med(v) if len(v) >= 20 else None, "n": len(v), "window": "1y",
                            "ages": age_stats([(None, None, x[2], x[3], x[4]) for x in xs])}
 
     # 縣市年變化改用「組成調整」：各行政區自己的年變化，依本期成交筆數加權。
