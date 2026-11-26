@@ -179,3 +179,37 @@
   window.SiteUI = { bindPage: bindPage, openSearch: openSearch, closeSearch: closeSearch, closeMenu: function () { setMenu(false); closeGroups(); } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
+
+// Email 按鈕：很多人電腦沒設定郵件程式，mailto 點了沒反應 → 改成跳出視窗，可選 Gmail、預設郵件程式或複製信箱
+(function () {
+  var dlg;
+  function open(addr, subj) {
+    if (!dlg) {
+      dlg = document.createElement('dialog');
+      dlg.className = 'mail-dlg';
+      dlg.innerHTML = '<form method="dialog"><button class="x" aria-label="關閉">×</button></form>' +
+        '<h3>寫信給 Simon 哥</h3><p class="addr"></p>' +
+        '<div class="acts"><a class="btn p g" target="_blank" rel="noopener">用 Gmail 寫信</a>' +
+        '<a class="btn s m">用電腦的郵件程式</a><button type="button" class="btn s c">複製信箱</button></div><p class="msg" aria-live="polite"></p>';
+      document.body.appendChild(dlg);
+      dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+    }
+    var q = subj ? '&su=' + encodeURIComponent(subj) : '';
+    dlg.querySelector('.addr').textContent = addr;
+    dlg.querySelector('.g').href = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(addr) + q;
+    dlg.querySelector('.m').href = 'mailto:' + addr + (subj ? '?subject=' + encodeURIComponent(subj) : '');
+    var msg = dlg.querySelector('.msg'); msg.textContent = '';
+    dlg.querySelector('.c').onclick = function () {
+      var done = function () { msg.textContent = '已複製：' + addr; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(addr).then(done, function () { msg.textContent = '請手動複製：' + addr; });
+      else { msg.textContent = '請手動複製：' + addr; }
+    };
+    if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[data-mail]');
+    if (!a) return;
+    e.preventDefault();
+    open(a.getAttribute('data-mail'), a.getAttribute('data-subject'));
+  });
+})();

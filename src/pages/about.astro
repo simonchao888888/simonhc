@@ -22,7 +22,7 @@ const ld = { '@context': 'https://schema.org', '@type': 'AboutPage', mainEntity:
       <div class="contact">
         {contacts.map(([k, v]) => isTodo(v)
           ? <span>{k}：<mark class="todo">待填</mark></span>
-          : <a href={k === 'Email' ? `mailto:${v}` : v} rel="noopener">{k}{k === 'Email' ? `：${v}` : ''}</a>)}
+          : <a href={k === 'Email' ? `mailto:${v}` : v} data-mail={k === 'Email' ? v : undefined} rel="noopener">{k}{k === 'Email' ? `：${v}` : ''}</a>)}
       </div>
     </div>
   </section>
