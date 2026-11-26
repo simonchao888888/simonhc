@@ -71,3 +71,6 @@ export const regionUrl = (k: RegionKey) => `/region/${regions[k].slug}/`;
 export const pct = (a: number, b: number) => ((a / b - 1) * 100);
 export const fmt = (n?: number | null, d = 0) =>
   n == null || isNaN(n) ? '—' : Number(n).toLocaleString('zh-TW', { maximumFractionDigits: d, minimumFractionDigits: d });
+
+// 14 個生活圈的中古屋每坪中位數（依門牌路名歸類，近半年；少於 10 筆為 null）
+export const zoneStats: Record<string, { used: number | null; n: number; ages?: AgeBands }> = (build as any).zones ?? {};

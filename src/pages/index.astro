@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import Photo from '../components/Photo.astro';
 import Portrait from '../components/Portrait.astro';
 import { getCollection } from 'astro:content';
-import { regions, districts, districtUrl, regionUrl, meta, latestRelease, nextRelease, md } from '../lib/data';
+import { regions, districts, districtUrl, regionUrl, meta, latestRelease, nextRelease, md, zoneStats } from '../lib/data';
 import { news, policyRate, mortgageRates, feedData } from '../lib/news';
 import { featured, f1 } from '../lib/presale';
 import { founder as F } from '../lib/founder';
@@ -137,7 +137,7 @@ const ld = { '@context': 'https://schema.org', '@type': 'WebSite', '@id': new UR
 
   <section class="sx t-life" aria-labelledby="zone-h">
     <div class="sx-h"><h2 id="zone-h">新竹行政區與生活圈</h2><a class="more" href="/areas/">生活圈完整介紹</a>
-      <p>價格是生活圈所在行政區的近半年中古屋每坪中位數（{period}），實價登錄沒有生活圈欄位，因此不另外切分。</p></div>
+      <p>近半年（{period}）中古屋每坪中位數，已扣車位。實價登錄沒有生活圈欄位，本站依成交門牌的路名歸到各生活圈，少於 10 筆不給數字。</p></div>
     <div class="zones">
       {ZONES.slice(7, 8).concat(ZONES.filter((z) => z.id !== 'zbhsr').slice(0, 9)).map((z, i) => {
         const d = zoneDist(z.dist);
@@ -145,8 +145,8 @@ const ld = { '@context': 'https://schema.org', '@type': 'WebSite', '@id': new UR
           <a class:list={['zone', { big: i === 0 }]} href={z.href}>
             <Photo id={z.img} ratio={i === 0 ? '16/10' : '3/2'} sizes={i === 0 ? '(max-width: 700px) 100vw, 600px' : '(max-width: 700px) 50vw, 300px'} note={z.imgNote} label={z.name} nested />
             <div class="bd">
-              <div class="nm"><b>{z.name}</b><span class="pr">{d.used ?? '—'}<small>萬/坪</small></span></div>
-              <span class="per">{d.name}中古屋中位數・{d.n ?? 0} 筆</span>
+              <div class="nm"><b>{z.name}</b><span class="pr">{zoneStats[z.id]?.used ?? '—'}<small>萬/坪</small></span></div>
+              <span class="per">{zoneStats[z.id]?.used != null ? `${d.name}・依路段歸類 ${zoneStats[z.id].n} 筆` : `近半年僅 ${zoneStats[z.id]?.n ?? 0} 筆，樣本不足`}</span>
               <span class="zf">{z.feature}</span>
               <span class="tr">交通：{z.transit}</span>
             </div>

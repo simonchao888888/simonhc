@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { dist, districtUrl, meta, md } from '../lib/data';
+import { dist, districtUrl, meta, md, zoneStats } from '../lib/data';
 import Photo from '../components/Photo.astro';
 import PageBanner from '../components/PageBanner.astro';
 import { ZONES } from '../lib/images';
@@ -19,13 +19,13 @@ const zones: [string, string, string[]][] = [
 ---
 <Base title="新竹生活圈房價與區域介紹" description="新竹 14 個主要生活圈：關埔、巨城、金雅、南寮、新竹舊城、光華、清大交大、竹北高鐵、竹北縣治、台元、竹東二重埔、寶山、湖口、新豐，附實景照片、房價、交通與生活機能。" active="areas" crumbs={[['生活圈']]}>
   <PageBanner img="zhubei-tofu" tone="life" kicker="新竹生活圈" title="用每天要去哪裡，選你的新竹生活圈" lead="14 個主要生活圈的實景照片、所在行政區房價、交通與生活機能。先決定通勤與學區，再比單價。" />
-  <p class="note">房價為生活圈所在行政區近半年（{period}）中古屋每坪中位數，已扣車位。實價登錄沒有生活圈欄位，因此不另外切分；照片標示攝影者與授權，沒有合法實景照片的生活圈以示意色塊呈現。</p>
+  <p class="note">房價為各生活圈近半年（{period}）中古屋每坪中位數，已扣車位。實價登錄沒有生活圈欄位，本站依成交門牌的路名歸到各生活圈（例如竹北高鐵＝高鐵路、文興路、嘉豐、隘口、六家一帶），少於 10 筆不給數字；照片標示攝影者與授權，沒有合法實景照片的生活圈以示意色塊呈現。</p>
   <div class="zgrid">{ZONES.map((z) => { const d = dist(z.dist); return (
     <article class="zcard t-life" id={`z-${z.id}`}>
       <Photo id={z.img} ratio="3/2" sizes="(max-width: 700px) 100vw, 380px" note={z.imgNote} label={z.name} />
       <div class="bd">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><h3>{z.name}</h3><span class="pr">{d.used ?? '—'}<small class="note"> 萬/坪</small></span></div>
-        <p class="note" style="margin:2px 0 8px">{d.name}中古屋中位數・{d.n ?? 0} 筆・{period}</p>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><h3>{z.name}</h3><span class="pr">{zoneStats[z.id]?.used ?? '—'}<small class="note"> 萬/坪</small></span></div>
+        <p class="note" style="margin:2px 0 8px">{zoneStats[z.id]?.used != null ? `依路段歸類 ${zoneStats[z.id].n} 筆・${period}（${d.name}整體 ${d.used} 萬）` : `近半年僅 ${zoneStats[z.id]?.n ?? 0} 筆，樣本不足（${d.name}整體 ${d.used} 萬）`}</p>
         <p style="margin:0">{z.feature}</p>
         <dl><dt>交通</dt><dd>{z.transit}</dd><dt>生活機能</dt><dd>{z.life}</dd></dl>
         <a class="go" href={districtUrl(d)}>看{d.name}房價、建案與租金</a>

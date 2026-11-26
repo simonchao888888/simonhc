@@ -1,6 +1,6 @@
 // 站內搜尋索引：區域、預售建案、文章、新聞、工具、頁面。site.js 第一次打開搜尋時才載入。
 import { getCollection } from 'astro:content';
-import { regions, districts, districtUrl, regionUrl } from '../lib/data';
+import { regions, districts, districtUrl, regionUrl, zoneStats } from '../lib/data';
 import { featured, pipelineOnly, f1 } from '../lib/presale';
 import { news } from '../lib/news';
 import { TOOLS } from '../lib/tools';
@@ -39,7 +39,7 @@ export async function GET() {
   ];
   for (const [t, u, s, w] of zones) items.push({ t, u, k: '生活圈', s, w });
   // V4：14 個生活圈卡片
-  for (const z of ZONES) { const d = districts.find((x) => x.id === z.dist)!; items.push({ t: `${z.name}生活圈`, u: `/areas/#z-${z.id}`, k: '生活圈', s: `${d.name}・${d.used ?? '—'} 萬/坪`, w: `${z.name} ${z.feature} ${z.transit} ${z.life}` }); }
+  for (const z of ZONES) { const d = districts.find((x) => x.id === z.dist)!; items.push({ t: `${z.name}生活圈`, u: `/areas/#z-${z.id}`, k: '生活圈', s: `${d.name}・${zoneStats[z.id]?.used != null ? zoneStats[z.id].used + ' 萬/坪' : '樣本不足'}`, w: `${z.name} ${z.feature} ${z.transit} ${z.life}` }); }
   for (const c of CON.items) items.push({ t: c.name, u: `/construction/#${c.id}`, k: '重大建設', s: `${c.dist}・${c.status}`, w: `${c.type} ${c.agency} ${c.where} 建設` });
   for (const d of districts) { const short = d.name.replace(/[市鎮鄉區]$/, ''); if (short !== d.name) items.push({ t: short, u: districtUrl(d), k: '區域', s: d.name, w: d.name }); }
   items.push({ t: '巨城購物中心周邊（東區）', u: districtUrl(districts.find((d) => d.id === 'east')!), k: '生活圈', s: '新竹市東區', w: '巨城 Big City 中央路 民權路' });

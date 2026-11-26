@@ -54,6 +54,13 @@ const desc = `${p.name}（${where}）預售屋實價登錄：${p.med ? `每坪�
   </table></div>
   {p.note && <div class="warn">{p.note}</div>}
 
+  {p.src === 'leju' && p.lj && (
+    <div class="card" style="margin:22px 0;border-left:4px solid var(--c-build)">
+      <h2 style="margin:0 0 6px;font-size:21px">另有 {p.lj.n - (p.moiN ?? 0)} 筆成交只在樂居</h2>
+      <p style="margin:0 0 10px">內政部官方網站目前只公布本案 {p.moiN} 筆（下方逐戶明細就是這 {p.moiN} 筆，我們在內政部實價查詢網核對過筆數一致）。樂居的 {p.lj.n} 筆包含它自行彙整、內政部尚未公布的預售成交，逐戶明細請到樂居查看；內政部公布後，本站會在下一批更新（每月 1、11、21 日）自動補進來。</p>
+      <a class="btn p" href={p.lj.url} rel="noopener" target="_blank">在樂居看全部 {p.lj.n} 筆成交明細</a>
+    </div>
+  )}
   {deals.length > 0 ? <DealsSection deals={deals} name={p.name} /> : <>
     <h2 id="deals">成交明細與拆分</h2>
     <div class="card">
