@@ -1,1 +1,13 @@
-[]
+[
+ {
+  "at": "2026-11-26 18:38",
+  "status": "ok",
+  "run": "45803192202",
+  "fetched": 322,
+  "dropped": 189,
+  "merged": 41,
+  "hsinchu": 26,
+  "national": 30,
+  "errors": 0
+ }
+]
