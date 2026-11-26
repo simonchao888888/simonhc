@@ -1,7 +1,11 @@
 ---
-import Icon from '../components/Icon.astro';
 import Base from '../layouts/Base.astro';
-import { dist, districtUrl } from '../lib/data';
+import { dist, districtUrl, meta, md } from '../lib/data';
+import Photo from '../components/Photo.astro';
+import PageBanner from '../components/PageBanner.astro';
+import { ZONES } from '../lib/images';
+const half = (iso: string) => { const d = new Date(iso); d.setDate(d.getDate() - 183); return d.toISOString().slice(0, 10); };
+const period = `${md(half(meta.latestDeal))}～${md(meta.latestDeal)}`;
 const ZID = ['tech', 'zhubei-hsr', 'zhudong', 'hukou-xinfeng', 'old-city', 'xiangshan', 'hakka'];
 const zones: [string, string, string[]][] = [
   ['竹科・東區生活圈', '東區、關埔、寶山。離園區最近，關埔重劃區新案 5～6 字頭。', ['east', 'baoshan']],
@@ -13,10 +17,24 @@ const zones: [string, string, string[]][] = [
   ['客家山城・觀光生活圈', '關西、新埔、北埔、峨眉。以透天與農地為主，成交量小。', ['guanxi', 'xinpu', 'beipu', 'emei']],
 ];
 ---
-<Base title="新竹生活圈" description="用每天要去哪裡來選區域：竹科東區、竹北高鐵、竹東台68、湖口新豐、北區、香山七大新竹生活圈。" active="areas" crumbs={[['生活圈']]}>
-  <div class="pagehead"><Icon name="map" size={56} /><h1>新竹生活圈</h1></div>
-  <p class="lead">用「你每天要去哪裡」來選區域，而不是只看單價。</p>
+<Base title="新竹生活圈房價與區域介紹" description="新竹 14 個主要生活圈：關埔、巨城、金雅、南寮、新竹舊城、光華、清大交大、竹北高鐵、竹北縣治、台元、竹東二重埔、寶山、湖口、新豐，附實景照片、房價、交通與生活機能。" active="areas" crumbs={[['生活圈']]}>
+  <PageBanner img="zhubei-tofu" tone="life" kicker="新竹生活圈" title="用每天要去哪裡，選你的新竹生活圈" lead="14 個主要生活圈的實景照片、所在行政區房價、交通與生活機能。先決定通勤與學區，再比單價。" />
+  <p class="note">房價為生活圈所在行政區近半年（{period}）中古屋每坪中位數，已扣車位。實價登錄沒有生活圈欄位，因此不另外切分；照片標示攝影者與授權，沒有合法實景照片的生活圈以示意色塊呈現。</p>
+  <div class="zgrid">{ZONES.map((z) => { const d = dist(z.dist); return (
+    <article class="zcard t-life" id={`z-${z.id}`}>
+      <Photo id={z.img} ratio="3/2" sizes="(max-width: 700px) 100vw, 380px" note={z.imgNote} label={z.name} />
+      <div class="bd">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><h3>{z.name}</h3><span class="pr">{d.used ?? '—'}<small class="note"> 萬/坪</small></span></div>
+        <p class="note" style="margin:2px 0 8px">{d.name}中古屋中位數・{d.n ?? 0} 筆・{period}</p>
+        <p style="margin:0">{z.feature}</p>
+        <dl><dt>交通</dt><dd>{z.transit}</dd><dt>生活機能</dt><dd>{z.life}</dd></dl>
+        <a class="go" href={districtUrl(d)}>看{d.name}房價、建案與租金</a>
+      </div>
+    </article>
+  ); })}</div>
+
+  <section class="sx t-life"><div class="sx-h"><h2>七大生活圈怎麼選</h2></div>
   <div class="grid g2">{zones.map(([t, d, ids], i) => (
     <div class="card" id={ZID[i]}><h3 style="margin-top:0">{t}</h3><p>{d}</p><p>{ids.map((i) => <a class="tag" href={districtUrl(dist(i))}>{dist(i).name}{dist(i).used != null ? ` ${dist(i).used} 萬` : ''}</a>)}</p></div>
-  ))}</div>
+  ))}</div></section>
 </Base>

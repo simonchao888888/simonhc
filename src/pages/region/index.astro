@@ -1,4 +1,5 @@
 ---
+import PageBanner from '../../components/PageBanner.astro';
 import Base from '../../layouts/Base.astro';
 import DistrictTable from '../../components/DistrictTable.astro';
 import TileMap from '../../components/TileMap.astro';
@@ -10,8 +11,7 @@ const countyRows = districts.filter((d) => d.r === 'county' && d.used != null).s
 const cityDs = districts.filter((d) => d.r === 'city');
 ---
 <Base title="新竹縣市房價行情" description={`新竹市中古屋每坪中位數 ${c.used} 萬、新竹縣 ${k.used} 萬。竹北、東區、竹東、湖口、新豐、香山等 16 個行政區房價一次比較。`} active="prices" crumbs={[['查房價']]}>
-  <h1>新竹縣市房價行情</h1>
-  <p class="lead">中古屋與預售屋分開統計；中古屋單價已盡量扣除車位面積與價格。</p>
+  <PageBanner img="zhubei-2023" tone="price" kicker="房價行情中心" title="新竹縣市房價行情" lead="中古屋與預售屋分開統計，中古屋再依屋齡分段；單價已盡量扣除車位面積與價格。資料來自內政部實價登錄，每 10 天自動更新。" />
   <div class="grid g2">
     <a class="card" href={regionUrl('city')}><b>新竹市</b><div class="stat">{c.used}<small> 萬/坪・中古（{c.usedN} 筆）</small></div><div>預售 {c.presale} 萬/坪（{c.presaleN} 筆）</div><div class="note">東區・北區・香山區</div></a>
     <a class="card" href={regionUrl('county')}><b>新竹縣</b><div class="stat">{k.used}<small> 萬/坪・中古（{k.usedN} 筆）</small></div><div>預售 {k.presale} 萬/坪（{k.presaleN} 筆）</div><div class="note">竹北・湖口・竹東・新豐等 13 鄉鎮市</div></a>

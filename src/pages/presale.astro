@@ -1,5 +1,6 @@
 ---
 import Icon from '../components/Icon.astro';
+import PageBanner from '../components/PageBanner.astro';
 import Base from '../layouts/Base.astro';
 import { regions, districts, districtUrl, presaleNews, pct } from '../lib/data';
 import { latestRelease, nextRelease, md, LAG_NOTE } from '../lib/data';
@@ -11,7 +12,7 @@ const active = featured.filter((p) => p.status.startsWith('2026'));
 const dists = [...new Set(all.map((p) => p.dist || rName(p.r)))];
 ---
 <Base title="新竹縣市預售屋建案與實價登錄" description={`新竹縣市預售建案一覽：建案名稱、建商（起造人）、戶數、銷售期間、實價登錄每坪中位數與最高最低價。目前 2026 年仍有成交的主要建案 ${active.length} 個。`} active="presale" crumbs={[['預售行情']]}>
-  <div class="pagehead"><Icon name="crane" size={56} /><h1>新竹縣市預售屋建案與行情</h1></div>
+  <PageBanner img="site" tone="build" kicker="社區建案資料庫" title="新竹縣市預售屋建案與行情" lead="依內政部預售屋實價登錄逐戶整理，2019 年起收錄；建案照片為資料照，不代表特定建案。" note="資料照：新竹市建築工地" />
   <p class="lead">建案名稱、建商、戶數、銷售期間與實價登錄成交行情一次看。預售屋與中古屋分開統計，單價已扣除車位。</p>
   <p class="note">已收錄內政部 {md(latestRelease())} 公布的預售屋實價登錄，最新簽約日 {md(asOf)}；下一批 {md(nextRelease())} 公布。{LAG_NOTE}</p>
 

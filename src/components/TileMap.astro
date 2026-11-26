@@ -14,10 +14,10 @@ const S = 96, G = 6;
 const vals = districts.map((d) => d.used ?? (d.r === 'city' ? regions.city.used : null)).filter((x): x is number => x != null);
 const mn = Math.min(...vals), mx = Math.max(...vals);
 const color = (v: number | null | undefined) => {
-  if (v == null) return '#E9EEEB';
+  if (v == null) return '#EDF1F5';
   const t = (v - mn) / (mx - mn || 1);
-  // 淡黃綠 → 橄欖綠 → 深橄欖：低價淺、高價深（SimonHC 品牌色）
-  const stops = [[240, 238, 214], [221, 229, 190], [130, 150, 107], [53, 69, 47]];
+  // 淡藍 → 房價藍 → 深海軍藍：低價淺、高價深（V4 房價行情色）
+  const stops = [[234, 243, 252], [168, 202, 230], [40, 120, 181], [18, 43, 64]];
   const x = t * (stops.length - 1), i = Math.min(Math.floor(x), stops.length - 2), f = x - i;
   return `rgb(${stops[i].map((c, k) => Math.round(c + (stops[i + 1][k] - c) * f)).join(',')})`;
 };

@@ -1,4 +1,5 @@
 ---
+import PageBanner from '../components/PageBanner.astro';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import { getCollection } from 'astro:content';
@@ -9,9 +10,9 @@ const cases = posts.filter((p) => p.id.startsWith('case-'));
 const weekly = (await getCollection('weekly')).sort((a, b) => b.id.localeCompare(a.id));
 ---
 <Base title="Simon 哥觀點：新竹房產實戰與市場觀察" description="Simon 哥的選屋原則、建案拆解、房市週報與新聞判讀。原創觀點與 AI 輔助整理的內容分開標示。" crumbs={[['Simon 哥觀點']]}>
-  <div class="pagehead"><Icon name="vane" size={56} /><h1>Simon 哥觀點</h1></div>
+  <PageBanner tone="view" kicker="Simon價差房產" title="Simon 哥觀點" lead="看懂價差，先算風險。選屋原則、建案拆解、實戰案例與每週市場觀察；Simon 哥原創與 AI 輔助整理的內容分開標示。" />
   <p class="lead">看懂價差，先算風險。這裡放 Simon 哥的選屋原則與實戰觀點，以及依這些原則整理的建案拆解和新聞判讀。</p>
-  <div class="warn">署名規則：標示「Simon 哥」的內容為本人撰寫或審核；標示「SimonHC 編輯部」的內容由編輯部依公開資料整理、使用 AI 輔助撰寫，尚未經 Simon 哥逐篇審核，不代表本人言論。詳見<a href="/editorial/">內容編輯政策</a>。</div>
+  <div class="warn">署名規則：標示「Simon 哥」的內容為本人撰寫或審核；標示「新竹房產情報站編輯部」的內容由編輯部依公開資料整理、使用 AI 輔助撰寫，尚未經 Simon 哥逐篇審核，不代表本人言論。詳見<a href="/editorial/">內容編輯政策</a>。</div>
 
   <h2>Simon 哥的選屋原則</h2>
   <p class="byline">作者：<b>Simon 哥</b>（摘自<a href="/about/">創辦人介紹</a>）</p>
@@ -19,15 +20,15 @@ const weekly = (await getCollection('weekly')).sort((a, b) => b.id.localeCompare
   <blockquote class="take" style="margin-top:18px">{F.intro[1]}</blockquote>
 
   <h2>建案拆解</h2>
-  <p class="byline">作者：<b>SimonHC 編輯部</b>（實價登錄自動整理，AI 輔助撰寫）</p>
+  <p class="byline">作者：<b>新竹房產情報站編輯部</b>（實價登錄自動整理，AI 輔助撰寫）</p>
   <div class="views">{cases.map((p) => <a href={`/guide/${p.id}/`}><b>{p.data.title}</b><span class="note">{p.data.description}</span><span class="date">{p.data.pubDate.toISOString().slice(0, 10)}</span></a>)}</div>
 
   <h2>Simon 新竹房市週報</h2>
-  <p class="byline">作者：<b>SimonHC 編輯部</b>・每週一更新</p>
+  <p class="byline">作者：<b>新竹房產情報站編輯部</b>・每週一更新</p>
   <div class="views">{weekly.slice(0, 6).map((w) => <a href={`/weekly/${w.id}/`}><b>{w.data.title}</b><span class="note">{w.data.description}</span></a>)}</div>
 
   <h2>新聞判讀</h2>
-  <p class="byline">作者：<b>SimonHC 編輯部</b>（依 Simon 哥選屋原則整理，AI 輔助）</p>
+  <p class="byline">作者：<b>新竹房產情報站編輯部</b>（依 Simon 哥選屋原則整理，AI 輔助）</p>
   <div class="feed2">{news.slice(0, 6).map((n) => <a href={`/news/${n.id}/`}><div class="dt"><b>{+n.date.slice(5, 7)}/{+n.date.slice(8, 10)}</b>{n.date.slice(0, 4)}</div><div><h3><span class="cat">{n.cat}</span>{n.title}</h3><div class="note">{n.take.slice(0, 80)}…</div></div></a>)}</div>
   <p><a href="/news/">全部新聞判讀</a>・<a href="/guide/">全部買房指南</a></p>
 </Base>

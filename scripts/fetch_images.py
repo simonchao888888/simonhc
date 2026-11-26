@@ -42,9 +42,10 @@ def info(fname):
     strip = lambda s: html.unescape(re.sub(r"<[^>]+>", "", s or "")).strip()
     date = strip(m.get("DateTimeOriginal"))
     d = re.search(r"(\d{4})[-:](\d{2})[-:](\d{2})", date)
+    y = re.search(r"\b(19|20)\d{2}\b", date)
     return {"url": i["url"], "page": i["descriptionurl"], "w": i["width"], "h": i["height"],
             "author": strip(m.get("Artist")) or "未具名", "license": strip(m.get("LicenseShortName")),
-            "licenseUrl": m.get("LicenseUrl", ""), "date": "-".join(d.groups()) if d else (date[:10] or None)}
+            "licenseUrl": m.get("LicenseUrl", ""), "date": "-".join(d.groups()) if d else (y.group(0) if y else None)}
 
 
 def main():

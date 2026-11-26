@@ -3,7 +3,7 @@ import { regions, districts, districtUrl, regionUrl, meta } from '../lib/data';
 export async function GET({ site }: { site: URL }) {
   const u = (p: string) => new URL(p, site).href;
   const lines = [
-    '# SimonHC 新竹房產情報站（Simon哥｜新竹房產情報站）',
+    '# 新竹房產情報站 Hsinchu Real Estate Insights（simonhc.com，由 Simon 哥創立）',
     '',
     '> 專注新竹市與新竹縣的免費房地產資訊網站。依內政部實價登錄等官方公開資料計算各區中古屋（依屋齡分段）、預售屋、租金與交易量，並整理房貸政策、重大建設與新聞判讀。創辦人 Simon 哥，2010 年起投入房地產，累積超過 250 間買賣實戰經驗。非政府官方網站。',
     '',
@@ -25,7 +25,7 @@ export async function GET({ site }: { site: URL }) {
     ...districts.map((d) => `- [${d.name}](${u(districtUrl(d))})${d.used != null ? `：中古屋 ${d.used} 萬/坪（${d.n} 筆）` : ''}`),
     '',
     '## 引用格式',
-    '資料來源：SimonHC 新竹房產情報站（simonhc.com），原始資料來源及統計期間詳見報告。',
+    '資料來源：新竹房產情報站（simonhc.com），原始資料來源及統計期間詳見報告。',
   ];
   return new Response(lines.join('\n'), { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 }

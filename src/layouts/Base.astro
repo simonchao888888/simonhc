@@ -1,13 +1,15 @@
 ---
 import '../styles/global.css';
-interface Props { title: string; description: string; active?: string; crumbs?: [string, string?][]; jsonld?: object; noindex?: boolean }
-const { title, description, active = '', crumbs = [], jsonld, noindex = false } = Astro.props;
+import '../styles/v4.css';
+import { meta as DM } from '../lib/data';
+interface Props { title: string; description: string; active?: string; crumbs?: [string, string?][]; jsonld?: object; noindex?: boolean; bodyClass?: string; ogImage?: string }
+const { title, description, active = '', crumbs = [], jsonld, noindex = false, bodyClass = '', ogImage: ogIn } = Astro.props;
 import F from '../data/founder.json';
-const SITE = 'SimonHC 新竹房產情報站';
-const HOME_TITLE = '新竹房價行情、實價登錄與房市資訊｜SimonHC 新竹房產情報站';
+const SITE = '新竹房產情報站';
+const HOME_TITLE = '新竹房產情報站｜新竹房價、實價登錄、房市新聞與重大建設';
 const fullTitle = title === SITE || title === HOME_TITLE ? HOME_TITLE : `${title}｜${SITE}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const ogImage = new URL('/og.png', Astro.site).href;
+const ogImage = new URL(ogIn ?? '/og.png', Astro.site).href;
 // 手機抽屜選單：分組，每一項附一句說明（桌機改用下方攤開的分類列，不用下拉選單）
 type Item = [string, string, string]; // [網址, 名稱, 說明]
 const groups: { id: string; label: string; items: Item[] }[] = [
@@ -46,15 +48,16 @@ const cur = segOf(Astro.url.pathname);
 const isOn = (u: string) => segOf(u) === cur;
 // 分類列：品牌規劃的十個入口，直接攤開
 const catnav: (Item | null)[] = [
-  ['/', '首頁', ''], ['/region/', '房價行情', ''], ['/presale/', '社區建案', ''], ['/areas/', '新竹生活圈', ''], ['/news/', '房市新聞', ''],
-  ['/construction/', '重大建設', ''], ['/policy/', '房貸政策', ''], ['/tools/', '免費工具', ''], ['/viewpoint/', 'Simon哥觀點', ''], ['/about-simonhc/', '關於我們', ''],
+  ['/', '首頁', 'view'], ['/region/', '房價行情', 'price'], ['/presale/', '社區建案', 'build'], ['/areas/', '新竹生活圈', 'life'], ['/news/', '房市新聞', 'news'],
+  ['/construction/', '重大建設', 'con'], ['/policy/', '房貸政策', 'policy'], ['/tools/', '免費工具', 'tool'], ['/viewpoint/', 'Simon 哥觀點', 'view'],
 ];
+const upd = DM.synced;
 const C = F.contact as Record<string, string>;
 const social: [string, string | undefined][] = [['Facebook', C.facebook], ['Instagram', C.instagram], ['YouTube', C.youtube], ['Threads', C.threads], ['TikTok', C.tiktok], ['LINE', C.line]];
 const orgLd = {
-  '@context': 'https://schema.org', '@type': 'Organization', name: 'SimonHC 新竹房產情報站', alternateName: ['SimonHC', 'Simon哥｜新竹房產情報站'],
+  '@context': 'https://schema.org', '@type': 'Organization', '@id': new URL('/#org', Astro.site).href, name: '新竹房產情報站', alternateName: ['Hsinchu Real Estate Insights', 'SimonHC', 'SimonHC 新竹房產情報站'],
   url: Astro.site?.href, logo: new URL('/favicon.svg', Astro.site).href, slogan: '深耕新竹，讓房產資訊更透明。',
-  founder: { '@type': 'Person', name: 'Simon 哥（Simon Chao）', url: new URL('/about/', Astro.site).href },
+  founder: { '@type': 'Person', '@id': new URL('/about/#simon', Astro.site).href, name: 'Simon 哥（Simon Chao）', alternateName: 'Simon價差房產', url: new URL('/about/', Astro.site).href },
   sameAs: social.map(([, u]) => u).filter(Boolean),
 };
 const tabs: [string, string, string][] = [['/region/', '房價', 'M3 20V9l9-6 9 6v11h-6v-6H9v6z'], ['/presale/', '預售', 'M4 21V7h4V3h8v4h4v14M9 11h2m2 0h2m-6 4h2m2 0h2'], ['', '搜尋', 'M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM20 20l-4.8-4.8'], ['/tools/', '試算', 'M6 3h12v18H6zM9 7h6M9 11h1m2 0h1m2 0h0M9 15h1m2 0h1m2 0h0'], ['/guide/', '指南', 'M4 5c3-1 6-1 8 1 2-2 5-2 8-1v14c-3-1-6-1-8 1-2-2-5-2-8-1zM12 6v14']];
@@ -79,22 +82,23 @@ const crumbLd = crumbs.length ? {
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonical} />
   <meta property="og:locale" content="zh_TW" />
-  <meta property="og:site_name" content="SimonHC 新竹房產情報站" />
+  <meta property="og:site_name" content="新竹房產情報站" />
   <meta property="og:image" content={ogImage} />
   <meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="theme-color" content="#35452F" />
+  <meta name="theme-color" content="#122B40" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet" />
   <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
   {crumbLd && <script type="application/ld+json" set:html={JSON.stringify(crumbLd)} />}
   {jsonld && <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />}
 </head>
-<body>
+<body class={bodyClass}>
   <a class="skip" href="#content">跳到主要內容</a>
   <header class="hd"><div class="hd-in">
-    <a class="logo" href="/" aria-label="SimonHC 新竹房產情報站 首頁"><span class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" fill="none" stroke="#DDE5BE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9h12v-9" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M9 16l2.2-2.4 1.8 1.6L15.5 12" fill="none" stroke="#DDE5BE" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b class="wm">SIMONHC</b><small class="wm-sub">Simon哥｜新竹房產情報站</small></div></a>
+    <a class="brand" href="/" aria-label="新竹房產情報站 首頁"><svg class="mk" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="4" fill="#1D3A52"/><path d="M8 19 20 9l12 10" fill="none" stroke="#D4A04B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 31v-7M17 31v-11M22 31v-5M27 31v-9" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+      <span><b class="zh">新竹房產情報站</b><span class="en">HSINCHU REAL ESTATE INSIGHTS<span class="by">由 Simon 哥創立</span></span></span></a>
     <nav class="mainnav" id="mainnav" aria-label="主選單">
       {groups.map((g) => (
         <div class:list={['grp', { on: g.items.some(([u]) => isOn(u)) }]}>
@@ -102,15 +106,20 @@ const crumbLd = crumbs.length ? {
           <div class="panel">{g.items.map(([u, t, d]) => <a class:list={{ on: isOn(u) }} href={u}><b>{t}</b><span>{d}</span></a>)}</div>
         </div>
       ))}
-      {direct.map(([u, t]) => <a class:list={['gl', { on: isOn(u) }]} href={u}>{t}</a>)}
       <a class="gl ask-m" href="/community/#ask">問站長一個問題</a>
     </nav>
+    <div class="hd-meta">
+      <span class="upd">資料更新 <b>{upd.slice(5).replace('-', '/')}</b></span>
+      <a href="/about/">關於 Simon 哥</a>
+      {C.facebook && <a class="soc-i" href={C.facebook} rel="me noopener" target="_blank" aria-label="Facebook 粉絲專頁"><svg viewBox="0 0 24 24"><path d="M14 8h3V4h-3c-2.8 0-4 1.8-4 4.3V10H7v4h3v8h4v-8h3l.6-4H14V8.6c0-.4.3-.6.6-.6z"/></svg></a>}
+      {C.instagram && <a class="soc-i" href={C.instagram} rel="me noopener" target="_blank" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm5 3.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7zm0 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM17 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg></a>}
+      {C.youtube && <a class="soc-i" href={C.youtube} rel="me noopener" target="_blank" aria-label="YouTube 頻道"><svg viewBox="0 0 24 24"><path d="M21.6 7.2c-.2-1-1-1.7-2-1.9C17.9 5 12 5 12 5s-5.9 0-7.6.3c-1 .2-1.8.9-2 1.9C2 8.9 2 12 2 12s0 3.1.4 4.8c.2 1 1 1.7 2 1.9 1.7.3 7.6.3 7.6.3s5.9 0 7.6-.3c1-.2 1.8-.9 2-1.9.4-1.7.4-4.8.4-4.8s0-3.1-.4-4.8zM10 15V9l5.2 3z"/></svg></a>}
+    </div>
     <button class="sbtn" type="button" data-search-open aria-label="搜尋"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM20 20l-4.8-4.8" /></svg><span>搜尋區域、建案、文章</span><kbd>/</kbd></button>
-    <a class="askbtn" href="/community/#ask">問站長</a>
     <button class="menubtn" type="button" aria-controls="mainnav" aria-expanded="false"><i></i><i></i><i></i><span class="sr">選單</span></button>
   </div>
-  <nav class="catnav" aria-label="分類"><div class="cat-in">
-    {catnav.map((c) => c ? <a class:list={{ on: isOn(c[0]) }} href={c[0]} aria-current={isOn(c[0]) ? 'page' : undefined}>{c[1]}</a> : <span class="sep" aria-hidden="true"></span>)}
+  <nav class="catnav" aria-label="主要功能"><div class="cat-in">
+    {catnav.map((c) => c && <a class:list={[`t-${c[2]}`, { on: isOn(c[0]) }]} href={c[0]} aria-current={isOn(c[0]) ? 'page' : undefined}>{c[1]}</a>)}
   </div></nav>
   </header>
 <main id="content">
@@ -120,19 +129,26 @@ const crumbLd = crumbs.length ? {
     <slot />
   </main>
   <footer>
-    <div class="ft">
-      <div class="fbrand">
-        <div class="wm">SIMONHC</div>
-        <div class="tag-line">Simon哥｜新竹房產情報站・Hsinchu Real Estate Insights</div>
-        <p>深耕新竹，讓房產資訊更透明。免費整理新竹縣市實價登錄、預售建案、租金、生活圈與政策資訊，不收費、不需註冊。</p>
-        <p>看懂價差，先算風險。— Simon 哥</p>
-        <div class="soc">{social.filter(([, u]) => u).map(([n, u]) => <a href={u} rel="me noopener" target="_blank">{n}</a>)}{C.email && <a href={`mailto:${C.email}`}>Email</a>}</div>
+    <div class="ft5">
+      <div class="fb">
+        <div class="zh">新竹房產情報站</div>
+        <div class="en">HSINCHU REAL ESTATE INSIGHTS</div>
+        <p><span class="by">由 Simon 哥創立</span>・深耕新竹，讓房產資訊更透明。<br />免費整理新竹縣市實價登錄、預售建案、租金、生活圈、房市新聞與重大建設，不收費、不需註冊。</p>
+        <p>看懂價差，先算風險。—— Simon價差房產</p>
       </div>
-      <div><b>房產資訊</b><a href="/region/">房價行情</a><a href="/volume/">交易量</a><a href="/rent/">租金行情</a><a href="/presale/">社區建案</a><a href="/areas/">新竹生活圈</a><a href="/construction/">重大建設</a></div>
-      <div><b>新聞與工具</b><a href="/news/">房市新聞</a><a href="/weekly/">房市週報</a><a href="/policy/">房貸政策</a><a href="/tools/">免費工具</a><a href="/viewpoint/">Simon 哥觀點</a><a href="/community/">交流平台</a></div>
-      <div><b>關於與政策</b><a href="/about-simonhc/">關於 SimonHC</a><a href="/about/">關於 Simon 哥</a><a href="/sources/">資料來源與統計方法</a><a href="/editorial/">內容編輯政策</a><a href="/privacy/">隱私權政策</a><a href="/terms/">使用條款與免責聲明</a><a href="/report/">資料錯誤回報</a></div>
+      <div><h4>快速入口</h4><a href="/region/">房價行情</a><a href="/presale/">社區建案</a><a href="/areas/">新竹生活圈</a><a href="/news/">房市新聞</a><a href="/construction/">重大建設</a><a href="/policy/">房貸政策</a><a href="/tools/">免費工具</a><a href="/weekly/">房市週報</a></div>
+      <div><h4>資料來源與透明度</h4><a href="/sources/">資料來源與統計方法</a><a href="/editorial/">內容編輯政策</a><a href="/about-simonhc/#visits">造訪統計方法</a><a href="/report/">資料錯誤回報</a><a href="/calendar/">資料更新日曆</a><a href="/about-simonhc/#images">圖片來源與授權</a></div>
+      <div><h4>創辦人與社群</h4><a href="/about/">關於 Simon 哥</a><a href="/viewpoint/">Simon 哥觀點</a><a href="/community/#ask">問站長一個問題</a>
+        <div class="soc">{social.filter(([, u]) => u).map(([n, u]) => <a href={u} rel="me noopener" target="_blank">{n}</a>)}{C.email && <a href={`mailto:${C.email}`}>Email</a>}</div></div>
     </div>
-    <div class="ft-bottom"><span>© {new Date().getFullYear()} SimonHC 新竹房產情報站・非政府官方網站，資料僅供一般參考，不構成估價或投資建議。</span><span>網站更新：{new Date().toISOString().slice(0, 10)}</span></div>
+    <div class="ft-stats" data-visits>
+      <span><span class="k">累計造訪</span><span class="v" data-k="visits">—</span></span>
+      <span><span class="k">今日造訪</span><span class="v" data-k="today">—</span></span>
+      <span><span class="k">本月造訪</span><span class="v" data-k="month">—</span></span>
+      <span><span class="k">累計頁面瀏覽</span><span class="v" data-k="views">—</span></span>
+      <span class="how"><span data-k="state">統計資料載入中</span>・<a href="/about-simonhc/#visits">統計方法</a></span>
+    </div>
+    <div class="ft-bottom"><span>© {new Date().getFullYear()} 新竹房產情報站（SimonHC）・非政府官方網站，資料僅供一般參考，不構成估價或投資建議。</span><span><a href="/privacy/">隱私權政策</a>・<a href="/terms/">使用條款</a>・實價登錄更新 {upd}</span></div>
   </footer>
   <nav class="tabbar" aria-label="快速導覽">
     {tabs.map(([u, t, d]) => u
@@ -147,5 +163,6 @@ const crumbLd = crumbs.length ? {
     </div>
   </div>
   <script is:inline src="/site.js" defer></script>
+  <script is:inline src="/visits.js" defer></script>
 </body>
 </html>

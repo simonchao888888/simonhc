@@ -1,0 +1,15 @@
+---
+// 內頁頁首照片橫幅：照片來自圖片資料庫，左側深色遮罩保證文字對比；沒有照片時只顯示深藍底。
+import Photo from './Photo.astro';
+interface Props { img?: string | null; kicker?: string; title: string; lead?: string; tone?: string; note?: string }
+const { img, kicker, title, lead, tone = 'view', note } = Astro.props;
+---
+<header class:list={['pbanner', `t-${tone}`]}>
+  {img && <Photo id={img} eager sizes="100vw" ratio="21/9" note={note} />}
+  <div class="in">
+    {kicker && <span class="kicker">{kicker}</span>}
+    <h1>{title}</h1>
+    {lead && <p class="lead">{lead}</p>}
+    <slot />
+  </div>
+</header>

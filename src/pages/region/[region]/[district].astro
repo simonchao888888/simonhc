@@ -2,6 +2,8 @@
 import Base from '../../../layouts/Base.astro';
 import Faq from '../../../components/Faq.astro';
 import TileMap from '../../../components/TileMap.astro';
+import PageBanner from '../../../components/PageBanner.astro';
+import { distImg } from '../../../lib/images';
 import { regions, districts, districtUrl, regionUrl, pct, fmt, AGE_LABEL, type District } from '../../../lib/data';
 import { DISCLAIMER, faqItems, faqLd } from '../../../components/Parts';
 import { featuredByDist, allByDist, f1 } from '../../../lib/presale';
@@ -25,10 +27,8 @@ const rentOk = usable(rs);
 ---
 <Base title={`${full}房價行情`} description={desc} active="prices"
   crumbs={[['查房價', '/region/'], [R.name, regionUrl(d.r)], [d.name]]} jsonld={faqLd(faq)}>
-  <div class="split" style="align-items:center">
-    <div><h1>{full}房價行情</h1><p class="lead">{d.intro}</p></div>
-    <div><TileMap highlight={d.id} small /></div>
-  </div>
+  <PageBanner img={distImg(d.id)?.id} tone="price" kicker={`${R.name}・${d.name}`} title={`${full}房價行情`} lead={d.intro} />
+  <div style="max-width:420px"><TileMap highlight={d.id} small /></div>
 
   {d.used != null ? (
     <div class="grid g4">

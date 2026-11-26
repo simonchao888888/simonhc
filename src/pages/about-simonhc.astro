@@ -1,10 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
+import { images, imagesUpdated } from '../lib/images';
 ---
-<Base title="關於 SimonHC 新竹房產情報站" description="SimonHC 是專注新竹市與新竹縣的免費房地產資訊網站：使命、編輯方式、資料來源、利益揭露與聯絡方式。" crumbs={[['關於 SimonHC']]}>
-  <div class="pagehead"><Icon name="house" size={56} /><h1>關於 SimonHC 新竹房產情報站</h1></div>
-  <p class="lead">深耕新竹，讓房產資訊更透明。SimonHC 是專注新竹市與新竹縣的免費房地產資訊網站，由新竹在地房地產投資人 Simon 哥創立。</p>
+<Base title="關於新竹房產情報站" description="新竹房產情報站（SimonHC）是專注新竹市與新竹縣的免費房地產資訊網站：使命、編輯方式、資料來源、利益揭露與聯絡方式。" crumbs={[['關於本站']]}>
+  <div class="pagehead"><Icon name="house" size={56} /><h1>關於新竹房產情報站</h1></div>
+  <p class="lead">深耕新竹，讓房產資訊更透明。新竹房產情報站（SimonHC）是專注新竹市與新竹縣的免費房地產資訊網站，由新竹在地房地產投資人 Simon 哥創立。</p>
 
   <h2>我們做什麼</h2>
   <ul>
@@ -21,10 +22,28 @@ import Icon from '../components/Icon.astro';
   </ul>
 
   <h2>內容怎麼產生</h2>
-  <p>大約八成是客觀的公共資訊與工具，兩成是 Simon 哥的實戰觀點。數據由程式依官方公開資料自動計算；文字摘要與新聞判讀使用 AI 輔助，並標示為「SimonHC 編輯部」，只有本人撰寫或審核的內容才署名 Simon 哥。詳見<a href="/editorial/">內容編輯政策</a>與<a href="/sources/">資料來源與統計方法</a>。</p>
+  <p>大約八成是客觀的公共資訊與工具，兩成是 Simon 哥的實戰觀點。數據由程式依官方公開資料自動計算；文字摘要與新聞判讀使用 AI 輔助，並標示為「新竹房產情報站編輯部」，只有本人撰寫或審核的內容才署名 Simon 哥。詳見<a href="/editorial/">內容編輯政策</a>與<a href="/sources/">資料來源與統計方法</a>。</p>
 
   <h2>利益關係揭露</h2>
   <p>創辦人 Simon 哥本身從事房地產投資，自 2010 年起累積超過 250 間房屋買賣經驗，也經營房產教育相關事業。網站內容若涉及創辦人持有或經手的物件，會在該頁面揭露。</p>
+
+  <h2 id="visits">網站造訪統計方法</h2>
+  <div class="card" data-visits style="margin:10px 0">
+    <p style="margin:0">累計造訪 <b data-k="visits">—</b>・今日 <b data-k="today">—</b>・本月 <b data-k="month">—</b>・累計頁面瀏覽 <b data-k="views">—</b>・統計開始 <b data-k="since">—</b><br /><span class="note" data-k="state">統計資料載入中</span></p>
+  </div>
+  <ul>
+    <li><b>造訪</b>：以工作階段計算。同一個瀏覽器 30 分鐘內連續看多頁只算一次；超過 30 分鐘沒有動作再回來，算新的一次造訪。這不是「獨立訪客人數」。</li>
+    <li><b>頁面瀏覽</b>：每次實際顯示的頁面算一次。預載入、搜尋引擎與其他機器人、沒有執行 JavaScript 的請求都不計入；同一來源每分鐘超過 30 次的請求會被限流。</li>
+    <li><b>每日與每月</b>：以台北時間（Asia/Taipei）切日。</li>
+    <li><b>從哪天開始</b>：從正式啟用日開始真實累積，沒有匯入或設定起始數字。統計服務故障時不顯示假數字，只顯示最後一次成功取得的數字與時間，或「暫未取得」。</li>
+    <li><b>隱私</b>：不使用 Cookie、不做裝置指紋、不公開任何個人資料。瀏覽器只在本機儲存「上次活動時間」與最後一次取得的統計數字；伺服器只保存累計數字，IP 只以雜湊形式暫存 60 秒做限流。</li>
+  </ul>
+
+  <h2 id="images">圖片來源與授權</h2>
+  <p>本站照片優先使用站長提供或取得授權的照片，其次是具明確開放授權的政府影像與 Wikimedia Commons 圖片；不使用搜尋引擎找到的圖片、不搬運房仲、建商或媒體照片。每張照片都標示攝影者與授權，點照片說明可看原始頁面。新聞與建設的照片若不是事件或工程本身，會標示「資料照」；找不到合法實景照片時以「示意圖」色塊呈現。（圖片資料庫更新：{imagesUpdated ?? '—'}）</p>
+  <div class="tw"><table><thead><tr><th>照片</th><th>地點</th><th>攝影者</th><th>授權</th><th>拍攝日期</th></tr></thead><tbody>
+    {images.map((x) => <tr><td><a href={x.source} rel="noopener" target="_blank">{x.title}</a></td><td>{x.dist}</td><td>{x.author}</td><td>{x.licenseUrl ? <a href={x.licenseUrl} rel="noopener" target="_blank">{x.license}</a> : x.license}</td><td>{x.date ?? '—'}</td></tr>)}
+  </tbody></table></div>
 
   <h2>相關頁面</h2>
   <p><a class="tag" href="/about/">關於 Simon 哥</a><a class="tag" href="/sources/">資料來源與統計方法</a><a class="tag" href="/editorial/">內容編輯政策與 AI 使用說明</a><a class="tag" href="/privacy/">隱私權政策</a><a class="tag" href="/terms/">使用條款與免責聲明</a><a class="tag" href="/report/">資料錯誤回報</a></p>

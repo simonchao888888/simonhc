@@ -1,25 +1,27 @@
 ---
 import Base from '../layouts/Base.astro';
-import Icon from '../components/Icon.astro';
+import PageBanner from '../components/PageBanner.astro';
+import Photo from '../components/Photo.astro';
 import D from '../data/construction.json';
-const STATUS = ['規劃中', '審議中', '已核定', '招標中', '施工中', '已完工', '暫停或延期', '尚待確認'];
+const STATUS = ['規劃中', '審議中', '已核定', '招標中', '施工中', '已完工', '延期', '尚待確認'];
+const IMG: Record<string, [string, string]> = { 'hsinchu-station': ['station-works', '資料照：新竹車站周邊施工（2021），非本計畫進度照'], 'future-heart': ['thsr-hsinchu', '資料照：高鐵新竹站現況'], 'ai-park': ['liujia', '資料照：竹北六家地區，非園區照片'] };
 ---
-<Base title="新竹重大建設追蹤：輕軌、大車站、AI 園區進度" description="新竹縣市重大建設進度追蹤：竹北 AI 智慧園區、新竹大車站、高鐵未來之心、大新竹輕軌，每項附主管機關、目前狀態與資料來源。" crumbs={[['重大建設']]}>
-  <div class="pagehead"><Icon name="crane" size={56} /><h1>新竹重大建設追蹤</h1></div>
-  <p class="lead">建案廣告常寫「未來捷運」「園區旁」，但「已經完工」和「還在可行性研究」對房價的意義完全不同。這裡只收有來源的項目，依官方或媒體公開資訊標示目前進度。</p>
-  <p class="note">狀態分為：{STATUS.join('、')}。規劃中或尚未核定的建設不代表一定會完成；房價影響只是分析情境，不代表必然上漲。最後檢查：{D.checked}。</p>
+<Base title="新竹重大建設與都市發展追蹤" description="新竹縣市重大建設進度追蹤：竹北 AI 智慧園區、新竹大車站、高鐵未來之心、大新竹輕軌，每項附主管機關、目前狀態與資料來源。" crumbs={[['重大建設']]}>
+  <PageBanner img="county-stadium" tone="con" kicker="城市發展追蹤中心" title="新竹重大建設追蹤" lead="「已經完工」和「還在可行性研究」對房價的意義完全不同。這裡只收有官方或可查證來源的項目，標示主管機關、狀態與最近更新。" />
+  <div class="legend-st">{STATUS.map((s) => <span class={`status st-${s}`}>{s}</span>)}</div>
+  <p class="note">不估算工程進度百分比；規劃中或尚未核定的建設不代表一定會完成，房價影響只是分析情境。最後查核：{D.checked}。照片若非該工程本身，會標示「資料照」。</p>
   {D.items.map((x) => (
-    <section class="card" id={x.id} style="margin:18px 0">
-      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
-        <h2 style="margin:0;font-size:21px">{x.name}</h2><span class="cat" style="font-size:13px;padding:2px 12px">{x.status}</span>
+    <section class="cx t-con" id={x.id}>
+      <div><Photo id={IMG[x.id]?.[0]} ratio="4/3" sizes="(max-width: 800px) 100vw, 320px" note={IMG[x.id]?.[1]} credit="below" label={x.name} /></div>
+      <div>
+        <span class={`status st-${x.status}`}>{x.status}</span>
+        <h2>{x.name}</h2>
+        <dl><dt>行政區</dt><dd>{x.dist}</dd><dt>類型</dt><dd>{x.type}</dd><dt>主管機關</dt><dd>{x.agency}</dd><dt>位置</dt><dd>{x.where}</dd><dt>預計完成</dt><dd>{x.eta}</dd><dt>最近更新</dt><dd>{(x.history as string[][]).at(-1)?.[0]}</dd></dl>
+        <p>{x.detail}</p>
+        <div class="take"><b>可能影響：</b>{x.impact}</div>
+        <ol class="tl">{x.history.map(([d, t]) => <li><time>{d}</time>{t}</li>)}</ol>
+        <p class="src">官方與查證來源：{x.sources.map(([t, u]) => <a href={u} rel="noopener" target="_blank">{t}</a>)}</p>
       </div>
-      <p class="note" style="margin:4px 0 10px">{x.dist}・{x.type}・主管：{x.agency}</p>
-      <p><b>位置：</b>{x.where}</p>
-      <p><b>內容與進度：</b>{x.detail}</p>
-      <p><b>預定完成：</b>{x.eta}</p>
-      <div class="take"><b>可能的生活與房產影響：</b>{x.impact}</div>
-      <details><summary>進度紀錄</summary><ul>{x.history.map(([d, t]) => <li><span class="date">{d}</span>　{t}</li>)}</ul></details>
-      <p class="src">來源：{x.sources.map(([t, u]) => <a href={u} rel="noopener" target="_blank">{t}</a>)}</p>
     </section>
   ))}
   <p>想知道怎麼判斷建設利多，請看<a href="/guide/hsinchu-development/">新竹重大建設怎麼看</a>。發現進度有誤，請<a href="/report/">回報給我們</a>。</p>

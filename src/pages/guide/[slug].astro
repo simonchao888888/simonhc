@@ -16,10 +16,10 @@ const ld = {
   '@context': 'https://schema.org', '@type': 'Article', headline: p.data.title, description: p.data.description,
   datePublished: p.data.pubDate.toISOString().slice(0, 10), inLanguage: 'zh-TW',
   dateModified: (p.data.updated ?? p.data.pubDate).toISOString().slice(0, 10),
-  author: p.data.reviewed ? { '@type': 'Person', name: 'Simon 哥', url: new URL('/about/', Astro.site).href } : { '@type': 'Organization', name: 'SimonHC 編輯部' },
-  publisher: { '@type': 'Organization', name: 'SimonHC 新竹房產情報站' },
+  author: p.data.reviewed ? { '@type': 'Person', name: 'Simon 哥', url: new URL('/about/', Astro.site).href } : { '@type': 'Organization', name: '新竹房產情報站編輯部' },
+  publisher: { '@type': 'Organization', name: '新竹房產情報站', '@id': 'https://simonhc.com/#org' },
 };
-const byline = p.data.reviewed ? 'Simon 哥撰寫／審閱' : 'SimonHC 編輯部整理（AI 輔助，尚待 Simon 哥審閱）';
+const byline = p.data.reviewed ? 'Simon 哥撰寫／審閱' : '新竹房產情報站編輯部整理（AI 輔助，尚待 Simon 哥審閱）';
 ---
 <Base title={p.data.title} description={p.data.description} crumbs={[['買房指南', '/guide/'], [p.data.category]]} jsonld={ld}>
   <div class="arthead">

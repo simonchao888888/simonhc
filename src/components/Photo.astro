@@ -1,0 +1,29 @@
+---
+// 照片元件：AVIF／WebP 響應式、固定比例避免版面跳動、非首屏延遲載入，並在照片上標示攝影者與授權。
+// 找不到照片時改用「示意」色塊，不拿無關照片充數。
+import { img as getImg } from '../lib/images';
+interface Props { id?: string | null; ratio?: string; sizes?: string; eager?: boolean; class?: string; credit?: 'overlay' | 'below' | 'none'; label?: string; note?: string; nested?: boolean; badge?: string }
+const { id, ratio = '16/9', sizes = '(max-width: 760px) 100vw, 50vw', eager = false, class: cls = '', credit = 'overlay', label = '', note, nested = false, badge } = Astro.props;
+const p = getImg(id);
+const set = (ext: string) => p!.widths.map((w) => `${p!.path}-${w}.${ext} ${w}w`).join(', ');
+const mid = p ? p.widths[Math.min(1, p.widths.length - 1)] : 0;
+const cred = p ? `${note ? note + '・' : ''}${p.title}｜攝影：${p.author}｜${p.license}｜Wikimedia Commons` : '';
+---
+{p ? (
+  <figure class:list={['ph', cls, `cr-${credit}`]} style={`aspect-ratio:${ratio}`}>
+    <picture>
+      {p.avif && <source type="image/avif" srcset={set('avif')} sizes={sizes} />}
+      <source type="image/webp" srcset={set('webp')} sizes={sizes} />
+      <img src={`${p.path}-${mid}.webp`} alt={p.alt} width={mid} height={Math.round(mid / p.ratio)} loading={eager ? 'eager' : 'lazy'} decoding={eager ? 'sync' : 'async'} fetchpriority={eager ? 'high' : 'auto'} style={`object-position:${p.pos}`} />
+    </picture>
+    {credit !== 'none' && <figcaption title={cred}>{nested ? <span>{credit === 'below' ? cred : `${note ?? p.place ?? p.title}・${p.author}／${p.license}`}</span> : <a href={p.source} rel="noopener" target="_blank">{credit === 'below' ? cred : `${note ?? p.place ?? p.title}・${p.author}／${p.license}`}</a>}</figcaption>}
+    {badge && <span class="ph-badge">{badge}</span>}
+    <slot />
+  </figure>
+) : (
+  <figure class:list={['ph', 'ph-none', cls]} style={`aspect-ratio:${ratio}`} role="img" aria-label={`${label || '照片'}：尚未取得合法授權的實景照片，以示意色塊呈現`}>
+    <svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><path d="M0 90V62h10V48h8v14h6V40h10v22h5V54h9v8h7V30h12v32h4V46h8v16h6V36h11v26h6V50h8v12h7V42h9v20h6V56h8v34z" /></svg>
+    <span class="ph-tag">示意圖・待補實景照片</span>
+    <slot />
+  </figure>
+)}

@@ -1,5 +1,6 @@
 ---
 import Icon from '../../components/Icon.astro';
+import PageBanner from '../../components/PageBanner.astro';
 import Base from '../../layouts/Base.astro';
 import Sources from '../../components/Sources.astro';
 import { policyRate as P, meetings, controls, mortgageRates, mortgageNote, qingan, watch, fmtDate, newsUpdated } from '../../lib/news';
@@ -9,7 +10,7 @@ const sharePts = mortgageRates.filter((r) => r[2] != null).map((r) => [r[0].repl
 const latest = ratePts.at(-1)!;
 ---
 <Base title="央行與房貸政策追蹤" description={`央行政策利率 ${P.discount}%（連 ${P.freezeCount} 凍）、選擇性信用管制現況、五大銀行房貸利率、青安 3.0 新竹縣市條件與每季理監事會議判讀。`} active="policy" crumbs={[['央行與貸款政策']]}>
-  <div class="pagehead"><Icon name="vane" size={56} /><h1>央行與房貸政策追蹤</h1></div>
+  <PageBanner img="cbc" tone="policy" kicker="房貸政策中心" title="央行與房貸政策追蹤" lead="政策利率、選擇性信用管制、五大銀行房貸利率與青安條件，每季理監事會後更新。" note="中央銀行總行（臺北）" />
   <p class="lead">政策利率、信用管制、房貸利率與青安條件，一頁看懂對新竹買方的影響。每次理監事會議後更新判讀。</p>
   <p class="note">最後更新：{fmtDate(newsUpdated)}</p>
 

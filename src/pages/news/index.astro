@@ -1,48 +1,78 @@
 ---
-import Icon from '../../components/Icon.astro';
 import Base from '../../layouts/Base.astro';
 import Sources from '../../components/Sources.astro';
-import { news, cats, feedData, fmtDate, newsUpdated } from '../../lib/news';
+import Photo from '../../components/Photo.astro';
+import PageBanner from '../../components/PageBanner.astro';
+import { news, feedData, fmtDate, newsUpdated } from '../../lib/news';
+import { newsImg, CAT_TONE } from '../../lib/images';
+
+// 分欄：依新聞分類與標題關鍵字歸到 V4 新聞中心的版面分類
+const SECT: [string, string, (c: string, t: string) => boolean][] = [
+  ['新竹市房市', 'news', (c, t) => /新竹市|東區|北區|香山|關埔|巨城/.test(t) || (c === '新竹市場' && /新竹縣市|新竹/.test(t) && !/新竹縣(?!市)/.test(t))],
+  ['新竹縣房市', 'news', (c, t) => /新竹縣|竹北|竹東|湖口|新豐|寶山/.test(t)],
+  ['中央銀行政策', 'policy', (c) => c === '央行政策'],
+  ['房貸與金融', 'policy', (c) => /房貸|貸款|青安/.test(c)],
+  ['重大建設', 'con', (_, t) => /建設|輕軌|車站|園區/.test(t)],
+  ['科學園區及產業', 'life', (_, t) => /竹科|台股|半導體|AI/.test(t)],
+];
+const sectOf = (c: string, t: string) => SECT.filter(([, , f]) => f(c, t)).map(([n]) => n);
+const tone = (c: string) => `t-${CAT_TONE[c] ?? 'news'}`;
+const top = news[0], seconds = news.slice(1, 4), rest = news.slice(4);
+const wire = feedData.items.filter((f) => /新竹|竹北|竹科|竹東|湖口|新豐|寶山|房|青安|央行|預售/.test(f.title) && !/美國|日本|中國|香港/.test(f.title));
 ---
-<Base title="新竹房市新聞與判讀" description="央行理監事會、房貸利率、青安貸款與新竹房市新聞，每則附上對新竹買方的判讀與建議做法。" active="news" crumbs={[['新聞判讀']]}>
-  <div class="pagehead"><Icon name="doc" size={56} /><h1>新竹房市新聞與判讀</h1></div>
-  <p class="lead">不只轉貼新聞：每則都說明「這代表什麼」與「新竹買方可以怎麼做」。政策細節請看<a href="/policy/">央行與貸款政策</a>，重要日期看<a href="/calendar/">更新日曆</a>。</p>
-  <p class="note">判讀更新：{fmtDate(newsUpdated)}</p>
+<Base title="新竹房市新聞與最新政策" description="新竹房市新聞中心：新竹市與新竹縣房市、央行政策、房貸與金融、重大建設與竹科產業新聞，每則附原創摘要、Simon 哥判讀與原文來源。" crumbs={[['房市新聞']]}>
+  <PageBanner img="tra-hsinchu-night" tone="news" kicker="新竹房市新聞中心" title="新竹房市新聞中心" lead="只收和新竹房市有關的新聞。每則有原創摘要、對新竹買方的判讀與原文連結；自動彙整的快訊另外標示「尚未判讀」。" />
+  <p class="note">判讀更新：{fmtDate(newsUpdated)}・快訊每小時自動檢查（{feedData.updated}）・新聞照片除特別註明外皆為主題資料照，不是新聞事件現場。</p>
 
-  <div class="filter" id="filter">
-    <button class="on" data-c="all">全部</button>
-    {cats.map((c) => <button data-c={c}>{c}</button>)}
+  <section class="nc-top">
+    <a class:list={['lead-story', tone(top.cat)]} href={`/news/${top.id}/`}>
+      <Photo id={newsImg(top.cat, top.title)?.id} ratio="16/9" sizes="(max-width: 900px) 100vw, 720px" nested note="資料照" badge="資料照" />
+      <h3>{top.title}</h3><p>{top.summary}</p>
+      <div class="meta-l"><span class="chip">{top.cat}</span><time datetime={top.date}>{fmtDate(top.date)}</time><span>來源：{top.sources.map((s) => s[0]).slice(0, 3).join('、')}</span><span class="ai">AI 輔助整理・編輯部審核</span></div>
+    </a>
+    <div class="side-stories">
+      {seconds.map((x) => (
+        <a class:list={['mid-story', tone(x.cat)]} href={`/news/${x.id}/`}>
+          <Photo id={newsImg(x.cat, x.title)?.id} ratio="4/3" sizes="140px" credit="none" badge="資料照" />
+          <div><span class="chip">{x.cat}</span><h3>{x.title}</h3><div class="meta-l" style="margin-top:4px"><time datetime={x.date}>{fmtDate(x.date)}</time></div></div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <div class="nc-tabs" id="filter" role="tablist">
+    <button class="on" data-c="all">全部新聞</button>
+    {SECT.map(([n, t]) => <button class={`t-${t}`} data-c={n}>{n}</button>)}
   </div>
-
-  <div class="dlist" id="list">
+  <div id="list">
     {news.map((n) => (
-      <article data-c={n.cat}>
-        <div class="when"><b>{+n.date.split('-')[1]}/{+n.date.split('-')[2]}</b>{n.date.split('-')[0]}<br /><span class={`tag c-${n.cat}`}>{n.cat}</span></div>
+      <article class:list={['nrow', tone(n.cat)]} data-c={sectOf(n.cat, n.title).join('|')}>
+        <Photo id={newsImg(n.cat, n.title)?.id} ratio="16/10" sizes="(max-width: 700px) 100vw, 240px" badge="資料照" />
         <div>
-        <h3><a href={`/news/${n.id}/`} style="color:var(--ink);text-decoration:none">{n.title}</a></h3>
-        <p>{n.summary}</p>
-        <div class="take"><b>判讀：</b>{n.take}</div>
-        <div class="act"><b>怎麼做：</b>{n.action}</div>
-        <Sources list={n.sources} />
+          <div class="meta-l" style="margin:0"><span class="chip">{n.cat}</span>{sectOf(n.cat, n.title).filter((s) => s !== n.cat).slice(0, 2).map((s) => <span>{s}</span>)}<time datetime={n.date}>{fmtDate(n.date)}</time><span class="ai">AI 輔助整理・編輯部審核</span></div>
+          <h3><a href={`/news/${n.id}/`}>{n.title}</a></h3>
+          <p>{n.summary}</p>
+          <div class="take"><b>Simon 哥判讀：</b>{n.take}</div>
+          <div class="act"><b>怎麼做：</b>{n.action}</div>
+          <Sources list={n.sources} />
         </div>
       </article>
     ))}
   </div>
 
-  <h2>自動彙整：最新相關報導</h2>
-  {feedData.items.length > 0 ? <>
-    <p class="note">每週自動整理「新竹房市、央行、房貸利率、青安」相關新聞標題（{feedData.updated} 更新），尚未經本站判讀，請點原文閱讀。</p>
-    <div class="card"><ul class="feed">{feedData.items.slice(0, 30).map((f) => (
-      <li><span class="tag g">{f.topic}</span> <a href={f.link} rel="nofollow noopener" target="_blank">{f.title}</a> <span class="date">{f.source}・{f.date}</span></li>
-    ))}</ul></div>
-  </> : <p class="note">網站部署後，每週更新時會把最新報導整理在這裡。</p>}
+  <section class="sx t-news">
+    <div class="sx-h"><h2>即時快訊</h2><p>每小時自動彙整新竹房市、央行、房貸利率與青安相關報導標題（{feedData.updated} 更新），已去除重複與不相關新聞，但尚未經本站判讀，請點原文閱讀。</p></div>
+    {wire.length > 0 ? <div class="wire">{wire.slice(0, 30).map((f) => (
+      <a href={f.link} rel="nofollow noopener" target="_blank"><span class="tt">{f.title}</span><span class="ms">{f.source}・{f.date}・{f.topic}</span></a>
+    ))}</div> : <p class="note">目前沒有新的相關報導。</p>}
+  </section>
 </Base>
 <script>
   const btns = document.querySelectorAll<HTMLButtonElement>('#filter button');
   btns.forEach((b) => b.addEventListener('click', () => {
     btns.forEach((x) => x.classList.toggle('on', x === b));
     document.querySelectorAll<HTMLElement>('#list article').forEach((a) => {
-      a.style.display = b.dataset.c === 'all' || a.dataset.c === b.dataset.c ? '' : 'none';
+      a.style.display = b.dataset.c === 'all' || (a.dataset.c ?? '').split('|').includes(b.dataset.c!) ? '' : 'none';
     });
   }));
 </script>
