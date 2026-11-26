@@ -4,6 +4,8 @@ import { regions, districts, districtUrl, regionUrl } from '../lib/data';
 import { featured, pipelineOnly, f1 } from '../lib/presale';
 import { news } from '../lib/news';
 import { TOOLS } from '../lib/tools';
+import { ZONES } from '../lib/images';
+import CON from '../data/construction.json';
 
 export async function GET() {
   const items: { t: string; u: string; k: string; s: string; w?: string }[] = [];
@@ -36,10 +38,14 @@ export async function GET() {
     ['香山・南竹生活圈', '/areas/#xiangshan', '公道三路、香山', '香山 公道三路 南寮'],
   ];
   for (const [t, u, s, w] of zones) items.push({ t, u, k: '生活圈', s, w });
+  // V4：14 個生活圈卡片
+  for (const z of ZONES) { const d = districts.find((x) => x.id === z.dist)!; items.push({ t: `${z.name}生活圈`, u: `/areas/#z-${z.id}`, k: '生活圈', s: `${d.name}・${d.used ?? '—'} 萬/坪`, w: `${z.name} ${z.feature} ${z.transit} ${z.life}` }); }
+  for (const c of CON.items) items.push({ t: c.name, u: `/construction/#${c.id}`, k: '重大建設', s: `${c.dist}・${c.status}`, w: `${c.type} ${c.agency} ${c.where} 建設` });
+  for (const d of districts) { const short = d.name.replace(/[市鎮鄉區]$/, ''); if (short !== d.name) items.push({ t: short, u: districtUrl(d), k: '區域', s: d.name, w: d.name }); }
   items.push({ t: '巨城購物中心周邊（東區）', u: districtUrl(districts.find((d) => d.id === 'east')!), k: '生活圈', s: '新竹市東區', w: '巨城 Big City 中央路 民權路' });
   const more: [string, string, string][] = [['重大建設追蹤', '/construction/', '輕軌、大車站、AI 園區進度'], ['Simon 哥觀點', '/viewpoint/', '選屋原則與建案拆解'],
-    ['關於 SimonHC', '/about-simonhc/', '網站使命與編輯方式'], ['內容編輯政策', '/editorial/', 'AI 使用與署名規則'], ['資料錯誤回報', '/report/', '回報資料錯誤'],
-    ['交易量', '/volume/', '建物買賣移轉棟數'], ['租金行情', '/rent/', '月租與逐年變化']];
+    ['關於新竹房產情報站', '/about-simonhc/', '網站使命、編輯方式、造訪統計'], ['內容編輯政策', '/editorial/', 'AI 使用與署名規則'], ['資料錯誤回報', '/report/', '回報資料錯誤'],
+    ['交易量', '/volume/', '建物買賣移轉棟數'], ['房價行情', '/region/', '新竹縣市 16 區房價'], ['新竹市房價', '/region/hsinchu-city/', '東區、北區、香山區'], ['新竹縣房價', '/region/hsinchu-county/', '竹北、竹東、湖口等 13 鄉鎮市'], ['房市新聞中心', '/news/', '新竹房市新聞與判讀'], ['房貸政策', '/policy/', '央行利率與房貸成數'], ['免費工具', '/tools/', '房貸、總成本、負擔能力試算'], ['實價登錄', '/presale/', '預售屋逐戶成交'], ['中古屋', '/region/', '依屋齡看中古屋單價']];
   for (const [t, u, s] of more) items.push({ t, u, k: '頁面', s });
   return new Response(JSON.stringify(items), { headers: { 'content-type': 'application/json' } });
 }

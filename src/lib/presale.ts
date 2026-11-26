@@ -4,8 +4,16 @@ import { districts } from './data';
 import dealsRaw from '../data/presale_deals.json';
 import sampleRaw from '../data/presale_sample.json';
 import { createHash } from 'node:crypto';
+import LJ from '../data/leju.json';
 
+export interface Leju { url: string; n: number; sold?: number; total?: number; avg1y?: number; max?: number; min?: number }
+// 站長規則：樂居筆數多於內政部開放資料時，以樂居為準（頁面標示來源）
+export const lejuChecked: string = (LJ as any).checked;
+const LJI = (LJ as any).items as Record<string, Leju>;
+export const lejuFor = (r: string, dist: string, name: string): Leju | undefined => LJI[`${r}|${dist}|${name}`];
+export const useLeju = (l: Leju | undefined, n: number) => !!l && l.n > n;
 export interface Project {
+  lj?: Leju; moiN?: number; src?: 'leju' | 'moi';
   id: string; name: string; r: 'city' | 'county'; dist: string; dev: string; addr: string; units: number; permit: string; sales: string;
   med: number | null; min: number | null; max: number | null; medTotal: number | null; rooms: string; n: number; latest: string; first?: string; alias?: string[];
   status: string; note: string; sources: [string, string][];
@@ -27,12 +35,17 @@ const pipeRows: any[] = B && B.projects ? B.projects.map((p: any) => ({ ...p, na
 export const featured: Project[] = (P.featured as Project[]).map((f) => {
   const q = pipeRows.find((x) => x.name === f.name && x.r === f.r);
   if (!q) return f;
-  return { ...f, alias: q.alias, first: q.first, med: q.med ?? f.med, min: q.min ?? f.min, max: q.max ?? f.max, medTotal: q.medTotal ?? f.medTotal, n: q.n, latest: q.latest,
+  const lj = lejuFor(f.r, f.dist || q.dist, f.name), win = useLeju(lj, q.n);
+  return { ...f, lj, moiN: q.n, src: win ? 'leju' : 'moi', alias: q.alias, first: q.first, med: q.med ?? f.med, min: q.min ?? f.min, max: q.max ?? f.max, medTotal: q.medTotal ?? f.medTotal, n: q.n, latest: q.latest,
     status: q.latest >= '2026' ? '2026 仍有成交' : (f.status === '已標示完售' ? f.status : '近期無新成交'),
     dev: q.dev ?? f.dev, units: q.units ?? f.units, addr: q.addr || f.addr, sales: q.sales || f.sales, permit: q.permit || f.permit,
-    sources: [['內政部實價登錄', 'https://lvr.land.moi.gov.tw/'], ...f.sources] as [string, string][] };
+    ...(win ? { n: lj!.n, max: Math.max(lj!.max ?? 0, q.max ?? 0) || q.max } : {}),
+    sources: [['內政部實價登錄', 'https://lvr.land.moi.gov.tw/'], ...(lj ? [['樂居建案頁', lj.url]] : []), ...f.sources] as [string, string][] };
 }).sort((a, b) => (b.latest || '').localeCompare(a.latest || ''));
-export const all: Row[] = (fromPipeline ? pipeRows : P.all) as Row[];
+export const all: Row[] = ((fromPipeline ? pipeRows : P.all) as Row[]).map((p: any) => {
+  const lj = lejuFor(p.r, p.dist, p.name);
+  return useLeju(lj, p.n) ? { ...p, lj, n: lj!.n, moiN: p.n, src: 'leju', max: Math.max(lj!.max ?? 0, p.max ?? 0) } : p;
+});
 export const rName = (r: string) => (r === 'city' ? '新竹市' : '新竹縣');
 export const statusClass = (s: string) => (s.startsWith('2026') ? 'tag' : 'tag g');
 export const developers = (() => {

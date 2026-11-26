@@ -4,14 +4,15 @@ import Base from '../../layouts/Base.astro';
 import Sources from '../../components/Sources.astro';
 import DealsSection from '../../components/DealsSection.astro';
 import { featured, pipelineOnly, dealsFor, hasRealDeals, rName, statusClass, districtIdOf, f1, type Project } from '../../lib/presale';
+import { lejuChecked } from '../../lib/presale';
 import { regions, districts, districtUrl, pct } from '../../lib/data';
 import { DISCLAIMER } from '../../components/Parts';
 export function getStaticPaths() {
   const extra = pipelineOnly.map((x) => ({
     id: x.id, name: x.name, r: x.r, dist: x.dist, dev: x.dev ?? '', addr: x.addr ?? '', units: x.units ?? 0, permit: x.permit ?? '', sales: x.sales ?? '',
-    alias: x.alias, first: x.first,
+    alias: x.alias, first: x.first, lj: (x as any).lj, moiN: (x as any).moiN, src: (x as any).src,
     med: x.med, min: x.min ?? null, max: x.max ?? null, medTotal: x.medTotal ?? null, rooms: '', n: x.n, latest: x.latest ?? '',
-    status: (x.latest ?? '') >= '2026' ? '2026 仍有成交' : '近期無新成交', note: '', sources: [['內政部實價登錄', 'https://lvr.land.moi.gov.tw/']],
+    status: (x.latest ?? '') >= '2026' ? '2026 仍有成交' : '近期無新成交', note: '', sources: [['內政部實價登錄', 'https://lvr.land.moi.gov.tw/'], ...((x as any).lj ? [['樂居建案頁', (x as any).lj.url]] : [])],
   }));
   return [...featured, ...extra].map((p) => ({ params: { id: p.id }, props: { p } }));
 }
@@ -30,18 +31,20 @@ const desc = `${p.name}（${where}）預售屋實價登錄：${p.med ? `每坪�
 <Base title={`${p.name}實價登錄｜${where}預售屋`} description={desc} active="presale" crumbs={[['預售行情', '/presale/'], [p.name]]}>
   <PageBanner tone="build" kicker={`預售建案・${where}`} title={p.name} lead={`${p.dev ? '建商（起造人）：' + p.dev : '起造人：來源未完整顯示'}・${p.addr}`}><p style="margin:10px 0 0"><span class={statusClass(p.status)}>{p.status}</span></p></PageBanner>
 
-  <p class="warn" style="font-size:14px">實價登錄筆數＝已簽約並向地政機關申報的戶數（簽約後 30 天內申報、每 10 天公布一批）。建商或房產網站公布的「已銷售戶數」可能包含訂單、尚未簽約或尚未申報的合約，所以通常比實價登錄多；本站只採用內政部實價登錄，不把兩種數字混在一起。</p>
+  {p.src === 'leju' && p.lj && (
+    <div class="warn" style="font-size:14px"><b>成交筆數以樂居為準：</b>樂居顯示本案實價登錄 {p.lj.n} 筆{p.lj.sold ? `、已銷售 ${p.lj.sold}／${p.lj.total} 戶` : ''}{p.lj.avg1y ? `、一年成交均價 ${p.lj.avg1y} 萬/坪` : ''}{p.lj.max ? `、最高 ${p.lj.max} 萬/坪` : ''}，多於內政部開放資料目前收錄的 {p.moiN} 筆，因此本頁筆數與最高價採用樂居數字（{lejuChecked} 核對，<a href={p.lj.url} rel="noopener" target="_blank">看樂居建案頁</a>）。下方逐戶明細仍是內政部開放資料的 {p.moiN} 筆。</div>
+  )}
   <div class="grid g4">
     <div class="card"><div class="note">每坪成交中位數</div><div class="stat acc">{f1(p.med)}<small> 萬/坪</small></div><div class="note">已扣車位</div></div>
     <div class="card"><div class="note">最低～最高單價</div><div class="stat sm">{f1(p.min)}～{f1(p.max)}<small> 萬/坪</small></div></div>
     <div class="card"><div class="note">中位總價</div><div class="stat sm">{p.medTotal ? p.medTotal.toLocaleString() : '—'}<small> 萬</small></div>{qOk != null && <div class="note">{qOk ? '在青安 3.0 新竹 2,500 萬上限內' : '超過青安 3.0 新竹 2,500 萬上限'}</div>}</div>
-    <div class="card"><div class="note">實價登錄揭露</div><div class="stat sm">{p.n}<small> 筆</small></div><div class="note">最新成交 {p.latest}</div></div>
+    <div class="card"><div class="note">實價登錄揭露</div><div class="stat sm">{p.n}<small> 筆</small></div><div class="note">{p.src === 'leju' ? `來源：樂居（內政部開放資料 ${p.moiN} 筆）` : `最新成交 ${p.latest}`}</div></div>
   </div>
 
   <h2>建案資料</h2>
   <div class="tw"><table>
     <tr><td style="width:28%"><b>建案名稱</b></td><td>{p.name}{p.alias?.length ? <small class="note">（實價登錄也寫作：{p.alias.join('、')}，已合併計算）</small> : ''}</td></tr>
-    {p.first && <tr><td><b>揭露成交期間</b></td><td>{p.first} ～ {p.latest}，共 {p.n} 筆</td></tr>}
+    {p.first && <tr><td><b>揭露成交期間</b></td><td>{p.first} ～ {p.latest}，內政部開放資料 {p.moiN ?? p.n} 筆{p.src === 'leju' ? `（樂居 ${p.n} 筆）` : ''}</td></tr>}
     <tr><td><b>起造人（建照登記名義人）</b></td><td>{p.dev || '—'}</td></tr>
     <tr><td><b>位置</b></td><td>{where}・{p.addr}</td></tr>
     {p.units > 0 && <tr><td><b>總戶數</b></td><td>{p.units} 戶</td></tr>}

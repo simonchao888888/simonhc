@@ -30,12 +30,13 @@
   /* ---------- 站內搜尋 ---------- */
   var INDEX = null, loading = null, results = [], sel = 0;
   var POPULAR = ['竹北市', '新竹市', '竹東鎮', '租金行情', '房貸月付', '寬限期', '房屋稅', '學區'];
-  var KIND_ORDER = { '區域': 0, '頁面': 1, '試算': 2, '建案': 3, '文章': 4, '新聞': 5 };
+  var KIND_ORDER = { '區域': 0, '生活圈': 1, '建案': 2, '頁面': 3, '重大建設': 4, '試算': 5, '文章': 6, '新聞': 7 };
   function norm(s) { return String(s || '').toLowerCase().replace(/臺/g, '台').replace(/\s+/g, ''); }
   function load() {
     if (INDEX) return Promise.resolve(INDEX);
     if (window.__SEARCH) { INDEX = window.__SEARCH; return Promise.resolve(INDEX); }
-    if (!loading) loading = fetch('/search.json').then(function (r) { return r.json(); }).then(function (d) { INDEX = d; return d; });
+    if (!loading) loading = fetch('/search.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw r.status; return r.json(); }).then(function (d) { INDEX = d; return d; })
+      .catch(function () { loading = null; var b = $('#srch-res'); if (b) b.innerHTML = '<div class="srch-empty">搜尋資料載入失敗，請檢查網路後再試一次。</div>'; return null; });
     return loading;
   }
   function score(it, terms) {
@@ -70,6 +71,7 @@
     results = results.filter(function (x) { per[x.it.k] = (per[x.it.k] || 0) + 1; if (!(x.it.k in best)) best[x.it.k] = x.s; return per[x.it.k] <= 6; })
       .sort(function (a, b) { return (best[b.it.k] - best[a.it.k]) || (b.s - a.s); }).map(function (x) { return x.it; });
     sel = 0;
+    if (!INDEX) { box.innerHTML = '<div class="srch-empty">搜尋資料載入中…</div>'; return; }
     if (!results.length) {
       box.innerHTML = '<div class="srch-empty">找不到「' + esc(q) + '」。可以試試區域名稱（竹北、湖口）、建案名稱，或到<a href="' + href('/community/') + '">交流平台</a>直接問站長。</div>';
       return;
@@ -109,6 +111,8 @@
       if (e.target.closest('[data-search-close]') || e.target.id === 'srch') closeSearch();
     });
     i.addEventListener('input', function () { render(i.value); });
+    i.addEventListener('compositionend', function () { render(i.value); });
+    i.addEventListener('search', function () { render(i.value); });
     i.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
       else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
