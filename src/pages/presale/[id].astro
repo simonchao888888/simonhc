@@ -30,6 +30,7 @@ const desc = `${p.name}（${where}）預售屋實價登錄：${p.med ? `每坪�
 <Base title={`${p.name}實價登錄｜${where}預售屋`} description={desc} active="presale" crumbs={[['預售行情', '/presale/'], [p.name]]}>
   <PageBanner tone="build" kicker={`預售建案・${where}`} title={p.name} lead={`${p.dev ? '建商（起造人）：' + p.dev : '起造人：來源未完整顯示'}・${p.addr}`}><p style="margin:10px 0 0"><span class={statusClass(p.status)}>{p.status}</span></p></PageBanner>
 
+  <p class="warn" style="font-size:14px">實價登錄筆數＝已簽約並向地政機關申報的戶數（簽約後 30 天內申報、每 10 天公布一批）。建商或房產網站公布的「已銷售戶數」可能包含訂單、尚未簽約或尚未申報的合約，所以通常比實價登錄多；本站只採用內政部實價登錄，不把兩種數字混在一起。</p>
   <div class="grid g4">
     <div class="card"><div class="note">每坪成交中位數</div><div class="stat acc">{f1(p.med)}<small> 萬/坪</small></div><div class="note">已扣車位</div></div>
     <div class="card"><div class="note">最低～最高單價</div><div class="stat sm">{f1(p.min)}～{f1(p.max)}<small> 萬/坪</small></div></div>
