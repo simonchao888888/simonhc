@@ -14,6 +14,13 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
       - run: python3 scripts/fetch_raw.py --from ${{ inputs.start }} --out raw
+      - name: 新竹市門牌資料（用來把實價登錄地址對應到東區／北區／香山區）
+        run: |
+          mkdir -p raw/addr
+          for f in 0a1a3db3-ddab-4868-9191-29c2bf5ad28b 3f6843a3-1dda-4690-82e2-3a613d0433d9 7b0186f0-6bad-45db-8ddf-dfaa97a942da; do
+            curl -sfL -A Mozilla/5.0 "https://odws.hccg.gov.tw/001/Upload/25/opendataback/9059/800/$f.csv" -o raw/addr/$f.csv || echo "skip $f"
+          done
+          ls -la raw/addr
       - name: 推到 raw-lvr 分支（覆蓋舊版，不影響 main）
         run: |
           cd raw && git init -q -b raw-lvr && git add . 
