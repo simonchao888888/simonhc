@@ -6,7 +6,9 @@ on:
     paths: ['scripts/data/image_sources.json', 'scripts/fetch_images.py']
 permissions:
   contents: write
-concurrency: { group: fetch-images-${{ github.ref }}, cancel-in-progress: false }
+concurrency:
+  group: fetch-images-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   fetch:
     runs-on: ubuntu-latest

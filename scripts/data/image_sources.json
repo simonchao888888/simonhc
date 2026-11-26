@@ -1,5 +1,5 @@
 {
-  "_note": "圖片來源清單：只收具明確開放授權的 Wikimedia Commons 檔案。scripts/fetch_images.py 依此下載、轉檔並寫出 src/data/images.json（含作者、授權、原始網址）。",
+  "_note": "圖片來源清單（V4）：只收具明確開放授權的 Wikimedia Commons 檔案。scripts/fetch_images.py 依此下載、轉檔並寫出 src/data/images.json（含作者、授權、原始網址）。",
   "images": [
     {"id":"hero-hsinchu","file":"Hsinchu Cityscape viewed from Eighteen Peaks Mountain.jpg","title":"從十八尖山眺望新竹市區","place":"十八尖山","dist":"東區","area":"新竹舊城","cat":"城市景觀","pos":"50% 38%","hero":true},
     {"id":"zhubei-tofu","file":"Zhubei Skyline 20200517 (cropped).jpg","title":"頭前溪豆腐岩與竹北天際線","place":"頭前溪豆腐岩","dist":"竹北市","area":"竹北高鐵","cat":"城市景觀","pos":"50% 40%","hero":true},
