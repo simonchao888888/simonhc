@@ -7,7 +7,7 @@ import { createHash } from 'node:crypto';
 
 export interface Project {
   id: string; name: string; r: 'city' | 'county'; dist: string; dev: string; addr: string; units: number; permit: string; sales: string;
-  med: number | null; min: number | null; max: number | null; medTotal: number | null; rooms: string; n: number; latest: string;
+  med: number | null; min: number | null; max: number | null; medTotal: number | null; rooms: string; n: number; latest: string; first?: string; alias?: string[];
   status: string; note: string; sources: [string, string][];
 }
 export interface Row { name: string; r: 'city' | 'county'; dist: string; n: number; med: number | null; dev?: string; latest?: string; min?: number; max?: number; medTotal?: number }
@@ -19,7 +19,7 @@ export const fromPipeline = !!(B && B.projects && B.projects.length);
 const presaleMax = Object.values(dealsRaw as Record<string, { d: string }[]>).flat().reduce((m, x) => (x.d > m ? x.d : m), '');
 export const asOf: string = fromPipeline ? presaleMax || B.meta.latestDeal : P.asOf;
 export const note: string = B && B.projects ? `建案名稱、起造人、戶數、建照與銷售期間來自內政部預售屋建案備查資料；成交統計與每戶明細依內政部預售屋實價登錄原始資料計算（已扣車位、排除特殊交易），最新簽約 ${presaleMax || B.meta.latestDeal}。` : P.note;
-export const allNote: string = fromPipeline ? '依內政部預售屋實價登錄原始資料計算（新竹市 O、新竹縣 J），近兩年有揭露成交的建案全部列出。' : P.allNote;
+export const allNote: string = fromPipeline ? '依內政部預售屋實價登錄原始資料計算（新竹市 O、新竹縣 J），列出還在預售或尚未交屋的建案（近兩年有成交，或近四年內開始銷售），並收錄 2019 年起每一筆揭露的成交；同一建案的不同寫法（例如豐采520／豐采）已合併。' : P.allNote;
 // 內政部資料中無法編碼的字以「?」表示，對應到常用名稱
 export const ALIAS: Record<string, string> = { '森?': '森藴' };
 const canon = (n: string) => ALIAS[n] ?? n;
@@ -27,7 +27,7 @@ const pipeRows: any[] = B && B.projects ? B.projects.map((p: any) => ({ ...p, na
 export const featured: Project[] = (P.featured as Project[]).map((f) => {
   const q = pipeRows.find((x) => x.name === f.name && x.r === f.r);
   if (!q) return f;
-  return { ...f, med: q.med ?? f.med, min: q.min ?? f.min, max: q.max ?? f.max, medTotal: q.medTotal ?? f.medTotal, n: q.n, latest: q.latest,
+  return { ...f, alias: q.alias, first: q.first, med: q.med ?? f.med, min: q.min ?? f.min, max: q.max ?? f.max, medTotal: q.medTotal ?? f.medTotal, n: q.n, latest: q.latest,
     status: q.latest >= '2026' ? '2026 仍有成交' : (f.status === '已標示完售' ? f.status : '近期無新成交'),
     dev: q.dev ?? f.dev, units: q.units ?? f.units, addr: q.addr || f.addr, sales: q.sales || f.sales, permit: q.permit || f.permit,
     sources: [['內政部實價登錄', 'https://lvr.land.moi.gov.tw/'], ...f.sources] as [string, string][] };

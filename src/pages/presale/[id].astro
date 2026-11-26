@@ -7,7 +7,8 @@ import { regions, districts, districtUrl, pct } from '../../lib/data';
 import { DISCLAIMER } from '../../components/Parts';
 export function getStaticPaths() {
   const extra = pipelineOnly.map((x) => ({
-    id: x.id, name: x.name, r: x.r, dist: x.dist, dev: x.dev ?? '', addr: '', units: 0, permit: '', sales: '',
+    id: x.id, name: x.name, r: x.r, dist: x.dist, dev: x.dev ?? '', addr: x.addr ?? '', units: x.units ?? 0, permit: x.permit ?? '', sales: x.sales ?? '',
+    alias: x.alias, first: x.first,
     med: x.med, min: x.min ?? null, max: x.max ?? null, medTotal: x.medTotal ?? null, rooms: '', n: x.n, latest: x.latest ?? '',
     status: (x.latest ?? '') >= '2026' ? '2026 仍有成交' : '近期無新成交', note: '', sources: [['內政部實價登錄', 'https://lvr.land.moi.gov.tw/']],
   }));
@@ -39,7 +40,8 @@ const desc = `${p.name}（${where}）預售屋實價登錄：${p.med ? `每坪�
 
   <h2>建案資料</h2>
   <div class="tw"><table>
-    <tr><td style="width:28%"><b>建案名稱</b></td><td>{p.name}</td></tr>
+    <tr><td style="width:28%"><b>建案名稱</b></td><td>{p.name}{p.alias?.length ? <small class="note">（實價登錄也寫作：{p.alias.join('、')}，已合併計算）</small> : ''}</td></tr>
+    {p.first && <tr><td><b>揭露成交期間</b></td><td>{p.first} ～ {p.latest}，共 {p.n} 筆</td></tr>}
     <tr><td><b>起造人（建照登記名義人）</b></td><td>{p.dev || '—'}</td></tr>
     <tr><td><b>位置</b></td><td>{where}・{p.addr}</td></tr>
     {p.units > 0 && <tr><td><b>總戶數</b></td><td>{p.units} 戶</td></tr>}

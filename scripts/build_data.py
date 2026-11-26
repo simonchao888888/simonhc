@@ -30,7 +30,7 @@ CITIES = {"o": "city", "j": "county"}           # 檔名前綴 → 站內 key
 PING = 3.30579
 # 「其他增建」是申報表的勾選項（竹北約 3 成成交都有勾），不代表特殊交易，所以不排除；「未登記建物」仍排除
 EXCLUDE_NOTE = re.compile(r"親友|員工|特殊關係|債權|債務|未登記|瑕疵|凶宅|毛胚|含.*裝潢|政府機關|法拍|急買急賣|共有物|持分")
-START_SEASON = "110S3"   # 預售屋實價登錄 2021 年 7 月起揭露；從這季起抓，建案頁才有完整成交（交易量統計另外只取 2023 年起）
+START_SEASON = "108S1"   # 2021/7 新制前，預售屋由代銷在委託結束後批次申報，成交日期可早到 2019；從 108S1 起抓才有完整建案成交（交易量統計另外只取 2023 年起）
 RES_TYPES = ("住宅大樓", "華廈", "公寓", "透天厝", "套房")
 DISTRICT_ID = {
     "竹北市": "zhubei", "湖口鄉": "hukou", "竹東鎮": "zhudong", "新豐鄉": "xinfeng", "芎林鄉": "qionglin",
@@ -389,6 +389,7 @@ def main():
             P = proj[k]
             P["n"] += 1
             P["dates"].append(d)
+            P.setdefault("addrset", set()).add(col(row, "土地位置建物門牌"))
             P.setdefault("deals", []).append(deal_detail(row, d, up, prk))
             if up:
                 P["ups"].append(up)
@@ -449,20 +450,63 @@ def main():
     out["presaleMonthly"] = {"bulkExcluded": bulk,
                              "months": {m: {r: [round(v[0]), v[1]] for r, v in x.items()} for m, x in sorted(pm.items())}}
 
-    # 預售建案：近兩年有揭露成交者
-    cutoff = latest - timedelta(days=730)
-    plist, deals_out = [], {}
+    # 預售建案：同一建案常有不同寫法（例：豐采520／豐采／豐邑-豐采520），坐落地號或街道相同、名稱互相包含就合併
+    def base_addr(a):
+        a = re.sub(r"\s", "", a or "")
+        a = re.sub(r"(地號).*$", r"\1", a)
+        return re.sub(r"(\d+號)?旁.*$|[A-Z]\d+-\d+$", "", a)
+
+    def core(n):
+        return re.sub(r"^[^-－]{1,6}[-－]", "", re.sub(r"\s", "", n))   # 去掉「建商-」前綴
+
+    PHASE = re.compile(r"[期區棟館座]|villa|[一二三四五六七八九十]", re.I)
+
+    def same_project(a, b):
+        a, b = core(a), core(b)
+        if min(len(a), len(b)) < 2 or not (a in b or b in a):
+            return False
+        long_, short = (a, b) if len(a) >= len(b) else (b, a)
+        extra = long_.replace(short, "", 1)
+        return not PHASE.search(extra)               # 只差分期、分區、別墅區等，視為不同建案
+
+    groups = defaultdict(list)
     for (region, dn, name), P in proj.items():
-        last = max(P["dates"])
-        if last < cutoff:
+        groups[(region, dn)].append((name, P))
+    merged = {}
+    for (region, dn), items in groups.items():
+        items.sort(key=lambda x: -x[1]["n"])            # 筆數多的名稱當主名
+        canon = []
+        for name, P in items:
+            addrs = {base_addr(x) for x in P.get("addrset", ())} - {""}
+            for c in canon:
+                if same_project(name, c["name"]) and addrs & c["addrs"]:
+                    c["alias"].add(name)
+                    for k in ("ups", "tot", "dates", "deals"):
+                        c["P"].setdefault(k, []).extend(P.get(k, []))
+                    c["P"]["n"] += P["n"]
+                    c["addrs"] |= addrs
+                    break
+            else:
+                canon.append({"name": name, "P": {k: list(v) if isinstance(v, (list, set)) else v for k, v in P.items()}, "addrs": addrs, "alias": set()})
+        for c in canon:
+            merged[(region, dn, c["name"])] = (c["P"], sorted(c["alias"]))
+
+    # 列出「還在預售／尚未交屋」的建案：近兩年有成交，或第一筆成交在近四年內（多半還在蓋）
+    cutoff, start_cut = latest - timedelta(days=730), latest - timedelta(days=1461)
+    plist, deals_out = [], {}
+    for (region, dn, name), (P, alias) in merged.items():
+        last, first = max(P["dates"]), min(P["dates"])
+        if last < cutoff and first < start_cut:
             continue
         ups = P["ups"]
+        info = next((builders.get(n) or builders.get(re.sub(r"\s", "", n)) for n in [name, *alias] if builders.get(n) or builders.get(re.sub(r"\s", "", n))), {}) or {}
         plist.append({
-            "name": name, "r": region, "dist": dn, "n": P["n"], "latest": last.isoformat(),
+            "name": name, "r": region, "dist": dn, "n": P["n"], "latest": last.isoformat(), "first": first.isoformat(),
+            **({"alias": alias} if alias else {}),
             "med": med(ups) if len(ups) >= 3 else None,
             "min": round(min(ups), 1) if ups else None, "max": round(max(ups), 1) if ups else None,
             "medTotal": round(statistics.median(P["tot"])) if P["tot"] else None,
-            **({k: v for k, v in (builders.get(name) or builders.get(re.sub(r"\s", "", name)) or {}).items() if k != "town"}),
+            **({k: v for k, v in info.items() if k != "town"}),
         })
         deals_out[f"{region}|{dn}|{name}"] = sorted(P.get("deals", []), key=lambda x: x["d"], reverse=True)
     plist.sort(key=lambda x: (-x["n"], x["name"]))
