@@ -78,10 +78,21 @@ def recent_batches(today=None):
     return out + ["CUR"]
 
 
-def _get(url, timeout=120):
-    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.read()
+FAILED = []   # 下載失敗的檔案；主要檔案失敗時整個流程中止，不覆蓋上一版資料
+
+
+def _get(url, timeout=120, tries=4):
+    """內政部伺服器偶爾拒絕連線，失敗會等一下重試（5、15、30 秒）"""
+    import time
+    for i in range(tries):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read()
+        except Exception:
+            if i == tries - 1:
+                raise
+            time.sleep([5, 15, 30][min(i, 2)])
 
 
 def _current_zip():
@@ -96,6 +107,8 @@ def _current_zip():
                     z.writestr(f, b)
             except Exception as e:
                 print(f"  ! 本期 {f} 下載失敗：{e}", file=sys.stderr)
+                if f.startswith(("o_lvr_land_a", "j_lvr_land_a", "o_lvr_land_b", "j_lvr_land_b")) and f.endswith(("_a.csv", "_b.csv")):
+                    FAILED.append(f"本期 {f}")
     return buf.getvalue()
 
 
@@ -116,6 +129,7 @@ def load_zip_bytes(season, local_dir=None):
         return b if b[:2] == b"PK" else None
     except Exception as e:
         print(f"  ! {season} 下載失敗：{e}", file=sys.stderr)
+        FAILED.append(season)
         return None
 
 
@@ -345,6 +359,12 @@ def main():
                     if region == "city":     # 新竹市原始資料不分區，用門牌地址判斷東區／北區／香山區
                         dn = city_district(col(row, "土地位置建物門牌")) or "新竹市"
                     raw.append((kind, region, dn, d, row, parks.get(key, [])))
+
+    # 近一年的季檔、10 天批次或本期主要檔案下載失敗 → 中止，保留上一版資料（不發布不完整的統計）
+    recent = set(seasons_since(f"{date.today().year - 1912}S1")) | {x for x in seasons if x.startswith("B") or x == "CUR"}
+    bad = [f for f in FAILED if f.split()[0] in recent or f.startswith("本期")]
+    if bad and not a.local:
+        sys.exit(f"✗ 主要資料下載失敗，本次不更新：{', '.join(bad)}")
 
     # 先算各行政區「分開標價」的單一車位價格中位數（近兩年），給車位未分開標價的成交估算扣除
     last = max(x[3] for x in raw)
