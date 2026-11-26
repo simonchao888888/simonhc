@@ -1,4 +1,5 @@
 ---
+import PageBanner from '../../../components/PageBanner.astro';
 import Base from '../../../layouts/Base.astro';
 import DistrictTable from '../../../components/DistrictTable.astro';
 import Faq from '../../../components/Faq.astro';
@@ -21,7 +22,7 @@ const faq = faqItems(R.name);
 const desc = `${R.name}近半年中古屋每坪中位數 ${R.used} 萬、預售屋 ${R.presale} 萬。各行政區房價排行、預售與中古價差、近 8 季趨勢一次看。`;
 ---
 <Base title={`${R.name}房價行情`} description={desc} active="prices" crumbs={[['查房價', '/region/'], [R.name]]} jsonld={faqLd(faq)}>
-  <h1>{R.name}房價行情</h1>
+  <PageBanner tone="price" kicker="房價行情" img={key === 'city' ? 'tra-hsinchu-night' : 'zhubei-tofu'} title={`${R.name}房價行情`} />
   <div class="grid g4">
     <div class="card"><div class="note">中古屋近半年中位數</div><div class="stat">{R.used}<small> 萬/坪</small></div><div class="note">{fmt(R.usedN)} 筆・已扣車位</div></div>
     <div class="card"><div class="note">預售屋近半年中位數</div><div class="stat acc">{R.presale}<small> 萬/坪</small></div><div class="note">{fmt(R.presaleN)} 筆</div></div>

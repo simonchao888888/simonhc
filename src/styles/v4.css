@@ -15,7 +15,7 @@
   --c-policy:#7964A6;--c-policy-bg:#F1ECFA;--c-policy-ink:#6B5794;
   --c-tool:#397E86;--c-tool-bg:#E6F4F6;--c-tool-ink:#2E6A71;
   --c-view:#122B40;--c-view-bg:#E9EFF4;--c-view-ink:#122B40;
-  --up:#C4302B;--down:#1E8449;   /* 紅漲綠跌，另加 ▲▼ 與正負號 */
+  --up:#C4302B;--down:#1E8449;--persimmon:#D4A04B;--persimmon2:#FBF2DD;--teal:var(--c-life);--teal2:var(--c-life-bg);--rice:var(--gold);--rice2:#FBF2DD;--brick:var(--c-news);--brick2:var(--c-news-bg);   /* 紅漲綠跌，另加 ▲▼ 與正負號 */
   /* 字體：標題用思源宋體，內文思源黑體，數字 Manrope 等寬數字 */
   --serif:"Noto Serif TC","Songti TC",serif;--sans:"Noto Sans TC",system-ui,-apple-system,"PingFang TC",sans-serif;--num:"Manrope","Noto Sans TC",system-ui,sans-serif;
   --r:4px;--r2:6px;
@@ -363,3 +363,4 @@ main>.pbanner .in{max-width:1200px}
 .crumb+.pbanner{margin-top:10px}
 body{overflow-x:clip}
 .scalebar span{background:linear-gradient(90deg,#EAF3FC,#A8CAE6,#2878B5,#122B40)!important}
+.stat.acc,.stat.up{color:var(--c-price-ink)!important}

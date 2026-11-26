@@ -1,4 +1,5 @@
 ---
+import PageBanner from '../../components/PageBanner.astro';
 import Base from '../../layouts/Base.astro';
 import Sources from '../../components/Sources.astro';
 import { meetings, fmtDate, type Meeting } from '../../lib/news';
@@ -12,7 +13,7 @@ const ld = { '@context': 'https://schema.org', '@type': 'Article', headline: m.t
 ---
 <Base title={m.title} description={`${fmtDate(m.date)} 央行理監事會議：${m.rate}；信用管制：${m.credit}。對新竹房市的判讀。`} active="policy" crumbs={[['央行與貸款政策', '/policy/'], [fmtDate(m.date) + ' 理監事會']]} jsonld={ld}>
   <span class="tag">央行理監事會</span> <span class="date">{fmtDate(m.date)}</span>
-  <h1>{m.title}</h1>
+  <PageBanner tone="policy" kicker="央行理監事會" img="cbc" title={m.title} />
   <div class="grid g2">
     <div class="card"><div class="note">政策利率</div><b style="font-size:18px">{m.rate}</b></div>
     <div class="card"><div class="note">選擇性信用管制</div><b style="font-size:18px">{m.credit}</b></div>

@@ -1,4 +1,5 @@
 ---
+import PageBanner from '../../components/PageBanner.astro';
 import Base from '../../layouts/Base.astro';
 import Sources from '../../components/Sources.astro';
 import DealsSection from '../../components/DealsSection.astro';
@@ -27,9 +28,7 @@ const qOk = p.medTotal != null ? p.medTotal <= 2500 : null;
 const desc = `${p.name}（${where}）預售屋實價登錄：${p.med ? `每坪中位數 ${p.med} 萬、` : ''}${p.max ? `最高 ${p.max} 萬/坪，` : ''}建商（起造人）${p.dev || '—'}，${p.units} 戶。`;
 ---
 <Base title={`${p.name}實價登錄｜${where}預售屋`} description={desc} active="presale" crumbs={[['預售行情', '/presale/'], [p.name]]}>
-  <span class={statusClass(p.status)}>{p.status}</span> <span class="tag g">{where}</span>
-  <h1>{p.name}</h1>
-  <p class="lead">{p.dev ? `建商（起造人）：${p.dev}` : '起造人：來源未完整顯示'}・{p.addr}</p>
+  <PageBanner tone="build" kicker={`預售建案・${where}`} title={p.name} lead={`${p.dev ? '建商（起造人）：' + p.dev : '起造人：來源未完整顯示'}・${p.addr}`}><p style="margin:10px 0 0"><span class={statusClass(p.status)}>{p.status}</span></p></PageBanner>
 
   <div class="grid g4">
     <div class="card"><div class="note">每坪成交中位數</div><div class="stat acc">{f1(p.med)}<small> 萬/坪</small></div><div class="note">已扣車位</div></div>

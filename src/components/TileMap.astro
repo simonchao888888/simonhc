@@ -33,7 +33,7 @@ const W = 6 * (S + G), H = 4 * (S + G);
 <svg viewBox={`-4 -4 ${W + 8} ${H + 8}`} role="img" aria-label="新竹縣市各行政區中古屋每坪中位數示意圖" style={small ? 'max-width:340px' : ''}>
   {tiles.map((t) => (
     <a href={districtUrl(t.d)}>
-      <rect x={t.x} y={t.y} width={S} height={S} rx="4" fill={t.fill} stroke={t.d.id === highlight ? '#B23A2E' : t.d.r === 'city' ? '#82966B' : '#C9D3CE'} stroke-width={t.d.id === highlight ? 3 : t.d.r === 'city' ? 1.6 : 1} stroke-dasharray={t.d.r === 'city' ? '4 3' : ''} />
+      <rect x={t.x} y={t.y} width={S} height={S} rx="4" fill={t.fill} stroke={t.d.id === highlight ? '#B23A2E' : t.d.r === 'city' ? '#2878B5' : '#C2CEDA'} stroke-width={t.d.id === highlight ? 3 : t.d.r === 'city' ? 1.6 : 1} stroke-dasharray={t.d.r === 'city' ? '4 3' : ''} />
       <text x={t.x + 10} y={t.y + 26} font-size="17" font-family="Noto Sans TC, sans-serif" fill={t.dark ? '#fff' : '#26332A'}>{t.d.name}</text>
       {!small && <text x={t.x + 10} y={t.y + S - 14} font-size="20" font-weight="700" font-family="Noto Sans TC, sans-serif" fill={t.dark ? '#fff' : '#26332A'}>{t.v != null ? t.v : t.cityAvg ? '' : '—'}</text>}
       {!small && t.cityAvg && <text x={t.x + 10} y={t.y + S - 14} font-size="11" fill={t.dark ? '#E6F0EA' : '#5E6B54'}>市區合計 {regions.city.used}</text>}

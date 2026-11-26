@@ -1,4 +1,5 @@
 ---
+import PageBanner from '../../components/PageBanner.astro';
 import Icon from '../../components/Icon.astro';
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
@@ -13,8 +14,7 @@ const path = ['first-time-buyer', 'read-transactions', 'tech-worker-buying', 'gr
   .map((id) => posts.find((p) => p.id === id)).filter(Boolean) as typeof posts;
 ---
 <Base title="新竹買房指南" description="針對新竹縣市寫的買房、房貸、稅費、預售屋、學區與市場分析知識。" crumbs={[['買房指南']]}>
-  <div class="pagehead"><Icon name="bamboo" size={56} /><h1>新竹買房指南</h1></div>
-  <p class="lead">針對新竹縣市寫的買房、房貸、稅費與市場知識，共 {posts.length} 篇。第一次來，建議從下面的「新手路線」開始。</p>
+  <PageBanner tone="view" kicker="買房指南" img="east-cityscape" title="新竹買房指南" lead={`針對新竹縣市寫的買房、房貸、稅費與市場知識，共 ${posts.length} 篇。第一次來，建議從下面的「新手路線」開始。`} />
 
   <h2>新手路線：照這個順序讀</h2>
   <ol class="route">

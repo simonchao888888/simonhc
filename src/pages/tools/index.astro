@@ -1,10 +1,10 @@
 ---
+import PageBanner from '../../components/PageBanner.astro';
 import Icon from '../../components/Icon.astro';
 import Base from '../../layouts/Base.astro';
 import { TOOLS } from '../../lib/tools';
 ---
 <Base title="免費買房試算工具" description="收入負擔能力、買房總費用、房貸月付金、買房或租房比較，四個免費試算工具，資料只在瀏覽器計算。" active="tools" crumbs={[['試算工具']]}>
-  <div class="pagehead"><Icon name="calc" size={56} /><h1>免費買房試算工具</h1></div>
-  <p class="lead">所有計算都在你的瀏覽器裡完成，不會上傳任何資料。</p>
+  <PageBanner tone="tool" kicker="免費房產工具" title="免費買房試算工具" lead="所有計算都在你的瀏覽器裡完成，不會上傳任何資料。" />
   <div class="grid g2">{TOOLS.map((t) => <a class="card" href={`/tools/${t.slug}/`}><h3 style="margin-top:0">{t.t}</h3><p class="note">{t.d}</p></a>)}</div>
 </Base>

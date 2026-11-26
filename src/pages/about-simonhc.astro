@@ -1,11 +1,11 @@
 ---
+import PageBanner from '../components/PageBanner.astro';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import { images, imagesUpdated } from '../lib/images';
 ---
 <Base title="關於新竹房產情報站" description="新竹房產情報站（SimonHC）是專注新竹市與新竹縣的免費房地產資訊網站：使命、編輯方式、資料來源、利益揭露與聯絡方式。" crumbs={[['關於本站']]}>
-  <div class="pagehead"><Icon name="house" size={56} /><h1>關於新竹房產情報站</h1></div>
-  <p class="lead">深耕新竹，讓房產資訊更透明。新竹房產情報站（SimonHC）是專注新竹市與新竹縣的免費房地產資訊網站，由新竹在地房地產投資人 Simon 哥創立。</p>
+  <PageBanner tone="view" kicker="關於本站" img="hero-hsinchu" title="關於新竹房產情報站" lead="深耕新竹，讓房產資訊更透明。新竹房產情報站（SimonHC）是專注新竹市與新竹縣的免費房地產資訊網站，由新竹在地房地產投資人 Simon 哥創立。" />
 
   <h2>我們做什麼</h2>
   <ul>

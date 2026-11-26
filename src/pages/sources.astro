@@ -1,9 +1,10 @@
 ---
+import PageBanner from '../components/PageBanner.astro';
 import Base from '../layouts/Base.astro';
 import { meta, latestRelease, nextRelease, LAG_NOTE, fromPipeline } from '../lib/data';
 ---
 <Base title="資料來源與更新方式" description="SimonHC 的資料來源、統計口徑（扣除車位、排除特殊交易、樣本門檻）與更新頻率。" active="sources" crumbs={[['資料來源']]}>
-  <h1>資料來源與更新方式</h1>
+  <PageBanner tone="view" kicker="資料來源與統計方法" title="資料來源與更新方式" />
   <div class="card art">
     <p>{meta.note}</p>
     <h3>主要資料</h3>

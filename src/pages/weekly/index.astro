@@ -1,4 +1,5 @@
 ---
+import PageBanner from '../../components/PageBanner.astro';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import { getCollection } from 'astro:content';
@@ -6,8 +7,7 @@ const reports = (await getCollection('weekly')).sort((a, b) => b.id.localeCompar
 const [latest, ...older] = reports;
 ---
 <Base title="新竹房市週報" description="每週整理新竹縣市實價登錄、預售屋成交、租金、央行與房貸政策和市場新聞，數字和上一期比較。" crumbs={[['房市週報']]}>
-  <div class="pagehead"><Icon name="doc" size={56} /><h1>新竹房市週報</h1></div>
-  <p class="lead">房市不是每天都在變，所以本站每週整理一次：實價登錄有什麼新成交、預售屋哪些建案在賣、各區房價和上一期比有沒有變，以及這段時間的政策與市場新聞。</p>
+  <PageBanner tone="news" kicker="Simon 新竹房市週報" img="tra-hsinchu" title="新竹房市週報" lead="房市不是每天都在變，所以本站每週整理一次：實價登錄有什麼新成交、預售屋哪些建案在賣、各區房價和上一期比有沒有變，以及這段時間的政策與市場新聞。" />
 
   {latest ? <>
     <a class="wk-latest" href={`/weekly/${latest.id}/`}>

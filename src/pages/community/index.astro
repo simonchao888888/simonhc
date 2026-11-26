@@ -1,4 +1,5 @@
 ---
+import PageBanner from '../../components/PageBanner.astro';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import Portrait from '../../components/Portrait.astro';
@@ -6,8 +7,7 @@ import { community as C, founder as F, fill, isTodo } from '../../lib/founder';
 const name = F.name;
 ---
 <Base title="新竹房地產知識交流平台" description="新竹縣市買房、預售屋、房貸政策、竹科通勤的交流平台：主題看板、臉書與 YouTube、讀者提問與常見問題。" active="community" crumbs={[['交流平台']]}>
-  <div class="pagehead"><Icon name="bamboo" size={56} /><h1>新竹房地產知識交流平台</h1></div>
-  <p class="lead">買房前最需要的，常常不是更多新聞，而是一個可以問「我這樣想對不對」的地方。這裡依主題分成看板，看到別人的問題，也許剛好就是你的答案。</p>
+  <PageBanner tone="view" kicker="交流平台" title="新竹房地產知識交流平台" lead="買房前最需要的，常常不是更多新聞，而是一個可以問「我這樣想對不對」的地方。這裡依主題分成看板，看到別人的問題，也許剛好就是你的答案。" />
 
   <h2>主題看板</h2>
   <div class="boards">

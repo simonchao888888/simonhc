@@ -1,10 +1,10 @@
 ---
+import PageBanner from '../components/PageBanner.astro';
 import Base from '../layouts/Base.astro';
 import C from '../data/community.json';
 ---
 <Base title="資料錯誤回報" description="發現 SimonHC 的房價、建案、建設或文章資料有誤，請在這裡回報。" crumbs={[['關於本站', '/about-simonhc/'], ['資料錯誤回報']]}>
-  <h1>資料錯誤回報</h1>
-  <p class="lead">看到數字對不上、建案名稱錯誤或建設進度過時，請告訴我們。確認後會修正並在該頁註明更正日期。</p>
+  <PageBanner tone="view" kicker="網站透明度" title="資料錯誤回報" lead="看到數字對不上、建案名稱錯誤或建設進度過時，請告訴我們。確認後會修正並在該頁註明更正日期。" />
   <form class="card" method="POST" action={C.form.endpoint} style="max-width:640px">
     <input type="hidden" name="_subject" value="【SimonHC】資料錯誤回報" />
     <input type="hidden" name="_template" value="table" />

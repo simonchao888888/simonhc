@@ -1,4 +1,5 @@
 ---
+import PageBanner from '../components/PageBanner.astro';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import N from '../data/news.json';
@@ -29,8 +30,7 @@ const weekly = [
 ];
 ---
 <Base title="新竹房市更新日曆" description="實價登錄、央行理監事會、五大銀行房貸利率、房屋稅與地價稅、學區登記，新竹買方該注意的日期，以及本站每次會更新什麼。" active="news" crumbs={[['新聞判讀', '/news/'], ['更新日曆']]}>
-  <div class="pagehead"><Icon name="doc" size={56} /><h1>新竹房市更新日曆</h1></div>
-  <p class="lead">這些日期一到，市場就有新數字。這裡列出接下來 100 天的重要日期，以及本站在那一天會做什麼。</p>
+  <PageBanner tone="news" kicker="資料更新日曆" title="新竹房市更新日曆" lead="這些日期一到，市場就有新數字。這裡列出接下來 100 天的重要日期，以及本站在那一天會做什麼。" />
 
   <div class="card" style="margin-bottom:24px">
     <b>下一次央行理監事會：</b>{N.policyRate.nextMeeting}。會後當天發布判讀，重點看政策利率、第 2 戶成數與不動產貸款集中度。

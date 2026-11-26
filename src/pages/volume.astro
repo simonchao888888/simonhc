@@ -1,4 +1,5 @@
 ---
+import PageBanner from '../components/PageBanner.astro';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import { DISCLAIMER } from '../components/Parts';
@@ -42,8 +43,7 @@ const lastMonth = +V.lastA.slice(5, 7);
 const city2025 = OFF.cityDistricts['2025'] as Record<string, number>;
 ---
 <Base title="新竹縣市交易量：建物買賣移轉棟數與各區成交量" description={`新竹縣、新竹市 2023～${curY} 年建物買賣移轉棟數（內政部）與各鄉鎮市區成屋買賣、預售屋簽約量（實價登錄），逐年比較。`} active="prices" crumbs={[['查房價', '/region/'], ['交易量']]}>
-  <div class="pagehead"><Icon name="vane" size={56} /><h1>新竹縣市交易量</h1></div>
-  <p class="lead">房價要配著量看。這頁整理 2023 年以來新竹縣市的建物買賣移轉棟數，以及各鄉鎮市區每年成交多少。</p>
+  <PageBanner tone="price" kicker="交易量統計" img="zhubei-night" title="新竹縣市交易量" lead="房價要配著量看。這頁整理 2023 年以來新竹縣市的建物買賣移轉棟數，以及各鄉鎮市區每年成交多少。" />
 
   <h2 id="official">建物買賣移轉棟數（內政部官方統計）</h2>
   <div class="tw"><table>

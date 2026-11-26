@@ -1,4 +1,5 @@
 ---
+import PageBanner from '../../components/PageBanner.astro';
 import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
 import { DISCLAIMER } from '../../components/Parts';
@@ -24,8 +25,7 @@ const byline = p.data.reviewed ? 'Simon 哥撰寫／審閱' : '新竹房產情�
 <Base title={p.data.title} description={p.data.description} crumbs={[['買房指南', '/guide/'], [p.data.category]]} jsonld={ld}>
   <div class="arthead">
     <span class={`tag c-${p.data.category}`}>{p.data.category}</span>
-    <h1>{p.data.title}</h1>
-    <p class="lead">{p.data.description}</p>
+    <PageBanner tone="view" kicker="買房指南" title={p.data.title} lead={p.data.description} />
     <p class="note">{p.data.pubDate.toISOString().slice(0, 10)} 發布{p.data.updated ? `・${p.data.updated.toISOString().slice(0, 10)} 更新` : ''}・閱讀約 {mins} 分鐘・{byline}・<a href="/editorial/">編輯政策</a></p>
   </div>
   <div class:list={['artwrap', { notoc: toc.length < 3 }]}>

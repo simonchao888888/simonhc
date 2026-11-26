@@ -1,4 +1,6 @@
 ---
+import PageBanner from '../../components/PageBanner.astro';
+import { newsImg } from '../../lib/images';
 import Base from '../../layouts/Base.astro';
 import Sources from '../../components/Sources.astro';
 import { news, fmtDate, type NewsItem } from '../../lib/news';
@@ -12,7 +14,7 @@ const ld = { '@context': 'https://schema.org', '@type': 'Article', headline: n.t
 ---
 <Base title={n.title} description={n.summary.slice(0, 120)} active="news" crumbs={[['新聞判讀', '/news/'], [n.cat]]} jsonld={ld}>
   <span class={`tag c-${n.cat}`}>{n.cat}</span> <span class="date">{fmtDate(n.date)}</span>
-  <h1>{n.title}</h1>
+  <PageBanner tone="news" kicker="房市新聞" img={newsImg(n.cat, n.title)?.id} note="資料照" title={n.title} />
   <div class="card art">
     <h3 style="margin-top:0">發生什麼事</h3><p>{n.summary}</p>
     <div class="take"><b>判讀：</b>{n.take}<div class="byline" style="margin-top:6px">新竹房產情報站編輯部整理（AI 輔助，依 Simon 哥選屋原則）</div></div>

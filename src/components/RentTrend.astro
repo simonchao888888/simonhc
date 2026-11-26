@@ -6,7 +6,7 @@ const years = T.meta.years.map(String);
 const lastY = years[years.length - 1];
 const latest = T.meta.latest;
 const yLabel = (y: string) => (y === lastY ? `${y}（至 ${+latest.slice(5, 7)}/${+latest.slice(8, 10)}）` : y);
-const COLORS = ['#A9C4DC', '#5B8DBA', '#1D3445', '#E07A2F'];
+const COLORS = ['#A8CAE6', '#2878B5', '#122B40', '#D4A04B'];
 const wan = (v: number) => `${(v / 10000).toFixed(2)}萬`;
 type Cell = { n: number; rent: number | null; pp?: number | null };
 const R = T.regions as Record<'city' | 'county', Record<string, { all: Cell; rooms: Record<string, Cell>; ages: Record<string, Cell> }>>;
@@ -56,7 +56,7 @@ const sets = (['city', 'county'] as const).map((r) => ({ r, name: r === 'city' ?
               <g class="b" tabindex="0"><title>{`${s.name} ${g.label} ${b.yy}：月租中位數 ${b.c.rent.toLocaleString()} 元（${b.c.n} 筆）`}</title>
                 <rect x={b.x} y={c.y(b.c.rent)} width={c.bw} height={c.y(0) - c.y(b.c.rent)} rx="2" fill={b.color} opacity={b.yy === lastY ? 0.9 : 1} />
                 <text class="vl" x={b.x + c.bw / 2} y={c.y(b.c.rent) - 5}>{wan(b.c.rent)}</text>
-                <text class="nl" x={b.x + c.bw / 2} y={c.y(0) - 7} fill={b.color === COLORS[0] ? '#1D3445' : '#fff'}>{b.c.n}筆</text></g>
+                <text class="nl" x={b.x + c.bw / 2} y={c.y(0) - 7} fill={b.color === COLORS[0] || b.color === COLORS[3] ? '#122B40' : '#fff'}>{b.c.n}筆</text></g>
             ) : <text class="na" x={b.x + c.bw / 2} y={c.y(0) - 6}>樣本少（{b.c.n}筆）</text>)}
             <text class="xl" x={g.cx} y={c.H - c.bottom + 18}>{g.label}</text>
           </g>)}
