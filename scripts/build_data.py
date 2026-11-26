@@ -21,6 +21,7 @@ from datetime import date, timedelta
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from city_district import city_district
 from zones import zone_of
+from schools import school_of, SCHOOLS
 
 URL = "https://plvr.land.moi.gov.tw/DownloadSeason?season={s}&type=zip&fileName=lvr_landcsv.zip"
 # 每 10 天（1、11、21 日）揭露的批次，季檔還沒出來前靠這些補上最新成交
@@ -381,6 +382,7 @@ def main():
 
     pm = defaultdict(lambda: {"city": [0.0, 0], "county": [0.0, 0]})   # 月 → 縣市 → [總價萬元, 戶數]
     bulk = 0
+    sdeals = []  # 熱門學區代表路段：(school, dist, date, 單價, 屋齡區間)
     zdeals = []  # 生活圈：(zone, dist, date, 單價, 屋齡區間)，依門牌路名歸類
     ages = []   # 中古屋（成屋）依屋齡分組：(region, dist, date, 單價, 屋齡區間)
     years = defaultdict(lambda: defaultdict(lambda: [0, 0]))   # (region, dist) → year → [成屋買賣建物棟數, 預售簽約戶數]
@@ -393,6 +395,9 @@ def main():
                 z = zone_of(dn, col(row, "土地位置建物門牌"))
                 if z:
                     zdeals.append((z, dn, d, up, age_band(row, d)))
+                sc = school_of(dn, col(row, "土地位置建物門牌"))
+                if sc:
+                    sdeals.append((sc, dn, d, up, age_band(row, d)))
         if d.year >= 2023:
             if kind == "a":
                 m = re.search(r"建物(\d+)", col(row, "交易筆棟數"))
@@ -472,6 +477,16 @@ def main():
         v = [x[3] for x in xs]
         out["zones"][z] = {"used": med(v) if len(v) >= 10 else None, "n": len(v),
                            "ages": age_stats([(None, None, x[2], x[3], x[4]) for x in xs])}
+
+    # 熱門學區（代表路段近似；近一年，少於 10 筆不給中位數）
+    since1y = latest - timedelta(days=365)
+    out["schools"] = {}
+    for sid, ds, es, js, area, _ in SCHOOLS:
+        xs = [x for x in sdeals if x[0] == sid and x[2] >= since1y]
+        v = [x[3] for x in xs]
+        dv = [p for _, dn, d, p in deals["a"] if dn in ds and d >= since1y]
+        out["schools"][sid] = {"used": med(v) if len(v) >= 10 else None, "n": len(v), "distMed": med(dv), "distN": len(dv),
+                               "ages": age_stats([(None, None, x[2], x[3], x[4]) for x in xs])}
 
     # 各行政區逐年交易量（依成交／簽約日期）：成屋買賣建物棟數、預售屋簽約戶數
     lastA = max(d for k, _, _, d, _, _ in raw if k == "a")

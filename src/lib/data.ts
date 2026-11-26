@@ -74,3 +74,4 @@ export const fmt = (n?: number | null, d = 0) =>
 
 // 14 個生活圈的中古屋每坪中位數（依門牌路名歸類，近半年；少於 10 筆為 null）
 export const zoneStats: Record<string, { used: number | null; n: number; ages?: AgeBands }> = (build as any).zones ?? {};
+export const schoolStats: Record<string, any> = (build as any).schools ?? {};
