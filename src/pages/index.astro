@@ -161,7 +161,7 @@ const ld = { '@context': 'https://schema.org', '@type': 'WebSite', '@id': new UR
     <div class="sx-h"><h2 id="proj-h">2026 年仍有成交的預售建案</h2><a class="more" href="/presale/">社區建案資料庫</a>
       <p>依內政部預售屋實價登錄整理，單價為該案全部成交每坪中位數（已扣車位）；預售簽約資料最新到 {md(presaleLatest)}。</p></div>
     <div class="proj">{active.map((p) => (
-      <a href={`/presale/${p.id}/`}><b>{p.name}</b><span class="p">{f1(p.med)}<small> 萬/坪</small></span><span class="m">{p.dist || '新竹市'}・{p.n} 筆成交・最近 {p.latest}</span><span class="m" style="text-align:right">{p.dev ?? ''}</span></a>
+      <a href={`/presale/${p.id}/`}><b>{p.name}</b><span class="p">{f1(p.med)}<small> 萬/坪</small></span><span class="m">{p.dist || '新竹市'}・實價登錄 {p.n} 筆{p.lj && p.lj.n > p.n ? <span class="pj-lj">（樂居 {p.lj.n} 筆）</span> : ''}・最近 {p.latest}</span><span class="m" style="text-align:right">{p.dev ?? ''}</span></a>
     ))}</div>
   </section>
 

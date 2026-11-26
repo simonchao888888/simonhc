@@ -45,7 +45,7 @@ const dists = [...new Set(all.map((p) => p.dist || rName(p.r)))];
         <td class="n"><b>{f1(p.med)}</b></td>
         <td class="n">{f1(p.min)}～{f1(p.max)}</td>
         <td class="n">{p.medTotal ? `${p.medTotal.toLocaleString()} 萬` : '—'}</td>
-        <td class="n">{p.n}</td>
+        <td class="n">{p.n}{(p as any).lj && (p as any).lj.n > p.n ? <div class="pj-lj">樂居 {(p as any).lj.n}</div> : ''}</td>
         <td class="date">{p.latest}</td>
         <td><span class={statusClass(p.status)}>{p.status}</span></td>
       </tr>
@@ -66,7 +66,7 @@ const dists = [...new Set(all.map((p) => p.dist || rName(p.r)))];
       const id = pageIdOf(p.name, p.r, p.dist || undefined);
       return <tr data-d={p.dist || rName(p.r)} data-s={`${p.name} ${p.dist} ${p.dev ?? ''}`}>
         <td>{id ? <a href={`/presale/${id}/`}>{p.name}</a> : p.name}</td>
-        <td>{rName(p.r)}</td><td>{p.dist || '—'}</td><td class="n">{p.n}</td><td class="n">{f1(p.med)}</td>
+        <td>{rName(p.r)}</td><td>{p.dist || '—'}</td><td class="n">{p.n}{(p as any).lj && (p as any).lj.n > p.n ? <div class="pj-lj">樂居 {(p as any).lj.n}</div> : ''}</td><td class="n">{f1(p.med)}</td>
         {all.some((x) => x.dev) && <td>{p.dev ?? '—'}</td>}
       </tr>;
     })}

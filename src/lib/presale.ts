@@ -7,10 +7,11 @@ import { createHash } from 'node:crypto';
 import LJ from '../data/leju.json';
 
 export interface Leju { url: string; n: number; sold?: number; total?: number; avg1y?: number; max?: number; min?: number }
-// 站長規則：樂居筆數多於內政部開放資料時，以樂居為準（頁面標示來源）
+// 本站統計一律以內政部開放資料為準；樂居的公開摘要只放在建案頁旁邊供參考（src='leju' 表示樂居筆數較多、官方尚未公布完）
 export const lejuChecked: string = (LJ as any).checked;
 const LJI = (LJ as any).items as Record<string, Leju>;
 export const lejuFor = (r: string, dist: string, name: string): Leju | undefined => LJI[`${r}|${dist}|${name}`];
+export const lejuSearch = (name: string, dist: string) => `https://www.google.com/search?q=${encodeURIComponent(`樂居 ${name} ${dist}`)}`;
 export const useLeju = (l: Leju | undefined, n: number) => !!l && l.n > n;
 export interface Project {
   lj?: Leju; moiN?: number; src?: 'leju' | 'moi';
@@ -39,12 +40,11 @@ export const featured: Project[] = (P.featured as Project[]).map((f) => {
   return { ...f, lj, moiN: q.n, src: win ? 'leju' : 'moi', alias: q.alias, first: q.first, med: q.med ?? f.med, min: q.min ?? f.min, max: q.max ?? f.max, medTotal: q.medTotal ?? f.medTotal, n: q.n, latest: q.latest,
     status: q.latest >= '2026' ? '2026 仍有成交' : (f.status === '已標示完售' ? f.status : '近期無新成交'),
     dev: q.dev ?? f.dev, units: q.units ?? f.units, addr: q.addr || f.addr, sales: q.sales || f.sales, permit: q.permit || f.permit,
-    ...(win ? { n: lj!.n, max: Math.max(lj!.max ?? 0, q.max ?? 0) || q.max } : {}),
     sources: [['內政部實價登錄', 'https://lvr.land.moi.gov.tw/'], ...(lj ? [['樂居建案頁', lj.url]] : []), ...f.sources] as [string, string][] };
 }).sort((a, b) => (b.latest || '').localeCompare(a.latest || ''));
 export const all: Row[] = ((fromPipeline ? pipeRows : P.all) as Row[]).map((p: any) => {
   const lj = lejuFor(p.r, p.dist, p.name);
-  return useLeju(lj, p.n) ? { ...p, lj, n: lj!.n, moiN: p.n, src: 'leju', max: Math.max(lj!.max ?? 0, p.max ?? 0) } : p;
+  return lj ? { ...p, lj, moiN: p.n, src: useLeju(lj, p.n) ? 'leju' : 'moi' } : p;
 });
 export const rName = (r: string) => (r === 'city' ? '新竹市' : '新竹縣');
 export const statusClass = (s: string) => (s.startsWith('2026') ? 'tag' : 'tag g');

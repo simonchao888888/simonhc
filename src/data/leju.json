@@ -1,17 +1,193 @@
 {
- "_說明": "樂居（leju.com.tw）建案頁的成交統計。站長規則：同一建案若樂居的實價登錄筆數多於本站（內政部開放資料），以樂居的筆數、均價與最高／最低價為準，並在頁面標示來源。樂居有防機器人機制，不做自動抓取；由編輯部人工到樂居建案頁核對後更新。",
+ "_說明": "樂居（leju.com.tw）建案頁公開顯示的摘要數字，只放在建案頁旁邊供參考並附連結；本站所有統計以內政部實價登錄開放資料為準。由編輯部人工到樂居建案頁核對（樂居有防機器人機制，不做自動抓取）。",
  "checked": "2026-11-26",
  "items": {
-  "county|竹北市|時華": {"url": "https://www.leju.com.tw/community/Lbfe156085d3afe", "n": 202, "sold": 202, "total": 415, "avg1y": 92.55, "max": 105.41, "min": 87.03},
-  "county|竹北市|豐采520": {"url": "https://www.leju.com.tw/community/L54b1109987f274", "n": 498, "sold": 496, "total": 890, "avg1y": 87.1, "max": 88.59, "min": 31.18},
-  "county|竹北市|御邸": {"url": "https://www.leju.com.tw/community/Lb86147537336ce", "n": 82, "sold": 82, "total": 193, "avg1y": 79.44, "max": 89.57, "min": 70.8},
-  "county|竹北市|品聚賦格": {"url": "https://www.leju.com.tw/community/Ld901547722b123", "n": 73, "sold": 73, "total": 87, "avg1y": 54.93, "max": 58.25, "min": 51.6},
-  "county|竹東鎮|森藴": {"url": "https://www.leju.com.tw/community/Lddc155018cf4dc", "n": 220, "sold": 220, "total": 644, "avg1y": 52.79, "max": 58.87, "min": 47.51},
-  "county|竹東鎮|富宇東方大境": {"url": "https://www.leju.com.tw/community/Lcde1452211e406", "n": 191, "sold": 191, "total": 398, "avg1y": 51.51, "max": 61.43, "min": 47.35},
-  "city|新竹市|益展心築湛": {"url": "https://www.leju.com.tw/community/Lb5d14589054cbd", "n": 213, "total": 214, "avg1y": 69.17, "max": 74.78, "min": 51.74},
-  "city|新竹市|鉑翡": {"url": "https://www.leju.com.tw/community/L1ac1495605a1f1", "n": 94, "sold": 94, "total": 169, "avg1y": 78.13, "max": 83.7, "min": 68.97},
-  "city|新竹市|春福承曦": {"url": "https://www.leju.com.tw/community/L124143010e2c91", "n": 229, "sold": 229, "total": 300, "avg1y": 69.2, "max": 72.25, "min": 56.66},
-  "city|新竹市|富宇-天雋": {"url": "https://www.leju.com.tw/community/L6351264368bb29", "n": 181, "sold": 181, "total": 257, "avg1y": 79.21, "max": 89.88, "min": 68.81},
-  "city|新竹市|富宇-天闊": {"url": "https://www.leju.com.tw/community/Le3d144695cb3a1", "n": 83, "total": 201}
+  "county|竹北市|時華": {
+   "url": "https://www.leju.com.tw/community/Lbfe156085d3afe",
+   "n": 202,
+   "sold": 202,
+   "total": 415,
+   "avg1y": 92.55,
+   "max": 105.41,
+   "min": 87.03
+  },
+  "county|竹北市|豐采520": {
+   "url": "https://www.leju.com.tw/community/L54b1109987f274",
+   "n": 498,
+   "sold": 496,
+   "total": 890,
+   "avg1y": 87.1,
+   "max": 88.59,
+   "min": 31.18
+  },
+  "county|竹北市|御邸": {
+   "url": "https://www.leju.com.tw/community/Lb86147537336ce",
+   "n": 82,
+   "sold": 82,
+   "total": 193,
+   "avg1y": 79.44,
+   "max": 89.57,
+   "min": 70.8
+  },
+  "county|竹北市|品聚賦格": {
+   "url": "https://www.leju.com.tw/community/Ld901547722b123",
+   "n": 73,
+   "sold": 73,
+   "total": 87,
+   "avg1y": 54.93,
+   "max": 58.25,
+   "min": 51.6
+  },
+  "county|竹東鎮|森藴": {
+   "url": "https://www.leju.com.tw/community/Lddc155018cf4dc",
+   "n": 220,
+   "sold": 220,
+   "total": 644,
+   "avg1y": 52.79,
+   "max": 58.87,
+   "min": 47.51
+  },
+  "county|竹東鎮|富宇東方大境": {
+   "url": "https://www.leju.com.tw/community/Lcde1452211e406",
+   "n": 191,
+   "sold": 191,
+   "total": 398,
+   "avg1y": 51.51,
+   "max": 61.43,
+   "min": 47.35
+  },
+  "city|新竹市|益展心築湛": {
+   "url": "https://www.leju.com.tw/community/Lb5d14589054cbd",
+   "n": 213,
+   "total": 214,
+   "avg1y": 69.17,
+   "max": 74.78,
+   "min": 51.74
+  },
+  "city|新竹市|鉑翡": {
+   "url": "https://www.leju.com.tw/community/L1ac1495605a1f1",
+   "n": 94,
+   "sold": 94,
+   "total": 169,
+   "avg1y": 78.13,
+   "max": 83.7,
+   "min": 68.97
+  },
+  "city|新竹市|春福承曦": {
+   "url": "https://www.leju.com.tw/community/L124143010e2c91",
+   "n": 229,
+   "sold": 229,
+   "total": 300,
+   "avg1y": 69.2,
+   "max": 72.25,
+   "min": 56.66
+  },
+  "city|新竹市|富宇-天雋": {
+   "url": "https://www.leju.com.tw/community/L6351264368bb29",
+   "n": 181,
+   "sold": 181,
+   "total": 257,
+   "avg1y": 79.21,
+   "max": 89.88,
+   "min": 68.81
+  },
+  "city|新竹市|富宇-天闊": {
+   "url": "https://www.leju.com.tw/community/Le3d144695cb3a1",
+   "n": 83,
+   "total": 201
+  },
+  "city|新竹市|利晉曙光": {
+   "url": "https://www.leju.com.tw/community/Lda3138572cda94",
+   "n": 183,
+   "total": 189,
+   "avg": 65.62,
+   "max": 73,
+   "min": 56.21
+  },
+  "city|新竹市|大任天澄": {
+   "url": "https://www.leju.com.tw/community/L6cd141649ccb78",
+   "n": 113,
+   "total": 116,
+   "avg1y": 66.12,
+   "max": 66.12,
+   "min": 56.46
+  },
+  "city|新竹市|達麗吾同": {
+   "url": "https://www.leju.com.tw/community/La2f1570812a52d",
+   "n": 0,
+   "total": 386
+  },
+  "county|寶山鄉|宏道新竹帝寶8區1號": {
+   "url": "https://www.leju.com.tw/community/Ld9c13514082cb1",
+   "n": 243,
+   "total": 246,
+   "max": 54.53,
+   "min": 29.31
+  },
+  "county|寶山鄉|宏道新竹帝寶8區2號": {
+   "url": "https://www.leju.com.tw/community/L3381351617f4ea",
+   "n": 221,
+   "total": 225,
+   "max": 51.56,
+   "min": 42.08
+  },
+  "county|寶山鄉|宏道新竹帝寶8區3號": {
+   "url": "https://www.leju.com.tw/community/L4cb133739d8647",
+   "n": 149,
+   "total": 149,
+   "max": 52.4,
+   "min": 36.59
+  },
+  "county|寶山鄉|宏道新竹帝寶7區1號": {
+   "url": "https://www.leju.com.tw/community/L1121476496f294",
+   "n": 132,
+   "sold": 132,
+   "total": 159,
+   "avg1y": 53.18,
+   "max": 63.1,
+   "min": 46.19
+  },
+  "county|寶山鄉|宏道新竹帝寶7區2號": {
+   "url": "https://www.leju.com.tw/community/Lce31476483837a",
+   "n": 125,
+   "sold": 125,
+   "total": 137,
+   "avg1y": 54.89,
+   "max": 63.3,
+   "min": 51.79
+  },
+  "county|寶山鄉|宏道新竹帝寶6區1號": {
+   "url": "https://www.leju.com.tw/community/Lb97135124c96c2",
+   "n": 143,
+   "total": 147,
+   "avg1y": 48,
+   "max": 52.35,
+   "min": 42.94
+  },
+  "county|寶山鄉|宏道新竹帝寶6區2號": {
+   "url": "https://www.leju.com.tw/community/L5ca13513052061",
+   "n": 185,
+   "total": 189,
+   "max": 52.9,
+   "min": 42.55
+  },
+  "county|寶山鄉|宏道新竹帝寶中央廣場": {
+   "url": "https://www.leju.com.tw/community/L487148908a8b00",
+   "n": 93,
+   "sold": 93,
+   "total": 279,
+   "avg1y": 71.72,
+   "max": 74.89,
+   "min": 68.06
+  },
+  "county|新豐鄉|富宇-大景": {
+   "url": "https://www.leju.com.tw/community/L9fb15052416b18",
+   "n": 22,
+   "sold": 22,
+   "total": 403,
+   "avg1y": 35.61,
+   "max": 37.6,
+   "min": 32.28
+  }
  }
 }

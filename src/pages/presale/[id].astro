@@ -4,7 +4,7 @@ import Base from '../../layouts/Base.astro';
 import Sources from '../../components/Sources.astro';
 import DealsSection from '../../components/DealsSection.astro';
 import { featured, pipelineOnly, dealsFor, hasRealDeals, rName, statusClass, districtIdOf, f1, type Project } from '../../lib/presale';
-import { lejuChecked } from '../../lib/presale';
+import { lejuChecked, lejuSearch } from '../../lib/presale';
 import { regions, districts, districtUrl, pct } from '../../lib/data';
 import { DISCLAIMER } from '../../components/Parts';
 export function getStaticPaths() {
@@ -31,20 +31,36 @@ const desc = `${p.name}（${where}）預售屋實價登錄：${p.med ? `每坪�
 <Base title={`${p.name}實價登錄｜${where}預售屋`} description={desc} active="presale" crumbs={[['預售行情', '/presale/'], [p.name]]}>
   <PageBanner tone="build" kicker={`預售建案・${where}`} title={p.name} lead={`${p.dev ? '建商（起造人）：' + p.dev : '起造人：來源未完整顯示'}・${p.addr}`}><p style="margin:10px 0 0"><span class={statusClass(p.status)}>{p.status}</span></p></PageBanner>
 
-  {p.src === 'leju' && p.lj && (
-    <div class="warn" style="font-size:14px"><b>成交筆數以樂居為準：</b>樂居顯示本案實價登錄 {p.lj.n} 筆{p.lj.sold ? `、已銷售 ${p.lj.sold}／${p.lj.total} 戶` : ''}{p.lj.avg1y ? `、一年成交均價 ${p.lj.avg1y} 萬/坪` : ''}{p.lj.max ? `、最高 ${p.lj.max} 萬/坪` : ''}，多於內政部開放資料目前收錄的 {p.moiN} 筆，因此本頁筆數與最高價採用樂居數字（{lejuChecked} 核對，<a href={p.lj.url} rel="noopener" target="_blank">看樂居建案頁</a>）。下方逐戶明細仍是內政部開放資料的 {p.moiN} 筆。</div>
-  )}
+  <div class="lj-wrap">
+  <div>
   <div class="grid g4">
     <div class="card"><div class="note">每坪成交中位數</div><div class="stat acc">{f1(p.med)}<small> 萬/坪</small></div><div class="note">已扣車位</div></div>
     <div class="card"><div class="note">最低～最高單價</div><div class="stat sm">{f1(p.min)}～{f1(p.max)}<small> 萬/坪</small></div></div>
     <div class="card"><div class="note">中位總價</div><div class="stat sm">{p.medTotal ? p.medTotal.toLocaleString() : '—'}<small> 萬</small></div>{qOk != null && <div class="note">{qOk ? '在青安 3.0 新竹 2,500 萬上限內' : '超過青安 3.0 新竹 2,500 萬上限'}</div>}</div>
-    <div class="card"><div class="note">實價登錄揭露</div><div class="stat sm">{p.n}<small> 筆</small></div><div class="note">{p.src === 'leju' ? `來源：樂居（內政部開放資料 ${p.moiN} 筆）` : `最新成交 ${p.latest}`}</div></div>
+    <div class="card"><div class="note">實價登錄揭露</div><div class="stat sm">{p.n}<small> 筆</small></div><div class="note">最新成交 {p.latest}</div></div>
+  </div>
+  </div>
+  <aside class="lj-side">
+    <div class="lj-h"><span>樂居即時數據</span><small>參考用・非本站統計</small></div>
+    {p.lj && p.lj.n > 0 ? <>
+      <div class="lj-n"><b>{p.lj.n}</b> 筆成交{p.lj.sold && p.lj.total ? <small>・已售 {p.lj.sold}／{p.lj.total} 戶</small> : p.lj.total ? <small>・總戶數 {p.lj.total}</small> : ''}</div>
+      {(p.lj.avg1y || p.lj.max) && <div class="lj-p">{p.lj.avg1y ? `一年均價 ${p.lj.avg1y} 萬/坪` : ''}{p.lj.max ? `${p.lj.avg1y ? '・' : ''}最高 ${p.lj.max} 萬/坪` : ''}</div>}
+      {p.lj.n > p.n
+        ? <p class="lj-note up">比實價登錄多 {p.lj.n - p.n} 筆：內政部尚未公布，樂居已先彙整。</p>
+        : <p class="lj-note">與實價登錄相近，本站資料已完整。</p>}
+      <a class="btn p" href={p.lj.url} rel="noopener" target="_blank">看樂居最新數據</a>
+      <p class="lj-src">樂居建案頁公開資訊，{lejuChecked} 核對。</p>
+    </> : <>
+      <p class="lj-note">查看樂居是否有比實價登錄更新的成交。</p>
+      <a class="btn s" href={p.lj?.url ?? lejuSearch(p.name, p.dist || '新竹市')} rel="noopener" target="_blank">到樂居查本案</a>
+    </>}
+  </aside>
   </div>
 
   <h2>建案資料</h2>
   <div class="tw"><table>
     <tr><td style="width:28%"><b>建案名稱</b></td><td>{p.name}{p.alias?.length ? <small class="note">（實價登錄也寫作：{p.alias.join('、')}，已合併計算）</small> : ''}</td></tr>
-    {p.first && <tr><td><b>揭露成交期間</b></td><td>{p.first} ～ {p.latest}，內政部開放資料 {p.moiN ?? p.n} 筆{p.src === 'leju' ? `（樂居 ${p.n} 筆）` : ''}</td></tr>}
+    {p.first && <tr><td><b>揭露成交期間</b></td><td>{p.first} ～ {p.latest}，共 {p.n} 筆</td></tr>}
     <tr><td><b>起造人（建照登記名義人）</b></td><td>{p.dev || '—'}</td></tr>
     <tr><td><b>位置</b></td><td>{where}・{p.addr}</td></tr>
     {p.units > 0 && <tr><td><b>總戶數</b></td><td>{p.units} 戶</td></tr>}
@@ -54,13 +70,6 @@ const desc = `${p.name}（${where}）預售屋實價登錄：${p.med ? `每坪�
   </table></div>
   {p.note && <div class="warn">{p.note}</div>}
 
-  {p.src === 'leju' && p.lj && (
-    <div class="card" style="margin:22px 0;border-left:4px solid var(--c-build)">
-      <h2 style="margin:0 0 6px;font-size:21px">另有 {p.lj.n - (p.moiN ?? 0)} 筆成交只在樂居</h2>
-      <p style="margin:0 0 10px">內政部官方網站目前只公布本案 {p.moiN} 筆（下方逐戶明細就是這 {p.moiN} 筆，我們在內政部實價查詢網核對過筆數一致）。樂居的 {p.lj.n} 筆包含它自行彙整、內政部尚未公布的預售成交，逐戶明細請到樂居查看；內政部公布後，本站會在下一批更新（每月 1、11、21 日）自動補進來。</p>
-      <a class="btn p" href={p.lj.url} rel="noopener" target="_blank">在樂居看全部 {p.lj.n} 筆成交明細</a>
-    </div>
-  )}
   {deals.length > 0 ? <DealsSection deals={deals} name={p.name} /> : <>
     <h2 id="deals">成交明細與拆分</h2>
     <div class="card">
