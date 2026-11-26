@@ -1189,6 +1189,35 @@
    ],
    "path": "/img/county-stadium",
    "avif": true
+  },
+  {
+   "id": "guanghua-ifg",
+   "title": "IFG 遠雄廣場新竹店（原大魯閣湳雅廣場）",
+   "place": "大雅路、湳雅街口",
+   "dist": "北區",
+   "area": "光華・湳雅生活圈",
+   "cat": "生活機能",
+   "author": "T Gordon Cheng",
+   "source": "https://commons.wikimedia.org/wiki/File:IFG%E9%81%A0%E9%9B%84%E5%BB%A3%E5%A0%B4%E6%96%B0%E7%AB%B9%E5%BA%97_2026-11-09.jpg",
+   "origin": "Wikimedia Commons",
+   "license": "CC BY-SA 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "date": "2026-11-09",
+   "real": true,
+   "illustration": false,
+   "limits": "依授權條款標示作者與授權；CC BY-SA 改作須同授權",
+   "alt": "IFG 遠雄廣場新竹店（原大魯閣湳雅廣場）",
+   "w": 4000,
+   "h": 3000,
+   "ratio": 1.3333,
+   "pos": "50% 55%",
+   "widths": [
+    480,
+    960,
+    1600
+   ],
+   "path": "/img/guanghua-ifg",
+   "avif": true
   }
  ],
  "skipped": []
