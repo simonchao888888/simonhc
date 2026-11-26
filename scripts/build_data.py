@@ -15,7 +15,7 @@
 
 只需 Python 3.9+ 標準函式庫。
 """
-import argparse, csv, io, json, os, re, statistics, sys, urllib.request, zipfile
+import os, argparse, csv, io, json, os, re, statistics, sys, urllib.request, zipfile
 from collections import defaultdict
 from datetime import date, timedelta
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -34,6 +34,7 @@ PING = 3.30579
 EXCLUDE_NOTE = re.compile(r"親友|員工|特殊關係|債權|債務|未登記|瑕疵|凶宅|毛胚|含.*裝潢|政府機關|法拍|急買急賣|共有物|持分")
 START_SEASON = "108S1"   # 2021/7 新制前，預售屋由代銷在委託結束後批次申報，成交日期可早到 2019；從 108S1 起抓才有完整建案成交（交易量統計另外只取 2023 年起）
 RES_TYPES = ("住宅大樓", "華廈", "公寓", "透天厝", "套房")
+REGION_OF = {"east": "city", "north": "city", "xiangshan": "city"}  # 其餘行政區屬新竹縣
 DISTRICT_ID = {
     "竹北市": "zhubei", "湖口鄉": "hukou", "竹東鎮": "zhudong", "新豐鄉": "xinfeng", "芎林鄉": "qionglin",
     "關西鎮": "guanxi", "新埔鎮": "xinpu", "北埔鄉": "beipu", "寶山鄉": "baoshan", "橫山鄉": "hengshan",
@@ -314,9 +315,29 @@ def deal_detail(row, d, up, parks):
 
 
 # 統計口徑版本：改變納入規則時要升版，週報遇到版本不同就不和上一期比較（見 /sources/#method）
-METHOD = "v2"
+METHOD = "v3"
 
 AGE_BANDS = [("0-10", 0, 10), ("11-20", 11, 20), ("21-30", 21, 30), ("31+", 31, 999)]
+
+
+VARIANT = int(os.environ.get("HC_VARIANT", "3"))
+
+
+def resale_ok(row, d):
+    """中古屋（成屋）統計要排除的交易（v3）：
+    1. 備註「預售屋、或土地及建物分件登記案件」：預售屋交屋或土地建物分開登記，不是中古屋轉手
+    2. 主要用途不是住宅（商業用、辦公、工業…），單價和住宅不可比
+    3. 新成屋：建築完成未滿 2 年就成交，多為建商首次銷售，單價接近預售、會拉高中古屋行情"""
+    if VARIANT >= 1 and "分件登記" in col(row, "備註"):
+        return False
+    use = col(row, "主要用途")
+    if VARIANT >= 2 and use and "住" not in use and "見其他登記事項" not in use:
+        return False
+    if VARIANT >= 3:
+        b = roc_date(col(row, "建築完成"))
+        if b and (d - b).days < 730:
+            return False
+    return True
 
 
 def age_band(row, d):
@@ -389,12 +410,19 @@ def main():
     bulk = 0
     sdeals = []  # 熱門學區代表路段：(school, dist, date, 單價, 屋齡區間)
     zdeals = []  # 生活圈：(zone, dist, date, 單價, 屋齡區間)，依門牌路名歸類
+    gross = []  # 同一批中古屋的「含車位」單價（總價 ÷ 建物總面積），房仲報導多用這種算法
     ages = []   # 中古屋（成屋）依屋齡分組：(region, dist, date, 單價, 屋齡區間)
     years = defaultdict(lambda: defaultdict(lambda: [0, 0]))   # (region, dist) → year → [成屋買賣建物棟數, 預售簽約戶數]
     for kind, region, dn, d, row, prk in raw:
+        if kind == "a" and not resale_ok(row, d):
+            continue
         up = unit_price(row, dn if kind == "a" else None)
         if up:
             deals[kind].append((region, dn, d, up))
+            if kind == "a":
+                ga = num(col(row, "建物移轉總面積平方公尺"))
+                if ga > 0:
+                    gross.append((region, dn, d, num(col(row, "總價元")) / 1e4 / (ga / 3.30579)))
             if kind == "a":
                 ages.append((region, dn, d, up, age_band(row, d)))
                 z = zone_of(dn, col(row, "土地位置建物門牌"))
@@ -452,8 +480,15 @@ def main():
                     "method": METHOD},
            "regions": {}, "districts": {}}
 
+    ly0, ly1 = since - timedelta(days=365), latest - timedelta(days=365)
+
+    def yoy(cur, prev):
+        return round((statistics.median(cur) / statistics.median(prev) - 1) * 100, 1) if len(cur) >= 20 and len(prev) >= 20 else None
+
     for region in ("city", "county"):
         used = [p for r, _, d, p in deals["a"] if r == region and d >= since]
+        last_y = [p for r, _, d, p in deals["a"] if r == region and ly0 <= d <= ly1]
+        g = [p for r, _, d, p in gross if r == region and d >= since]
         pre = [p for r, _, d, p in deals["b"] if r == region and d >= since]
         byq = defaultdict(list)
         for r, _, d, p in deals["a"]:
@@ -462,16 +497,18 @@ def main():
         cur_q = quarter(latest)
         trend = [[q, len(v), med(v)] for q, v in sorted(byq.items()) if q != cur_q and len(v) >= 5][-8:]
         out["regions"][region] = {"ages": age_stats([x for x in ages if x[0] == region and x[2] >= since]),
-                                  "used": med(used), "usedN": len(used),
+                                  "used": med(used), "usedN": len(used), "gross": med(g), "yoy": yoy(used, last_y),
                                   "presale": med(pre), "presaleN": len(pre), "trend": trend}
 
     for name, did in DISTRICT_ID.items():
         used = [p for _, dn, d, p in deals["a"] if dn == name and d >= since]
         pre = [p for _, dn, d, p in deals["b"] if dn == name and d >= since]
+        g = [p for _, dn, d, p in gross if dn == name and d >= since]
+        last_y = [p for _, dn, d, p in deals["a"] if dn == name and ly0 <= d <= ly1]
         n = len(used)
         out["districts"][did] = {
             "ages": age_stats([x for x in ages if x[1] == name and x[2] >= since]),
-            "used": med(used) if n >= 5 else None, "n": n,
+            "used": med(used) if n >= 5 else None, "n": n, "gross": med(g) if n >= 5 else None, "yoyH": yoy(used, last_y),
             "presale": med(pre) if len(pre) >= 5 else None, "pn": len(pre),
             "tier": "main" if n >= 20 else "ref" if n >= 5 else "low",
         }
@@ -483,6 +520,14 @@ def main():
         v = [x[3] for x in xs]
         out["zones"][z] = {"used": med(v) if len(v) >= 10 else None, "n": len(v),
                            "ages": age_stats([(None, None, x[2], x[3], x[4]) for x in xs])}
+
+    # 縣市年變化改用「組成調整」：各行政區自己的年變化，依本期成交筆數加權。
+    # 直接比全縣市中位數會受行政區組成影響（例如本期竹北成交比例變高，全縣中位數就會跳升）。
+    for region in ("city", "county"):
+        ds = [v for did, v in out["districts"].items() if v.get("yoyH") is not None and REGION_OF.get(did, "county") == region]
+        w = sum(v["n"] for v in ds)
+        out["regions"][region]["yoyRaw"] = out["regions"][region]["yoy"]
+        out["regions"][region]["yoy"] = round(sum(v["yoyH"] * v["n"] for v in ds) / w, 1) if w else None
 
     # 熱門學區（代表路段近似；近一年，少於 10 筆不給中位數）
     since1y = latest - timedelta(days=365)

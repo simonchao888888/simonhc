@@ -1,46 +1,415 @@
 {
   "_note": "圖片來源清單（V4）：只收具明確開放授權的 Wikimedia Commons 檔案。scripts/fetch_images.py 依此下載、轉檔並寫出 src/data/images.json（含作者、授權、原始網址）。",
   "images": [
-    {"id":"hero-hsinchu","file":"Hsinchu Cityscape viewed from Eighteen Peaks Mountain.jpg","title":"從十八尖山眺望新竹市區","place":"十八尖山","dist":"東區","area":"新竹舊城","cat":"城市景觀","pos":"50% 38%","hero":true},
-    {"id":"zhubei-tofu","file":"Zhubei Skyline 20200517 (cropped).jpg","title":"頭前溪豆腐岩與竹北天際線","place":"頭前溪豆腐岩","dist":"竹北市","area":"竹北高鐵","cat":"城市景觀","pos":"50% 40%","hero":true},
-    {"id":"zhubei-night","file":"Zhubei Light Trail.jpg","title":"竹北光明六路東一段夜間車流","place":"光明六路東一段","dist":"竹北市","area":"竹北縣治","cat":"道路及交通","pos":"50% 55%"},
-    {"id":"zhubei-2023","file":"Zhubei, Hsinchu Skyline 20231117.jpg","title":"竹北住宅天際線","place":"竹北市","dist":"竹北市","area":"竹北高鐵","cat":"住宅社區","pos":"50% 50%"},
-    {"id":"thsr-hsinchu","file":"THSR Hsinchu Station 2024-01-06.jpg","title":"高鐵新竹站","place":"高鐵新竹站","dist":"竹北市","area":"竹北高鐵","cat":"道路及交通","pos":"50% 55%"},
-    {"id":"liujia","file":"Liujia Area near THSR Hsinchu Station 2024-01-06.jpg","title":"高鐵新竹站周邊六家地區","place":"六家","dist":"竹北市","area":"竹北高鐵","cat":"住宅社區","pos":"50% 60%"},
-    {"id":"county-gov","file":"縣治特區的新竹縣政府.jpg","title":"縣治特區的新竹縣政府","place":"新竹縣政府","dist":"竹北市","area":"竹北縣治","cat":"公共建設","pos":"50% 50%"},
-    {"id":"taiyuan","file":"台元科技園區東大門.jpg","title":"台元科技園區東大門","place":"台元科技園區","dist":"竹北市","area":"台元","cat":"科學園區","pos":"50% 55%"},
-    {"id":"sky-city","file":"竹北大遠百 Sky City.jpg","title":"竹北遠東百貨 Sky City","place":"竹北遠百","dist":"竹北市","area":"竹北縣治","cat":"商業設施","pos":"50% 45%"},
-    {"id":"tra-hsinchu","file":"Main entrance building of TRA Hsinchu Station.jpg","title":"臺鐵新竹車站站房","place":"新竹車站","dist":"東區","area":"新竹舊城","cat":"道路及交通","pos":"50% 45%"},
-    {"id":"tra-hsinchu-night","file":"TRA Hsinchu Station night 2020-11-17.jpg","title":"夜晚的臺鐵新竹車站","place":"新竹車站","dist":"東區","area":"新竹舊城","cat":"城市景觀","pos":"50% 50%","hero":true},
-    {"id":"city-god","file":"Hsinchu City God Temple 20210405.jpg","title":"新竹都城隍廟","place":"新竹都城隍廟","dist":"北區","area":"新竹舊城","cat":"城市景觀","pos":"50% 45%"},
-    {"id":"moat","file":"Hsinchu City Moat Park-20250329.jpg","title":"新竹護城河親水公園","place":"護城河親水公園","dist":"東區","area":"新竹舊城","cat":"學校及公園","pos":"50% 50%"},
-    {"id":"east-gate","file":"View of Hsinchu City East Gate and surroundings.jpg","title":"新竹東門城與周邊街區","place":"東門城","dist":"東區","area":"新竹舊城","cat":"城市景觀","pos":"50% 50%"},
-    {"id":"big-city","file":"Big City shopping mall 2022-08-25.jpg","title":"遠東巨城購物中心","place":"巨城購物中心","dist":"東區","area":"巨城","cat":"商業設施","pos":"50% 50%"},
-    {"id":"guanxin-park","file":"新竹市關新公園 Kuan Hisn Park, Hsinchu City.jpg","title":"東區關新公園","place":"關新公園","dist":"東區","area":"關埔","cat":"學校及公園","pos":"50% 55%"},
-    {"id":"science-park","file":"Hsinchu Science Park Life Hub 2020-11-27.jpg","title":"新竹科學園區生活廣場","place":"新竹科學園區","dist":"東區","area":"關埔","cat":"科學園區","pos":"50% 50%"},
-    {"id":"nthu-nctu","file":"Distant View of Buildings in National Tsing Hua University and National Chiao Tung University from Eighteen Peaks Mountain.jpg","title":"從十八尖山遠眺清大、交大校區","place":"十八尖山","dist":"東區","area":"清大交大","cat":"學校及公園","pos":"50% 50%"},
-    {"id":"nycu-gate","file":"National Yang Ming Chiao Tung University Kuang-Fu Campus South Gate 2021-03-08.jpg","title":"陽明交大光復校區南大門","place":"陽明交大光復校區","dist":"東區","area":"清大交大","cat":"學校及公園","pos":"50% 50%"},
-    {"id":"east-cityscape","file":"Cityscape in east Hsinchu City.jpg","title":"新竹市東區住宅街景","place":"東區","dist":"東區","area":"光華","cat":"中古住宅","pos":"50% 50%"},
-    {"id":"fishing-port","file":"2022 Hsinchu Fishing Port.jpg","title":"南寮新竹漁港","place":"新竹漁港","dist":"北區","area":"南寮","cat":"城市景觀","pos":"50% 50%"},
-    {"id":"xiangshan","file":"Xiangshan Wetland-Yang MingHsiung-03.jpg","title":"香山濕地","place":"香山濕地","dist":"香山區","area":"香山","cat":"城市景觀","pos":"50% 50%"},
-    {"id":"zhudong","file":"竹東圓環街景 Zhudong - panoramio.jpg","title":"竹東圓環街景","place":"竹東圓環","dist":"竹東鎮","area":"竹東二重埔","cat":"城市景觀","pos":"50% 50%"},
-    {"id":"erchongpu","file":"二重埔湧泉生態園區.jpg","title":"竹東二重埔湧泉生態園區","place":"二重埔","dist":"竹東鎮","area":"竹東二重埔","cat":"學校及公園","pos":"50% 50%"},
-    {"id":"baoshan","file":"Baoshan Reservoir 寶山水庫 - panoramio.jpg","title":"寶山水庫","place":"寶山水庫","dist":"寶山鄉","area":"寶山","cat":"城市景觀","pos":"50% 50%"},
-    {"id":"hukou","file":"Hukou Old Street DSC 2194.jpg","title":"湖口老街","place":"湖口老街","dist":"湖口鄉","area":"湖口","cat":"城市景觀","pos":"50% 40%"},
-    {"id":"xinfeng","file":"TRA Xinfeng station(front).JPG","title":"臺鐵新豐車站","place":"新豐車站","dist":"新豐鄉","area":"新豐","cat":"道路及交通","pos":"50% 50%"},
-    {"id":"xinpu","file":"Xinpu Liu Ancestral Temple 新埔劉氏家廟 - panoramio.jpg","title":"新埔劉氏家廟","place":"新埔鎮","dist":"新埔鎮","cat":"城市景觀","pos":"50% 50%"},
-    {"id":"guanxi","file":"Guanxi Nanmenkanxia Paddy field.jpg","title":"關西南門坎下稻田","place":"關西鎮","dist":"關西鎮","cat":"城市景觀","pos":"50% 50%"},
-    {"id":"qionglin","file":"Qionglin Guanfu Temples.jpg","title":"芎林廣福宮","place":"芎林鄉","dist":"芎林鄉","cat":"城市景觀","pos":"50% 50%"},
-    {"id":"hengshan","file":"Neiwan Drawbridge.jpg","title":"橫山內灣吊橋","place":"內灣","dist":"橫山鄉","cat":"城市景觀","pos":"50% 50%"},
-    {"id":"beipu","file":"北埔慈天宮 alpinetrout1984.jpg","title":"北埔慈天宮","place":"北埔老街","dist":"北埔鄉","cat":"城市景觀","pos":"50% 50%"},
-    {"id":"emei","file":"峨眉湖 Emei Lake - panoramio (1).jpg","title":"峨眉湖","place":"峨眉湖","dist":"峨眉鄉","cat":"城市景觀","pos":"50% 50%"},
-    {"id":"jianshi","file":"尖石岩 Jianshi Rock - panoramio.jpg","title":"尖石岩與油羅溪","place":"尖石岩","dist":"尖石鄉","cat":"城市景觀","pos":"50% 50%"},
-    {"id":"wufeng","file":"Zhang Xueliang's former residence,Wufeng, Hsinchu, Taiwan.jpg","title":"五峰張學良故居","place":"五峰鄉","dist":"五峰鄉","cat":"城市景觀","pos":"50% 50%"},
-    {"id":"cbc","file":"Central Bank of ROC Main Building 20230510.jpg","title":"中央銀行總行（臺北）","place":"中央銀行","dist":"臺北市","cat":"房貸與金融","pos":"50% 50%"},
-    {"id":"apartment","file":"An Apartment Building in Hsinchu City.jpg","title":"新竹市的中古公寓","place":"新竹市","dist":"新竹市","cat":"老公寓","pos":"50% 45%"},
-    {"id":"renai","file":"Scene in Ren-ai Community in Hsinchu City 03.jpg","title":"新竹市仁愛社區巷弄","place":"仁愛社區","dist":"新竹市","cat":"中古住宅","pos":"50% 50%"},
-    {"id":"site","file":"View of a Building Construction Site in Hsinchu City.jpg","title":"新竹市建築工地","place":"新竹市","dist":"新竹市","cat":"預售建案","pos":"50% 50%"},
-    {"id":"station-works","file":"Construction in the southeast of Hsinchu Railway Station.jpg","title":"新竹車站東南側施工現場（2021）","place":"新竹車站","dist":"東區","cat":"公共建設","pos":"50% 50%"},
-    {"id":"county-stadium","file":"Hsinchu County Second Stadium at sunset 20171207.jpg","title":"黃昏的新竹縣第二運動場","place":"新竹縣第二運動場","dist":"竹北市","area":"竹北高鐵","cat":"城市景觀","pos":"50% 55%"}
+    {
+      "id": "hero-hsinchu",
+      "file": "Hsinchu Cityscape viewed from Eighteen Peaks Mountain.jpg",
+      "title": "從十八尖山眺望新竹市區",
+      "place": "十八尖山",
+      "dist": "東區",
+      "area": "新竹舊城",
+      "cat": "城市景觀",
+      "pos": "50% 38%",
+      "hero": true
+    },
+    {
+      "id": "zhubei-tofu",
+      "file": "Zhubei Skyline 20200517 (cropped).jpg",
+      "title": "頭前溪豆腐岩與竹北天際線",
+      "place": "頭前溪豆腐岩",
+      "dist": "竹北市",
+      "area": "竹北高鐵",
+      "cat": "城市景觀",
+      "pos": "50% 40%",
+      "hero": true
+    },
+    {
+      "id": "zhubei-night",
+      "file": "Zhubei Light Trail.jpg",
+      "title": "竹北光明六路東一段夜間車流",
+      "place": "光明六路東一段",
+      "dist": "竹北市",
+      "area": "竹北縣治",
+      "cat": "道路及交通",
+      "pos": "50% 55%"
+    },
+    {
+      "id": "zhubei-2023",
+      "file": "Zhubei, Hsinchu Skyline 20231117.jpg",
+      "title": "竹北住宅天際線",
+      "place": "竹北市",
+      "dist": "竹北市",
+      "area": "竹北高鐵",
+      "cat": "住宅社區",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "thsr-hsinchu",
+      "file": "THSR Hsinchu Station 2024-01-06.jpg",
+      "title": "高鐵新竹站",
+      "place": "高鐵新竹站",
+      "dist": "竹北市",
+      "area": "竹北高鐵",
+      "cat": "道路及交通",
+      "pos": "50% 55%"
+    },
+    {
+      "id": "liujia",
+      "file": "Liujia Area near THSR Hsinchu Station 2024-01-06.jpg",
+      "title": "高鐵新竹站周邊六家地區",
+      "place": "六家",
+      "dist": "竹北市",
+      "area": "竹北高鐵",
+      "cat": "住宅社區",
+      "pos": "50% 60%"
+    },
+    {
+      "id": "county-gov",
+      "file": "縣治特區的新竹縣政府.jpg",
+      "title": "縣治特區的新竹縣政府",
+      "place": "新竹縣政府",
+      "dist": "竹北市",
+      "area": "竹北縣治",
+      "cat": "公共建設",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "taiyuan",
+      "file": "台元科技園區東大門.jpg",
+      "title": "台元科技園區東大門",
+      "place": "台元科技園區",
+      "dist": "竹北市",
+      "area": "台元",
+      "cat": "科學園區",
+      "pos": "50% 55%"
+    },
+    {
+      "id": "sky-city",
+      "file": "竹北大遠百 Sky City.jpg",
+      "title": "竹北遠東百貨 Sky City",
+      "place": "竹北遠百",
+      "dist": "竹北市",
+      "area": "竹北縣治",
+      "cat": "商業設施",
+      "pos": "50% 45%"
+    },
+    {
+      "id": "tra-hsinchu",
+      "file": "Main entrance building of TRA Hsinchu Station.jpg",
+      "title": "臺鐵新竹車站站房",
+      "place": "新竹車站",
+      "dist": "東區",
+      "area": "新竹舊城",
+      "cat": "道路及交通",
+      "pos": "50% 45%"
+    },
+    {
+      "id": "tra-hsinchu-night",
+      "file": "TRA Hsinchu Station night 2020-11-17.jpg",
+      "title": "夜晚的臺鐵新竹車站",
+      "place": "新竹車站",
+      "dist": "東區",
+      "area": "新竹舊城",
+      "cat": "城市景觀",
+      "pos": "50% 50%",
+      "hero": true
+    },
+    {
+      "id": "city-god",
+      "file": "Hsinchu City God Temple 20210405.jpg",
+      "title": "新竹都城隍廟",
+      "place": "新竹都城隍廟",
+      "dist": "北區",
+      "area": "新竹舊城",
+      "cat": "城市景觀",
+      "pos": "50% 45%"
+    },
+    {
+      "id": "moat",
+      "file": "Hsinchu City Moat Park-20250329.jpg",
+      "title": "新竹護城河親水公園",
+      "place": "護城河親水公園",
+      "dist": "東區",
+      "area": "新竹舊城",
+      "cat": "學校及公園",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "east-gate",
+      "file": "View of Hsinchu City East Gate and surroundings.jpg",
+      "title": "新竹東門城與周邊街區",
+      "place": "東門城",
+      "dist": "東區",
+      "area": "新竹舊城",
+      "cat": "城市景觀",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "big-city",
+      "file": "Big City shopping mall 2022-08-25.jpg",
+      "title": "遠東巨城購物中心",
+      "place": "巨城購物中心",
+      "dist": "東區",
+      "area": "巨城",
+      "cat": "商業設施",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "guanxin-park",
+      "file": "新竹市關新公園 Kuan Hisn Park, Hsinchu City.jpg",
+      "title": "東區關新公園",
+      "place": "關新公園",
+      "dist": "東區",
+      "area": "關埔",
+      "cat": "學校及公園",
+      "pos": "50% 55%"
+    },
+    {
+      "id": "science-park",
+      "file": "Hsinchu Science Park Life Hub 2020-11-27.jpg",
+      "title": "新竹科學園區生活廣場",
+      "place": "新竹科學園區",
+      "dist": "東區",
+      "area": "關埔",
+      "cat": "科學園區",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "nthu-nctu",
+      "file": "Distant View of Buildings in National Tsing Hua University and National Chiao Tung University from Eighteen Peaks Mountain.jpg",
+      "title": "從十八尖山遠眺清大、交大校區",
+      "place": "十八尖山",
+      "dist": "東區",
+      "area": "清大交大",
+      "cat": "學校及公園",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "nycu-gate",
+      "file": "National Yang Ming Chiao Tung University Kuang-Fu Campus South Gate 2021-03-08.jpg",
+      "title": "陽明交大光復校區南大門",
+      "place": "陽明交大光復校區",
+      "dist": "東區",
+      "area": "清大交大",
+      "cat": "學校及公園",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "east-cityscape",
+      "file": "Cityscape in east Hsinchu City.jpg",
+      "title": "新竹市東區住宅街景",
+      "place": "東區",
+      "dist": "東區",
+      "area": "光華",
+      "cat": "中古住宅",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "fishing-port",
+      "file": "2022 Hsinchu Fishing Port.jpg",
+      "title": "南寮新竹漁港",
+      "place": "新竹漁港",
+      "dist": "北區",
+      "area": "南寮",
+      "cat": "城市景觀",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "xiangshan",
+      "file": "Xiangshan Wetland-Yang MingHsiung-03.jpg",
+      "title": "香山濕地",
+      "place": "香山濕地",
+      "dist": "香山區",
+      "area": "香山",
+      "cat": "城市景觀",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "zhudong",
+      "file": "竹東圓環街景 Zhudong - panoramio.jpg",
+      "title": "竹東圓環街景",
+      "place": "竹東圓環",
+      "dist": "竹東鎮",
+      "area": "竹東二重埔",
+      "cat": "城市景觀",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "erchongpu",
+      "file": "二重埔湧泉生態園區.jpg",
+      "title": "竹東二重埔湧泉生態園區",
+      "place": "二重埔",
+      "dist": "竹東鎮",
+      "area": "竹東二重埔",
+      "cat": "學校及公園",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "baoshan",
+      "file": "Baoshan Reservoir 寶山水庫 - panoramio.jpg",
+      "title": "寶山水庫",
+      "place": "寶山水庫",
+      "dist": "寶山鄉",
+      "area": "寶山",
+      "cat": "城市景觀",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "hukou",
+      "file": "Hukou Old Street DSC 2194.jpg",
+      "title": "湖口老街",
+      "place": "湖口老街",
+      "dist": "湖口鄉",
+      "area": "湖口",
+      "cat": "城市景觀",
+      "pos": "50% 40%"
+    },
+    {
+      "id": "xinfeng",
+      "file": "TRA Xinfeng station(front).JPG",
+      "title": "臺鐵新豐車站",
+      "place": "新豐車站",
+      "dist": "新豐鄉",
+      "area": "新豐",
+      "cat": "道路及交通",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "xinpu",
+      "file": "Xinpu Liu Ancestral Temple 新埔劉氏家廟 - panoramio.jpg",
+      "title": "新埔劉氏家廟",
+      "place": "新埔鎮",
+      "dist": "新埔鎮",
+      "cat": "城市景觀",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "guanxi",
+      "file": "Guanxi Nanmenkanxia Paddy field.jpg",
+      "title": "關西南門坎下稻田",
+      "place": "關西鎮",
+      "dist": "關西鎮",
+      "cat": "城市景觀",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "qionglin",
+      "file": "Qionglin Guanfu Temples.jpg",
+      "title": "芎林廣福宮",
+      "place": "芎林鄉",
+      "dist": "芎林鄉",
+      "cat": "城市景觀",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "hengshan",
+      "file": "Neiwan Drawbridge.jpg",
+      "title": "橫山內灣吊橋",
+      "place": "內灣",
+      "dist": "橫山鄉",
+      "cat": "城市景觀",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "beipu",
+      "file": "北埔慈天宮 alpinetrout1984.jpg",
+      "title": "北埔慈天宮",
+      "place": "北埔老街",
+      "dist": "北埔鄉",
+      "cat": "城市景觀",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "emei",
+      "file": "峨眉湖 Emei Lake - panoramio (1).jpg",
+      "title": "峨眉湖",
+      "place": "峨眉湖",
+      "dist": "峨眉鄉",
+      "cat": "城市景觀",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "jianshi",
+      "file": "尖石岩 Jianshi Rock - panoramio.jpg",
+      "title": "尖石岩與油羅溪",
+      "place": "尖石岩",
+      "dist": "尖石鄉",
+      "cat": "城市景觀",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "wufeng",
+      "file": "Zhang Xueliang's former residence,Wufeng, Hsinchu, Taiwan.jpg",
+      "title": "五峰張學良故居",
+      "place": "五峰鄉",
+      "dist": "五峰鄉",
+      "cat": "城市景觀",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "cbc",
+      "file": "Central Bank of ROC Main Building 20230510.jpg",
+      "title": "中央銀行總行（臺北）",
+      "place": "中央銀行",
+      "dist": "臺北市",
+      "cat": "房貸與金融",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "apartment",
+      "file": "An Apartment Building in Hsinchu City.jpg",
+      "title": "新竹市的中古公寓",
+      "place": "新竹市",
+      "dist": "新竹市",
+      "cat": "老公寓",
+      "pos": "50% 45%"
+    },
+    {
+      "id": "renai",
+      "file": "Scene in Ren-ai Community in Hsinchu City 03.jpg",
+      "title": "新竹市仁愛社區巷弄",
+      "place": "仁愛社區",
+      "dist": "新竹市",
+      "cat": "中古住宅",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "site",
+      "file": "View of a Building Construction Site in Hsinchu City.jpg",
+      "title": "新竹市建築工地",
+      "place": "新竹市",
+      "dist": "新竹市",
+      "cat": "預售建案",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "station-works",
+      "file": "Construction in the southeast of Hsinchu Railway Station.jpg",
+      "title": "新竹車站東南側施工現場（2021）",
+      "place": "新竹車站",
+      "dist": "東區",
+      "cat": "公共建設",
+      "pos": "50% 50%"
+    },
+    {
+      "id": "county-stadium",
+      "file": "Hsinchu County Second Stadium at sunset 20171207.jpg",
+      "title": "黃昏的新竹縣第二運動場",
+      "place": "新竹縣第二運動場",
+      "dist": "竹北市",
+      "area": "竹北高鐵",
+      "cat": "城市景觀",
+      "pos": "50% 55%"
+    },
+    {
+      "id": "guanghua-ifg",
+      "file": "IFG遠雄廣場新竹店 2026-11-09.jpg",
+      "title": "IFG 遠雄廣場新竹店（原大魯閣湳雅廣場）",
+      "place": "大雅路、湳雅街口",
+      "dist": "北區",
+      "area": "光華・湳雅生活圈",
+      "cat": "生活機能",
+      "pos": "50% 55%"
+    }
   ]
 }

@@ -5,7 +5,7 @@ on:
   push:
     branches: [main]
   workflow_run:            # 每週更新是機器人 push，不會觸發 push 事件，所以在它跑完後發布
-    workflows: [Weekly update, Update data, Update news]
+    workflows: [Weekly update, Update data, Update news, Fetch images]
     types: [completed]
   workflow_dispatch:
 permissions:

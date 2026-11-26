@@ -29,7 +29,7 @@ export const ZONES: Zone[] = [
   { id: 'jinya', name: '金雅', img: '', dist: 'north', transit: '台 68 快速道路、公道五路、鐵道路', life: '載熙國小、舊社國小、湳雅商圈', feature: '北區的低密度重劃區，新案總價較關埔親民', href: '/areas/#old-city' },
   { id: 'nanliao', name: '南寮', img: 'fishing-port', dist: 'north', transit: '東大路、西濱公路', life: '新竹漁港、南寮旅遊服務中心、海岸自行車道', feature: '靠海的北區住宅區，透天與新大樓並存', href: '/areas/#old-city' },
   { id: 'oldcity', name: '新竹舊城', img: 'city-god', dist: 'north', transit: '臺鐵新竹站、公車總站', life: '城隍廟商圈、東門市場、護城河', feature: '機能最成熟的老城區，中古公寓與華廈多', href: '/areas/#old-city' },
-  { id: 'guanghua', name: '光華', img: '', dist: 'north', transit: '光華街、經國路、北新竹站', life: '光華國中、傳統市場、經國路商圈', feature: '北區東側的成熟住宅區，以中古屋為主', href: '/areas/#old-city' },
+  { id: 'guanghua', name: '光華', img: 'guanghua-ifg', dist: 'north', transit: '光華街、經國路、北新竹站', life: '光華國中、IFG 遠雄廣場、大全聯、經國路商圈', feature: '北區東側的成熟住宅區，以中古屋為主', href: '/areas/#old-city' },
   { id: 'univ', name: '清大交大', img: 'nthu-nctu', dist: 'east', transit: '光復路、大學路、國道 1 號新竹交流道', life: '清大、陽明交大、十八尖山', feature: '學區與園區之間，租屋需求穩定', href: '/areas/#tech' },
   { id: 'zbhsr', name: '竹北高鐵', img: 'thsr-hsinchu', dist: 'zhubei', transit: '高鐵新竹站、臺鐵六家站', life: '高鐵特區商圈、生醫園區、新竹縣第二運動場', feature: '新竹縣單價最高的重劃區，大樓新案集中', href: '/areas/#zhubei-hsr' },
   { id: 'zbgov', name: '竹北縣治', img: 'county-gov', dist: 'zhubei', transit: '光明六路、國道 1 號竹北交流道', life: '新竹縣政府、竹北遠百、文化公園', feature: '縣府周邊的成熟重劃區，機能與學區完整', href: '/areas/#zhubei-hsr' },
