@@ -7,5 +7,5 @@ export default defineConfig({
   trailingSlash: 'always',
   build: { format: 'directory' },
   // 示範頁（模擬資料）與表單送出後的感謝頁不送搜尋引擎
-  integrations: [sitemap({ filter: (p) => !/\/presale\/sample\/|\/community\/thanks\//.test(p) })],
+  integrations: [sitemap({ filter: (p) => !/\/presale\/sample\/|\/community\/thanks\/|\/admin\//.test(p) })],
 });

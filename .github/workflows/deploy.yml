@@ -13,6 +13,8 @@ permissions:
 concurrency: { group: pages, cancel-in-progress: true }
 jobs:
   deploy:
+    # 每小時快訊若沒有新內容就不重新發布
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,6 +31,8 @@ jobs:
           mkdir -p dist/_astro
           git archive FETCH_HEAD _astro | tar -x -C /tmp && cp -n /tmp/_astro/* dist/_astro/ || true
           ls dist/_astro | wc -l
+          # 帶雜湊檔名的 site.*.js、visits.*.js 也保留上一版（邊緣快取的舊 HTML 5 分鐘內仍會引用）
+          for f in $(git ls-tree --name-only FETCH_HEAD | grep -E '^(site|visits)\.[0-9a-f]{10}\.js$'); do [ -e "dist/$f" ] || git show "FETCH_HEAD:$f" > "dist/$f"; done
       - name: 推到 gh-pages
         run: |
           cd dist

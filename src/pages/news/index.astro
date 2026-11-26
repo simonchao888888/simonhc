@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Sources from '../../components/Sources.astro';
 import Photo from '../../components/Photo.astro';
 import PageBanner from '../../components/PageBanner.astro';
-import { news, feedData, fmtDate, newsUpdated } from '../../lib/news';
+import { news, feedData, fmtDate, newsUpdated, newsRuns } from '../../lib/news';
 import { newsImg, CAT_TONE } from '../../lib/images';
 
 // 分欄：依新聞分類與標題關鍵字歸到 V4 新聞中心的版面分類
@@ -18,11 +18,16 @@ const SECT: [string, string, (c: string, t: string) => boolean][] = [
 const sectOf = (c: string, t: string) => SECT.filter(([, , f]) => f(c, t)).map(([n]) => n);
 const tone = (c: string) => `t-${CAT_TONE[c] ?? 'news'}`;
 const top = news[0], seconds = news.slice(1, 4), rest = news.slice(4);
-const wire = feedData.items.filter((f) => /新竹|竹北|竹科|竹東|湖口|新豐|寶山|房|青安|央行|預售/.test(f.title) && !/美國|日本|中國|香港/.test(f.title));
+// 快訊：新的 feed 有 scope（新竹／全國政策）；舊格式退回關鍵字判斷
+const isHc = (f: any) => f.scope ? f.scope === 'hsinchu' : /新竹|竹北|竹科|竹東|湖口|新豐|寶山/.test(f.title);
+const okOld = (f: any) => f.scope || (/房|青安|央行|預售|新竹|竹北/.test(f.title) && !/美國|日本|中國|香港|韓國|加拿大/.test(f.title));
+const wireHc = feedData.items.filter((f) => okOld(f) && isHc(f)).slice(0, 12);
+const wireNat = feedData.items.filter((f) => okOld(f) && !isHc(f)).slice(0, 12);
+const lastRun = newsRuns[0];
 ---
 <Base title="新竹房市新聞與最新政策" description="新竹房市新聞中心：新竹市與新竹縣房市、央行政策、房貸與金融、重大建設與竹科產業新聞，每則附原創摘要、Simon 哥判讀與原文來源。" crumbs={[['房市新聞']]}>
   <PageBanner img="tra-hsinchu-night" tone="news" kicker="新竹房市新聞中心" title="新竹房市新聞中心" lead="只收和新竹房市有關的新聞。每則有原創摘要、對新竹買方的判讀與原文連結；自動彙整的快訊另外標示「尚未判讀」。" />
-  <p class="note">判讀更新：{fmtDate(newsUpdated)}・快訊每小時自動檢查（{feedData.updated}）・新聞照片除特別註明外皆為主題資料照，不是新聞事件現場。</p>
+  <p class="note">判讀更新：{fmtDate(newsUpdated)}・<a href="#flash">最新快訊</a>每小時自動檢查（{feedData.updated}）・新聞照片除特別註明外皆為主題資料照，不是新聞事件現場。</p>
 
   <section class="nc-top">
     <a class:list={['lead-story', tone(top.cat)]} href={`/news/${top.id}/`}>
@@ -36,6 +41,24 @@ const wire = feedData.items.filter((f) => /新竹|竹北|竹科|竹東|湖口|�
           <Photo id={newsImg(x.cat, x.title)?.id} ratio="4/3" sizes="140px" credit="none" badge="資料照" />
           <div><span class="chip">{x.cat}</span><h3>{x.title}</h3><div class="meta-l" style="margin-top:4px"><time datetime={x.date}>{fmtDate(x.date)}</time></div></div>
         </a>
+      ))}
+    </div>
+  </section>
+
+
+  <section class="sx t-news wire5" id="flash" aria-labelledby="flash-h">
+    <div class="sx-h"><h2 id="flash-h">最新快訊</h2><p>自動彙整、尚未判讀，請點原文閱讀。同一事件多家報導已合併；海外房市與只談其他縣市的報導不收。</p></div>
+    <p class="note w-upd">最後更新 {feedData.updated ?? '—'}{lastRun && <>・每小時自動檢查，最近一次 {lastRun.at}（{lastRun.status === 'ok' ? `成功：抓到 ${lastRun.fetched} 則、排除 ${lastRun.dropped} 則、合併 ${lastRun.merged} 則` : '失敗，保留上一版'}）</>}・<a href="https://github.com/simonchao888888/simonhc/actions/workflows/update-news.yml" target="_blank" rel="noopener">執行紀錄</a></p>
+    <div class="w-cols">
+      {[['新竹房市快訊', wireHc], ['影響新竹買方的全國政策', wireNat]].map(([t, list]: any) => (
+        <div class="w-col"><h3>{t}</h3>
+          {list.length ? <ol class="wire-l">{list.map((f: any) => (
+            <li><a href={f.link} rel="nofollow noopener" target="_blank">{f.title}</a>
+              <span class="ms">{f.source}・{f.date.slice(5).replace('-', '/')}{f.time ? ` ${f.time}` : ''}{f.topic && f.topic !== '新竹房市' ? `・${f.topic}` : ''}</span>
+              {f.also?.length > 0 && <details class="also"><summary>另有 {f.also.length} 家報導</summary>{f.also.map((a: any) => <a href={a.link} rel="nofollow noopener" target="_blank">{a.source}</a>)}</details>}
+            </li>
+          ))}</ol> : <p class="note">目前沒有新的相關報導。</p>}
+        </div>
       ))}
     </div>
   </section>
@@ -60,12 +83,6 @@ const wire = feedData.items.filter((f) => /新竹|竹北|竹科|竹東|湖口|�
     ))}
   </div>
 
-  <section class="sx t-news">
-    <div class="sx-h"><h2>即時快訊</h2><p>每小時自動彙整新竹房市、央行、房貸利率與青安相關報導標題（{feedData.updated} 更新），已去除重複與不相關新聞，但尚未經本站判讀，請點原文閱讀。</p></div>
-    {wire.length > 0 ? <div class="wire">{wire.slice(0, 30).map((f) => (
-      <a href={f.link} rel="nofollow noopener" target="_blank"><span class="tt">{f.title}</span><span class="ms">{f.source}・{f.date}・{f.topic}</span></a>
-    ))}</div> : <p class="note">目前沒有新的相關報導。</p>}
-  </section>
 </Base>
 <script>
   const btns = document.querySelectorAll<HTMLButtonElement>('#filter button');

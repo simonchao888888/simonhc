@@ -4,7 +4,9 @@ import feed from '../data/news_feed.json';
 export type Src = [string, string];
 export interface NewsItem { id: string; date: string; cat: string; title: string; summary: string; take: string; action: string; link?: string; sources: Src[] }
 export interface Meeting { id: string; date: string; title: string; rate: string; credit: string; facts: string[]; take: string; hsinchu: string; sources: Src[] }
-export interface FeedItem { title: string; link: string; source: string; date: string; topic: string }
+export interface FeedItem { title: string; link: string; source: string; date: string; time?: string; topic: string; scope?: 'hsinchu' | 'national'; also?: { source: string; link: string }[] }
+import runsData from '../data/news_runs.json';
+export const newsRuns = runsData as { at: string; status: string; run?: string | null; fetched?: number; dropped?: number; merged?: number; hsinchu?: number; national?: number; errors?: number }[];
 
 export const news: NewsItem[] = [...(N.news as NewsItem[])].sort((a, b) => b.date.localeCompare(a.date));
 export const meetings: Meeting[] = [...(N.meetings as Meeting[])].sort((a, b) => b.date.localeCompare(a.date));

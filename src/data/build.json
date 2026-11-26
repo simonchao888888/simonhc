@@ -2,7 +2,8 @@
  "meta": {
   "synced": "2026-11-26",
   "latestDeal": "2026-10-26",
-  "note": "由 build_data.py 依內政部實價登錄原始資料計算（新竹市 O、新竹縣 J）。"
+  "note": "由 build_data.py 依內政部實價登錄原始資料計算（新竹市 O、新竹縣 J）。",
+  "method": "v2"
  },
  "regions": {
   "city": {

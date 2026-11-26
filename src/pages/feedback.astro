@@ -1,0 +1,74 @@
+---
+import Base from '../layouts/Base.astro';
+import PageBanner from '../components/PageBanner.astro';
+const CATS = ['房價資料錯誤', '新聞及政策補充', '重大建設補充', '社區建案補充', '生活圈資訊補充', '網站操作問題', '希望新增的功能', '其他建議'];
+---
+<Base title="提供網站建議" description="新竹房產情報站正式公開，網站持續優化中。房價資料錯誤、新聞與建設補充、操作問題或想要的新功能，都歡迎告訴我們，可匿名送出。" active="" crumbs={[['提供網站建議']]}>
+  <PageBanner tone="view" kicker="一起打造" title="提供網站建議" lead="資料哪裡不對、新聞或建設漏了什麼、哪裡不好用、希望多什麼功能，都歡迎告訴我們。可以匿名送出，Email 選填。" />
+  <div class="fb-wrap">
+    <form id="fbform" class="card fb-form" novalidate>
+      <fieldset>
+        <legend>建議類型</legend>
+        <div class="fb-cats">{CATS.map((c, i) => (
+          <label class="fb-cat"><input type="radio" name="cat" value={c} required={i === 0} /><span>{c}</span></label>
+        ))}</div>
+      </fieldset>
+      <div class="field"><label for="fb-msg">內容</label>
+        <textarea id="fb-msg" name="msg" rows="6" maxlength="2000" required placeholder="例如：竹北某建案的成交筆數和我看到的不一樣，網址是…"></textarea>
+        <small class="note"><span id="fb-count">0</span>／2000 字</small></div>
+      <div class="field"><label for="fb-email">Email（選填，需要回覆時才填）</label>
+        <input id="fb-email" name="email" type="email" maxlength="120" autocomplete="email" inputmode="email" /></div>
+      <div class="fb-hp" aria-hidden="true"><label>請勿填寫<input name="website" tabindex="-1" autocomplete="off" /></label></div>
+      <input type="hidden" name="page" />
+      <button class="btn p fb-send" type="submit">送出建議</button>
+      <p class="fb-msg" role="status" aria-live="polite"></p>
+      <p class="note">送出的內容只有站長看得到，不會直接公開在網站上；有用的建議整理後才會更新到網站。Email 只用於回覆你。詳見<a href="/privacy/">隱私權政策</a>。</p>
+    </form>
+    <aside class="fb-side">
+      <div class="card"><h3>回報資料錯誤時</h3><p>附上頁面網址、建案或行政區名稱，以及你看到的正確數字和出處，處理會快很多。</p></div>
+      <div class="card"><h3>也可以這樣聯絡</h3><p><a href="mailto:simon.chao888@gmail.com" data-mail="simon.chao888@gmail.com" data-subject="新竹房產情報站 網站建議">寫信給 Simon 哥</a></p></div>
+    </aside>
+  </div>
+  <script is:inline>
+  (function () {
+    var f = document.getElementById('fbform'); if (!f) return;
+    var t0 = Date.now(), out = f.querySelector('.fb-msg'), btn = f.querySelector('.fb-send'), msg = f.querySelector('#fb-msg'), cnt = document.getElementById('fb-count');
+    try { var from = new URLSearchParams(location.search).get('from') || (document.referrer && new URL(document.referrer).origin === location.origin ? new URL(document.referrer).pathname : ''); f.page.value = from || ''; } catch (e) {}
+    try { var c = new URLSearchParams(location.search).get('cat'); if (c) { var r = f.querySelector('input[name=cat][value="' + c + '"]'); if (r) r.checked = true; } } catch (e) {}
+    msg.addEventListener('input', function () { cnt.textContent = msg.value.length; });
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var cat = (f.querySelector('input[name=cat]:checked') || {}).value;
+      if (!cat) { out.className = 'fb-msg err'; out.textContent = '請先選擇建議類型。'; return; }
+      if (msg.value.trim().length < 5) { out.className = 'fb-msg err'; out.textContent = '內容請至少寫 5 個字。'; msg.focus(); return; }
+      btn.disabled = true; btn.textContent = '送出中…'; out.className = 'fb-msg'; out.textContent = '';
+      fetch('/api/feedback', { method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ cat: cat, msg: msg.value, email: f.email.value, page: f.page.value, hp: f.website.value, t: t0 }) })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok && j.ok, j: j }; }); })
+        .then(function (r) {
+          if (!r.ok) throw new Error(r.j && r.j.error || '送出失敗');
+          f.reset(); cnt.textContent = '0'; out.className = 'fb-msg ok'; out.textContent = '已收到，謝謝你的建議！我們會盡快處理。';
+        })
+        .catch(function (err) { out.className = 'fb-msg err'; out.textContent = (err && err.message && err.message !== 'Failed to fetch' ? err.message : '網路連線失敗') + '，也可以直接寫信給 Simon 哥。'; })
+        .finally(function () { btn.disabled = false; btn.textContent = '送出建議'; });
+    });
+  })();
+  </script>
+</Base>
+<style>
+  .fb-wrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start;margin-top:8px}
+  .fb-form fieldset{border:0;padding:0;margin:0 0 16px}
+  .fb-form legend{font-weight:700;margin-bottom:10px}
+  .fb-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+  .fb-cat{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;background:#fff;min-height:44px}
+  .fb-cat:has(input:checked){border-color:var(--navy);background:#EEF3F7;font-weight:600}
+  .fb-cat input{accent-color:var(--navy);width:18px;height:18px;margin:0}
+  .fb-form textarea,.fb-form input[type=email]{width:100%;box-sizing:border-box;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:8px}
+  .fb-form .field{margin:0 0 14px}.fb-form .field label{display:block;font-weight:700;margin-bottom:6px}
+  .fb-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .fb-send{min-height:46px;padding:0 28px;font-size:16px;cursor:pointer;border:0}
+  .fb-send:disabled{opacity:.6;cursor:wait}
+  .fb-msg{min-height:1.4em;margin:12px 0 4px;font-weight:600}.fb-msg.ok{color:#1F6B57}.fb-msg.err{color:#B3361F}
+  .fb-side{display:grid;gap:14px}.fb-side h3{margin:0 0 6px;font-size:17px}.fb-side p{margin:0}
+  @media (max-width:820px){.fb-wrap{grid-template-columns:1fr}.fb-cats{grid-template-columns:1fr 1fr}}
+</style>

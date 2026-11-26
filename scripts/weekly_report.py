@@ -51,6 +51,7 @@ def money(x):
 def snapshot(build, deals, rent):
     return {
         "latestDeal": build["meta"]["latestDeal"],
+        "method": build["meta"].get("method", "v1"),
         "regions": {k: {x: v.get(x) for x in ("used", "usedN", "presale", "presaleN")} for k, v in build["regions"].items()},
         "districts": {k: {x: v.get(x) for x in ("used", "n", "presale", "pn", "tier")} for k, v in build["districts"].items()},
         "projects": {k: len([d for d in v if not d.get("cancel")]) for k, v in deals.items()},
@@ -89,11 +90,19 @@ def main():
     prev = json.load(open(prev_files[-1], encoding="utf-8")) if prev_files else None
     prev_date = prev_files[-1].stem if prev_files else None
 
+    # 統計口徑或資料範圍不同（例如 v1→v2 補入 2019 年起舊制成交）時，不和上一期比較，避免把口徑調整誤當成漲跌或新增成交
+    prev_method = (prev or {}).get("method", "v1")
+    method_changed = prev is not None and prev_method != cur["method"]
+    if method_changed:
+        prev = {**prev, "regions": {}, "districts": {}}
+
     # ---- 預售屋：這一期新增的成交 ----
     rows = []
     for key, v in deals.items():
         live = sorted([d for d in v if not d.get("cancel")], key=lambda d: d["d"])
-        if prev is not None:
+        if method_changed:
+            new = []                                    # 口徑調整這一期不計算「新增」
+        elif prev is not None:
             n_new = len(live) - prev["projects"].get(key, 0)
             new = live[-n_new:] if n_new > 0 else []
         else:  # 第一期沒有比較基準：用最新揭露日前 30 天內的成交
@@ -135,6 +144,7 @@ def main():
     takes = [n for n in news["news"] if since.isoformat() <= n["date"] <= today.isoformat()]
 
     # ---- 重點 ----
+    # 統計口徑不同（例如 v1→v2）時不和上一期比較，避免把口徑調整誤當成漲跌
     R, P = cur["regions"], (prev or {}).get("regions", {})
     hl = [f"實價登錄已揭露的最新一筆成交日期是 {cur['latestDeal']}" + (f"（上一期 {prev['latestDeal']}）" if prev and prev["latestDeal"] != cur["latestDeal"] else "") + "。"]
     for k in ("city", "county"):
@@ -144,7 +154,7 @@ def main():
         top = "、".join(f"{x['name']} {x['n']} 筆" for x in rows[:3])
         hl.append(f"{'這一期' if prev else '最近 30 天'}新增預售屋成交 {new_total} 筆，最多的是 {top}。")
     else:
-        hl.append("這一期沒有新增的預售屋成交揭露。")
+        hl.append("本期統計口徑調整，預售屋新增成交不和上一期比較，下一期恢復。" if method_changed else "這一期沒有新增的預售屋成交揭露。")
     if fresh:
         hl.append("新出現的建案：" + "、".join(f"{x['name']}（{x['dist'] or RNAME[x['r']]}）" for x in fresh[:6]) + "。")
     pr = news["policyRate"]
@@ -163,8 +173,10 @@ def main():
         "highlights: " + json.dumps(hl, ensure_ascii=False),
         "---",
         "",
-        f"這是{label}，涵蓋 {period}。" + (f"變化都和上一期（{prev_date}）比較。" if prev else "這是第一期，從下一期開始會標出和上一期比較的變化。")
-        + "數字全部來自內政部實價登錄，單價已扣除車位，皆為中位數。",
+        f"這是{label}，涵蓋 {period}。" + (
+            f"本期起統計口徑由 {prev_method} 改為 {cur['method']}（說明見[資料來源與統計方法](/sources/#method)），各區房價不和上一期（{prev_date}）直接比較；預售屋新增成交這一期也不比較。" if method_changed
+            else f"變化都和上一期（{prev_date}）比較。" if prev else "這是第一期，從下一期開始會標出和上一期比較的變化。")
+        + f"數字全部來自內政部實價登錄，單價已扣除車位，皆為中位數（統計口徑 {cur['method']}）。",
         "",
         "### 這一期重點",
         "",
@@ -195,7 +207,7 @@ def main():
             L.append(f"| [{x['name']}]({page_of(x)}){'（新）' if x['isNew'] else ''} | {x['dist'] or RNAME[x['r']]} | {x['n']} | {f1(x['up'])} | {money(x['total'])} |")
         L += ["", "點建案名稱可以看每一戶的樓層、坪數和車位價格。完整列表在[預售建案](/presale/)。", ""]
     else:
-        L += ["這一期沒有新增的預售屋成交揭露。實價登錄每 10 天揭露一次，下一批出來後會更新。", ""]
+        L += ["本期統計口徑調整（補入 2019 年起舊制預售成交），各建案筆數不和上一期比較，下一期恢復計算新增成交。" if method_changed else "這一期沒有新增的預售屋成交揭露。實價登錄每 10 天揭露一次，下一批出來後會更新。", ""]
 
     if rent and cur["rent"]:
         PR = (prev or {}).get("rent", {})

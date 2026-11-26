@@ -9,9 +9,10 @@ const [latest, ...older] = reports;
 <Base title="新竹房市週報" description="每週整理新竹縣市實價登錄、預售屋成交、租金、央行與房貸政策和市場新聞，數字和上一期比較。" crumbs={[['房市週報']]}>
   <PageBanner tone="news" kicker="Simon 新竹房市週報" img="tra-hsinchu" title="新竹房市週報" lead="房市不是每天都在變，所以本站每週整理一次：實價登錄有什麼新成交、預售屋哪些建案在賣、各區房價和上一期比有沒有變，以及這段時間的政策與市場新聞。" />
 
+  <p class="note">2026/11/25 以前的週報採舊版統計口徑 v1，數字和首頁目前（v2）不同，差異說明見<a href="/sources/#method">資料來源與統計方法</a>。</p>
   {latest ? <>
     <a class="wk-latest" href={`/weekly/${latest.id}/`}>
-      <span class="tag">最新一期・{latest.data.period}</span>
+      <span class="tag">最新一期・{latest.data.period}{latest.id < '2026-11-26' && '・統計口徑 v1'}</span>
       <b>{latest.data.title}</b>
       <ul>{latest.data.highlights.map((h) => <li>{h}</li>)}</ul>
       <em>看完整{latest.data.cadence}</em>
@@ -19,7 +20,7 @@ const [latest, ...older] = reports;
     {older.length > 0 && <>
       <h2>過去各期</h2>
       <div class="dlist">
-        {older.map((r) => <a href={`/weekly/${r.id}/`}><span class="date">{r.id}</span><div><b>{r.data.title}</b><span class="note">{r.data.description}</span></div></a>)}
+        {older.map((r) => <a href={`/weekly/${r.id}/`}><span class="date">{r.id}</span><div><b>{r.data.title}</b><span class="note">{r.id < '2026-11-26' && '［口徑 v1］'}{r.data.description}</span></div></a>)}
       </div>
     </>}
   </> : <p class="note">第一期週報會在下一次自動更新後出現。</p>}

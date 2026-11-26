@@ -385,3 +385,26 @@ body{overflow-x:clip}
 .mail-dlg .x{position:absolute;top:8px;right:10px;border:0;background:none;font-size:24px;line-height:1;cursor:pointer;color:var(--sub)}
 .mail-dlg .msg{min-height:1.2em;margin:10px 0 0;font-size:14px;color:var(--c-life-ink,#1F6B57)}
 .mail-dlg .btn.s{background:#fff;border:1px solid var(--navy);color:var(--navy);padding:10px 14px}.mail-dlg .btn.s:hover{background:#EEF3F7}
+
+/* V5 首頁公告（可關閉，不遮擋內容） */
+.notice5{display:flex;align-items:center;gap:12px;margin:0 0 16px;padding:10px 14px;border:1px solid #E9D7AE;background:#FFF8E8;border-radius:10px;font-size:15px;line-height:1.5}
+.notice5 p{margin:0;flex:1}
+.notice5 .nt-dot{width:8px;height:8px;border-radius:50%;background:#C8902E;flex:none}
+.notice5 .nt-go{flex:none;font-weight:700;color:var(--navy);white-space:nowrap;text-decoration:underline;text-underline-offset:3px}
+.notice5 .nt-x{flex:none;border:0;background:none;font-size:22px;line-height:1;width:36px;height:36px;cursor:pointer;color:var(--sub);border-radius:6px}
+.notice5 .nt-x:hover{background:#F3E7CC}
+@media (max-width:640px){.notice5{flex-wrap:wrap;gap:6px 10px;font-size:14px;position:relative;padding-right:44px}.notice5 .nt-x{position:absolute;top:4px;right:4px}.notice5 .nt-dot{display:none}}
+
+/* V5 新聞快訊（移到新聞中心前段） */
+.wire5{margin-top:8px}.wire5 .w-upd{margin:-4px 0 12px}
+.w-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.w-col h3{font-size:17px;margin:0 0 8px;padding-bottom:6px;border-bottom:2px solid var(--navy)}
+.wire-l{list-style:none;margin:0;padding:0}
+.wire-l li{padding:10px 0;border-bottom:1px solid var(--line)}
+.wire-l li>a{font-weight:600;color:var(--ink,#1A2733);text-decoration:none;line-height:1.45;display:block}
+.wire-l li>a:hover{text-decoration:underline}
+.wire-l .ms{display:block;font-size:13px;color:var(--sub);margin-top:3px}
+.wire-l .also{font-size:13px;margin-top:4px}.wire-l .also summary{cursor:pointer;color:var(--navy)}
+.wire-l .also a{display:inline-block;margin:4px 10px 0 0;color:var(--sub)}
+@media (max-width:760px){.w-cols{grid-template-columns:1fr}}
+.wk-v1{margin:8px 0 0;padding:10px 14px;border-left:4px solid #C8902E;background:#FFF8E8;border-radius:6px;font-size:15px}

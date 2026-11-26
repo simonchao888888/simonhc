@@ -16,6 +16,7 @@ const toc = headings.filter((h) => h.depth === 3);
     <span class="tag c-市場分析">{r.data.cadence}</span>
     <PageBanner tone="news" kicker="Simon 新竹房市週報" title={r.data.title} />
     <p class="note">資料期間 {r.data.period}・程式依公開資料自動整理</p>
+    {r.id < '2026-11-26' && <p class="wk-v1">這一期採用舊版統計口徑 v1（車位未分開標價、勾選「其他增建」的成交不納入，樣本較少），所以和首頁目前的數字（v2）不同。歷史週報保留當時的數字、不改寫，口徑差異說明見<a href="/sources/#method">資料來源與統計方法</a>。</p>}
   </div>
   <div class="artwrap">
     <aside class="tocwrap"><details class="toc" open><summary>本期目錄</summary><ol>{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol></details></aside>

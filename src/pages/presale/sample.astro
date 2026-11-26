@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import DealsSection from '../../components/DealsSection.astro';
 import { sample } from '../../lib/presale';
 ---
-<Base noindex title="預售建案成交明細版面示範（模擬資料）" description="SimonHC 預售建案成交明細頁面示範，使用模擬資料。" active="presale" crumbs={[['預售行情', '/presale/'], ['明細版面示範']]}>
+<Base noindex title="預售建案成交明細版面示範（模擬資料）" description="新竹房產情報站預售建案成交明細頁面示範，使用模擬資料。" active="presale" crumbs={[['預售行情', '/presale/'], ['明細版面示範']]}>
   <div class="warn"><b>這是版面示範，資料全部為模擬，不是任何真實建案。</b>接上內政部實價登錄原始資料後，每個預售建案頁都會出現同樣的明細區塊。</div>
   <h1>{sample.name}</h1>
   <p class="lead">新竹縣{sample.dist}・模擬 {sample.deals.length} 筆成交</p>

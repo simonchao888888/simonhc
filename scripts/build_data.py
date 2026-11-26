@@ -313,6 +313,9 @@ def deal_detail(row, d, up, parks):
     }
 
 
+# 統計口徑版本：改變納入規則時要升版，週報遇到版本不同就不和上一期比較（見 /sources/#method）
+METHOD = "v2"
+
 AGE_BANDS = [("0-10", 0, 10), ("11-20", 11, 20), ("21-30", 21, 30), ("31+", 31, 999)]
 
 
@@ -445,7 +448,8 @@ def main():
         return o
 
     out = {"meta": {"synced": date.today().isoformat(), "latestDeal": latest.isoformat(),
-                    "note": "由 build_data.py 依內政部實價登錄原始資料計算（新竹市 O、新竹縣 J）。"},
+                    "note": "由 build_data.py 依內政部實價登錄原始資料計算（新竹市 O、新竹縣 J）。",
+                    "method": METHOD},
            "regions": {}, "districts": {}}
 
     for region in ("city", "county"):

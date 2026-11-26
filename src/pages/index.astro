@@ -73,8 +73,15 @@ const ld = { '@context': 'https://schema.org', '@type': 'WebSite', '@id': new UR
   potentialAction: { '@type': 'SearchAction', target: `${site}?q={q}`, 'query-input': 'required name=q' },
   description: '專注新竹市與新竹縣的免費房地產資訊平台。' };
 ---
-<Base title="新竹房產情報站｜新竹房價、實價登錄、房市新聞與重大建設" description="專注新竹市與新竹縣的免費房地產資訊平台，提供中古屋與預售屋房價、實價登錄、社區建案、生活圈、房貸政策及重大建設。由 Simon 哥創立，深耕新竹，讓房產資訊更透明。" jsonld={ld} bodyClass="v4home">
+<Base title="新竹房產情報站｜新竹房價、實價登錄、房市新聞與重大建設" description="讓新竹房產資訊，不再難找。新竹市與新竹縣的房價行情、實價登錄、房市新聞、社區建案與重大建設，免費公開、不需註冊，由 Simon 哥創立。" jsonld={ld} bodyClass="v4home">
 
+  <div class="notice5" id="notice5" role="region" aria-label="網站公告">
+    <span class="nt-dot" aria-hidden="true"></span>
+    <p>新竹房產情報站正式公開！網站持續優化中，歡迎提供建議，一起打造更完整的新竹房產資訊平台。</p>
+    <a class="nt-go" href="/feedback/?from=/">提供網站建議</a>
+    <button type="button" class="nt-x" aria-label="關閉公告">×</button>
+  </div>
+  <script is:inline>(function(){var K='hc_notice_v5',n=document.getElementById('notice5');try{if(localStorage.getItem(K)){n.remove();return}}catch(e){}n.querySelector('.nt-x').addEventListener('click',function(){n.remove();try{localStorage.setItem(K,'1')}catch(e){}})})();</script>
   <section class="hero4" aria-labelledby="hero-h">
     <Photo id="hero-hsinchu" eager sizes="100vw" ratio="21/9" />
     <div class="in">
@@ -97,7 +104,7 @@ const ld = { '@context': 'https://schema.org', '@type': 'WebSite', '@id': new UR
     </div>
   </section>
   <div class="tick-ft"><div class="wrap">
-    <span>房價：內政部實價登錄近半年（{period}）每坪中位數，已扣車位</span>
+    <span>房價：內政部實價登錄近半年（{period}）每坪中位數，已扣車位・<a href="/sources/#method">統計口徑 {(meta as any).method ?? 'v2'}</a></span>
     <span>年／季變化：比 {cc.q} 完整季</span>
     <span>最新批次 {md(latestRelease())}，下一批 {md(nextRelease())}</span>
     <span>移轉棟數：內政部；利率：中央銀行 {rate[0]}</span>
@@ -183,7 +190,7 @@ const ld = { '@context': 'https://schema.org', '@type': 'WebSite', '@id': new UR
     <div class="sx-h"><h2 id="wk-h">房市週報與市場研究</h2><a class="more" href="/weekly/">歷期週報</a></div>
     <div class="wk4">
       <a class="main" href={`/weekly/${wk.id}/`}><span class="chip">Simon 新竹房市週報・{wk.data.period}</span>
-        <h3>{wk.data.title}</h3><p class="note" style="margin:0">{wk.data.description}</p>
+        <h3>{wk.data.title}</h3><p class="note" style="margin:0">{wk.id < '2026-11-26' && '［統計口徑 v1，與上方數字（v2）不同，見資料來源說明］'}{wk.data.description}</p>
         <p class="meta-l">每週一更新・新竹房產情報站編輯部整理（AI 輔助）</p></a>
       <ul>
         {weekly.slice(1, 3).map((w) => <li><a href={`/weekly/${w.id}/`}><span class="kicker">往期週報</span><br />{w.data.title}</a></li>)}

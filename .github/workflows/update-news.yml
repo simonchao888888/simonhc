@@ -1,21 +1,34 @@
-# 每天台灣時間早上 7 點自動彙整新竹房市、央行、房貸利率、青安相關新聞標題
-# 已改由 weekly.yml 每週執行；這裡保留手動執行
+# 每小時自動彙整新竹房市快訊（Google 新聞 RSS 標題，不存內文）
+# 規則見 scripts/fetch_news.py：新竹優先、全國只收影響新竹買方的政策、排除海外與其他縣市、同事件合併
+# 每次執行都寫一筆紀錄到 src/data/news_runs.json（網站新聞頁公開顯示最近一次結果）
+# 跑完後 deploy.yml 會自動發布（workflow_run）
 name: Update news
 on:
+  schedule:
+    - cron: '17 * * * *'     # 每小時第 17 分（避開整點尖峰）
   workflow_dispatch:
 permissions:
   contents: write
+concurrency: { group: news, cancel-in-progress: false }
 jobs:
   news:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
-      - run: python3 scripts/fetch_news.py src/data/news_feed.json
-      - run: |
+      - name: 彙整快訊
+        run: python3 scripts/fetch_news.py src/data/news_feed.json
+      - name: 失敗也留下紀錄
+        if: failure()
+        run: git checkout src/data/news_feed.json || true
+      - name: 發布
+        if: always()
+        run: |
           git config user.name "news-bot"
           git config user.email "news-bot@users.noreply.github.com"
-          git add src/data/news_feed.json
-          git diff --cached --quiet || git commit -m "news: 自動彙整 $(date +%F)"
-          git push
+          git add src/data/news_feed.json src/data/news_runs.json
+          git diff --cached --quiet && { echo "沒有變動"; exit 0; }
+          git commit -m "news: 快訊更新 $(date -u -d '+8 hours' '+%Y-%m-%d %H:%M')"
+          for i in 1 2 3; do git pull --rebase -q && git push && break; sleep 5; done

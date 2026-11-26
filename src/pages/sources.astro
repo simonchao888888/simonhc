@@ -3,7 +3,7 @@ import PageBanner from '../components/PageBanner.astro';
 import Base from '../layouts/Base.astro';
 import { meta, latestRelease, nextRelease, LAG_NOTE, fromPipeline } from '../lib/data';
 ---
-<Base title="資料來源與更新方式" description="SimonHC 的資料來源、統計口徑（扣除車位、排除特殊交易、樣本門檻）與更新頻率。" active="sources" crumbs={[['資料來源']]}>
+<Base title="資料來源與更新方式" description="新竹房產情報站的資料來源、統計口徑（扣除車位、排除特殊交易、樣本門檻）與更新頻率。" active="sources" crumbs={[['資料來源']]}>
   <PageBanner tone="view" kicker="資料來源與統計方法" title="資料來源與更新方式" />
   <div class="card art">
     <p>{meta.note}</p>
@@ -24,10 +24,17 @@ import { meta, latestRelease, nextRelease, LAG_NOTE, fromPipeline } from '../lib
       <li>資料涵蓋 2023 年起所有季檔與每 10 天批次，交易量逐年統計見<a href="/volume/">交易量</a>。</li>
       <li>近半年 ≥20 筆列主要排行；5～19 筆為參考；少於 5 筆不顯示中位數。</li>
       <li>未完成季度不計算中位數。</li>
+      <li>主要用途為「農業用」的農舍不納入單價統計（總價含大面積農地，換算建物單價會嚴重失真）。</li>
     </ul>
     <h3>更新頻率</h3>
     <p>實價登錄每月 1、11、21 日揭露；本站每週一自動下載最新一批、重新計算並發布<a href="/weekly/">房市週報</a>。</p>
     <p>最近同步：{meta.synced}（已收錄內政部 {latestRelease()} 公布的資料）・資料內最新住宅成交：{meta.latestDeal}・下一批公布：{nextRelease()}</p>
+    <h3 id="method">統計口徑版本</h3>
+    <p>改變納入規則時會升版並在這裡記錄。舊的房市週報保留當時的數字、不回頭改寫；週報遇到版本不同時，不和上一期比較漲跌，避免把口徑調整誤當成市場變化。</p>
+    <ul>
+      <li><b>v2（2026-11-26 起，目前使用）：</b>中古屋車位未分開標價的成交，改用同區同類車位中位數估算扣除後納入；「其他增建」勾選項不再排除；預售屋補入 2019 年起舊制（代銷批次申報）成交；新竹市依門牌分東區、北區、香山區；農舍不納入。樣本約為 v1 的 2 倍，新竹縣中古屋中位數因此較高（大樓樣本變多）。</li>
+      <li><b>v1（～2026-11-25）：</b>車位未分開標價、或勾選「其他增建」的成交一律不納入，樣本偏向華廈、公寓與透天。2026/11/23、11/25 兩期週報採用此口徑，例如新竹縣中古屋 v1 為 31.1 萬/坪、v2 為 38.2 萬/坪（同一批資料、最新成交同為 2026-10-26）。</li>
+    </ul>
     <p id="lag"><b>為什麼成交日期比今天晚？</b>{LAG_NOTE}這是法規造成的落差，不是資料沒更新；同一筆成交，房仲業者的內部資料可能比實價登錄早幾週看到。</p>
   </div>
 </Base>

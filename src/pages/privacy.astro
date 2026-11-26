@@ -2,15 +2,17 @@
 import PageBanner from '../components/PageBanner.astro';
 import Base from '../layouts/Base.astro';
 ---
-<Base title="隱私權政策" description="新竹房產情報站蒐集哪些資料、怎麼使用：不需註冊、試算在瀏覽器計算、表單只用於回覆。" crumbs={[['關於本站', '/about-simonhc/'], ['隱私權政策']]}>
+<Base title="隱私權政策" description="新竹房產情報站蒐集哪些資料、怎麼使用：不需註冊、試算在瀏覽器計算、表單只用於回覆、流量只記總數。" crumbs={[['關於本站', '/about-simonhc/'], ['隱私權政策']]}>
   <PageBanner tone="view" kicker="網站透明度" title="隱私權政策" />
-  <p class="note">最後更新：2026-11-26</p>
+  <p class="note">最後更新：2026-11-26（新增網站建議表單與流量來源統計說明）</p>
   <ul>
     <li><b>不需註冊：</b>本站所有內容免費閱讀，不建立會員帳號。</li>
     <li><b>試算工具：</b>你輸入的收入、貸款等數字只在你的瀏覽器裡計算，不會傳回本站。</li>
+    <li><b>網站建議表單：</b>可匿名送出，Email 選填。內容存放在本站的 Cloudflare D1 資料庫，只有站長看得到、不會直接公開；送出時會同步透過 FormSubmit 寄信通知站長。為了防止垃圾訊息，送出時 IP 只以雜湊形式暫存（最長 1 天）做次數限制，不寫入資料庫。</li>
     <li><b>提問與錯誤回報表單：</b>你主動填寫的內容與 Email 會透過表單寄信服務（FormSubmit）寄到站長信箱，只用於回覆你，不會出售或提供給第三方。</li>
     <li><b>網站主機：</b>本站透過 Cloudflare 提供服務，Cloudflare 可能為安全與效能目的記錄一般連線資訊（例如 IP 位址）。</li>
     <li><b>公開造訪統計：</b>本站以自建的輕量計數服務統計造訪與頁面瀏覽次數，不使用 Cookie、不做裝置指紋、未安裝 Google Analytics 等追蹤程式。你的瀏覽器會在本機儲存「上次活動時間」與最後一次取得的統計數字（localStorage），用來判斷 30 分鐘內是否為同一次造訪；伺服器只保存累計數字，IP 只以雜湊形式暫存 60 秒做限流，不寫入資料庫。詳見<a href="/about-simonhc/#visits">統計方法</a>。</li>
+    <li><b>流量來源與熱門頁面：</b>為了了解讀者從哪裡來、哪些內容有用，本站另外以「總數」方式記錄：造訪來源類別（Facebook、Instagram、LINE、Threads、Google 搜尋、其他）、各頁面瀏覽次數、新訪客與回訪的比例，以及社群連結、分享與意見回饋按鈕的點擊次數。不記錄完整來源網址、不記錄個人身分，也不把同一個人的瀏覽串成紀錄。判斷回訪時，你的瀏覽器會在本機另存「第一次造訪的日期」（localStorage），可隨時清除瀏覽器資料刪除。</li>
     <li><b>外部連結：</b>本站連到的政府、新聞與社群網站有各自的隱私權政策。</li>
   </ul>
   <p>對隱私權有任何疑問，請寫信到 <a href="mailto:simon.chao888@gmail.com" data-mail="simon.chao888@gmail.com">simon.chao888@gmail.com</a>。</p>

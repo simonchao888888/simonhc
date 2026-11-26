@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base noindex title="站長後台：流量與意見回饋" description="站長專用：流量來源、熱門頁面、回訪、按鈕點擊與意見回饋。" crumbs={[['站長後台']]}>
+  <h1 style="margin:8px 0 6px">站長後台</h1>
+  <p class="note">只有輸入管理密碼（Cloudflare Worker 的 ADMIN_TOKEN）才看得到資料；密碼只存在這台裝置的瀏覽器。</p>
+  <form id="adm-login" class="card" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0">
+    <label for="adm-tk">管理密碼</label><input id="adm-tk" type="password" autocomplete="current-password" style="flex:1;min-width:200px;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:8px" />
+    <label for="adm-m">月份</label><input id="adm-m" type="month" style="font-size:16px;padding:8px;border:1px solid var(--line);border-radius:8px" />
+    <button class="btn p" type="submit" style="border:0;min-height:42px;padding:0 18px;cursor:pointer">查看</button>
+  </form>
+  <p id="adm-msg" class="note" role="status"></p>
+  <div id="adm-out" hidden>
+    <div class="grid g2">
+      <section class="card"><h2 style="margin-top:0;font-size:20px">造訪來源（本月）</h2><table id="t-src"></table></section>
+      <section class="card"><h2 style="margin-top:0;font-size:20px">新訪客與回訪</h2><table id="t-ret"></table><h2 style="font-size:20px">按鈕點擊</h2><table id="t-clk"></table></section>
+    </div>
+    <section class="card" style="margin-top:16px"><h2 style="margin-top:0;font-size:20px">熱門頁面（瀏覽）與著陸頁（造訪）</h2><table id="t-page"></table></section>
+    <section class="card" style="margin-top:16px"><h2 style="margin-top:0;font-size:20px">意見回饋（最新 100 則）</h2><div id="t-fb"></div></section>
+  </div>
+  <script is:inline>
+  (function () {
+    var K = 'hc_admin_tk', f = document.getElementById('adm-login'), msg = document.getElementById('adm-msg');
+    var NAME = { facebook: 'Facebook', instagram: 'Instagram', line: 'LINE', threads: 'Threads', google: 'Google 搜尋', 'other-search': '其他搜尋引擎', other: '其他網站', direct: '直接輸入／書籤', youtube: 'YouTube', email: 'Email', share: '分享', feedback: '意見回饋', leju: '樂居連結', new: '新訪客', return: '回訪' };
+    var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+    var tbl = function (id, head, rows) { document.getElementById(id).innerHTML = '<thead><tr>' + head.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead><tbody>' + (rows.length ? rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + esc(c) + '</td>'; }).join('') + '</tr>'; }).join('') : '<tr><td colspan="' + head.length + '">尚無資料</td></tr>') + '</tbody>'; };
+    try { document.getElementById('adm-tk').value = localStorage.getItem(K) || ''; } catch (e) {}
+    document.getElementById('adm-m').value = new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 7);
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var tk = document.getElementById('adm-tk').value.trim(), m = document.getElementById('adm-m').value;
+      msg.textContent = '讀取中…';
+      fetch('/api/admin/summary?m=' + encodeURIComponent(m), { headers: { authorization: 'Bearer ' + tk } })
+        .then(function (r) { if (r.status === 403) throw new Error('密碼不正確，或尚未在 Cloudflare 設定 ADMIN_TOKEN'); if (!r.ok) throw new Error('讀取失敗（' + r.status + '）'); return r.json(); })
+        .then(function (d) {
+          try { localStorage.setItem(K, tk); } catch (e) {}
+          msg.textContent = d.month + ' 的資料';
+          var by = function (pre) { return d.rows.filter(function (r) { return r.k.indexOf(pre) === 0; }); };
+          tbl('t-src', ['來源', '造訪'], by('s:' + d.month + ':').map(function (r) { return [NAME[r.k.split(':')[2]] || r.k.split(':')[2], r.visits]; }).sort(function (a, b) { return b[1] - a[1]; }));
+          tbl('t-ret', ['類型', '造訪'], by('r:' + d.month + ':').map(function (r) { return [NAME[r.k.split(':')[2]], r.visits]; }));
+          tbl('t-clk', ['按鈕', '點擊'], by('c:' + d.month + ':').map(function (r) { return [NAME[r.k.split(':')[2]] || r.k.split(':')[2], r.visits]; }).sort(function (a, b) { return b[1] - a[1]; }));
+          tbl('t-page', ['頁面', '瀏覽', '著陸造訪'], by('p:' + d.month + ':').map(function (r) { return [r.k.split(':').slice(2).join(':'), r.views, r.visits]; }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 50));
+          document.getElementById('t-fb').innerHTML = d.feedback.length ? d.feedback.map(function (x) {
+            return '<div style="border-top:1px solid var(--line);padding:10px 0"><b>' + esc(x.cat) + '</b> <span class="note">' + esc(x.at.replace('T', ' ')) + (x.page ? '・來自 ' + esc(x.page) : '') + (x.email ? '・' + esc(x.email) : '・匿名') + '</span><p style="margin:6px 0 0;white-space:pre-wrap">' + esc(x.msg) + '</p></div>';
+          }).join('') : '<p>尚無回饋</p>';
+          document.getElementById('adm-out').hidden = false;
+        })
+        .catch(function (err) { msg.textContent = err.message; });
+    });
+  })();
+  </script>
+</Base>

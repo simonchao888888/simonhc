@@ -9,7 +9,8 @@ const SITE = '新竹房產情報站';
 const HOME_TITLE = '新竹房產情報站｜新竹房價、實價登錄、房市新聞與重大建設';
 const fullTitle = title === SITE || title === HOME_TITLE ? HOME_TITLE : `${title}｜${SITE}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const ogImage = new URL(ogIn ?? '/og.png', Astro.site).href;
+const ogImage = new URL(ogIn ?? '/og-v5.jpg', Astro.site).href;
+const ogAlt = '新竹房產情報站：讓新竹房產資訊，不再難找。房價行情、實價登錄、房市新聞、重大建設，免費公開、不需註冊，由 Simon 哥創立';
 // 手機抽屜選單：分組，每一項附一句說明（桌機改用下方攤開的分類列，不用下拉選單）
 type Item = [string, string, string]; // [網址, 名稱, 說明]
 const groups: { id: string; label: string; items: Item[] }[] = [
@@ -34,7 +35,8 @@ const groups: { id: string; label: string; items: Item[] }[] = [
     ['/community/', '交流平台', '問站長、討論區'],
   ] },
   { id: 'about', label: '關於', items: [
-    ['/about-simonhc/', '關於 SimonHC', '網站使命、編輯方式與透明度'],
+    ['/about-simonhc/', '關於本站', '網站使命、編輯方式與透明度'],
+    ['/feedback/', '提供網站建議', '資料錯誤、補充與新功能建議'],
     ['/about/', '關於 Simon 哥', '創辦人背景與實戰經驗'],
     ['/sources/', '資料來源與統計方法', '每個數字怎麼算出來的'],
   ] },
@@ -84,8 +86,14 @@ const crumbLd = crumbs.length ? {
   <meta property="og:locale" content="zh_TW" />
   <meta property="og:site_name" content="新竹房產情報站" />
   <meta property="og:image" content={ogImage} />
+  <meta property="og:image:secure_url" content={ogImage} />
+  <meta property="og:image:type" content={ogImage.endsWith('.png') ? 'image/png' : 'image/jpeg'} />
   <meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={ogAlt} />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={fullTitle} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
   <meta name="theme-color" content="#122B40" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -136,7 +144,7 @@ const crumbLd = crumbs.length ? {
         <p><span class="by">由 Simon 哥創立</span>・深耕新竹，讓房產資訊更透明。<br />免費整理新竹縣市實價登錄、預售建案、租金、生活圈、房市新聞與重大建設，不收費、不需註冊。</p>
         <p>看懂價差，先算風險。—— Simon價差房產</p>
       </div>
-      <div><h4>快速入口</h4><a href="/region/">房價行情</a><a href="/presale/">社區建案</a><a href="/areas/">新竹生活圈</a><a href="/school/">學區房</a><a href="/news/">房市新聞</a><a href="/construction/">重大建設</a><a href="/policy/">房貸政策</a><a href="/tools/">免費工具</a><a href="/weekly/">房市週報</a></div>
+      <div><h4>快速入口</h4><a href="/region/">房價行情</a><a href="/presale/">社區建案</a><a href="/areas/">新竹生活圈</a><a href="/school/">學區房</a><a href="/news/">房市新聞</a><a href="/construction/">重大建設</a><a href="/policy/">房貸政策</a><a href="/tools/">免費工具</a><a href="/weekly/">房市週報</a><a href="/feedback/">提供網站建議</a></div>
       <div><h4>資料來源與透明度</h4><a href="/sources/">資料來源與統計方法</a><a href="/editorial/">內容編輯政策</a><a href="/about-simonhc/#visits">造訪統計方法</a><a href="/report/">資料錯誤回報</a><a href="/calendar/">資料更新日曆</a><a href="/about-simonhc/#images">圖片來源與授權</a></div>
       <div><h4>創辦人與社群</h4><a href="/about/">關於 Simon 哥</a><a href="/viewpoint/">Simon 哥觀點</a><a href="/community/#ask">問站長一個問題</a>
         <div class="soc">{social.filter(([, u]) => u).map(([n, u]) => <a href={u} rel="me noopener" target="_blank">{n}</a>)}{C.email && <a href={`mailto:${C.email}`} data-mail={C.email}>Email</a>}</div></div>
