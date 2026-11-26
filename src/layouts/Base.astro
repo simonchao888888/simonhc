@@ -11,6 +11,7 @@ const groups: { id: string; label: string; items: Item[] }[] = [
   { id: 'market', label: '查行情', items: [
     ['/region/', '各區房價', '中古屋、預售屋每坪中位數'],
     ['/rent/', '租金行情', '各區月租與租金報酬率'],
+    ['/volume/', '交易量', '各區每年成交棟數與官方移轉棟數'],
     ['/presale/', '預售建案', '每一戶的樓層、坪數、車位價'],
     ['/areas/', '生活圈', '竹科、高鐵特區、舊城怎麼選'],
   ] },
@@ -28,7 +29,7 @@ const cur = segOf(Astro.url.pathname);
 const isOn = (u: string) => segOf(u) === cur;
 // 分類列：所有分類直接攤開，不收進下拉選單，新手一眼就看得到
 const catnav: (Item | null)[] = [
-  ['/region/', '查房價', ''], ['/rent/', '租金行情', ''], ['/presale/', '預售建案', ''], ['/areas/', '生活圈', ''], null,
+  ['/region/', '查房價', ''], ['/volume/', '交易量', ''], ['/rent/', '租金行情', ''], ['/presale/', '預售建案', ''], ['/areas/', '生活圈', ''], null,
   ['/weekly/', '房市週報', ''], ['/news/', '新聞判讀', ''], ['/policy/', '央行政策', ''], ['/calendar/', '更新日曆', ''], null,
   ['/tools/', '房貸試算', ''], ['/guide/', '買房指南', ''], null,
   ['/community/', '交流平台', ''], ['/about/', '創辦人', ''],
@@ -90,7 +91,7 @@ const crumbLd = crumbs.length ? {
   </main>
   <footer><div class="in">
     <div class="fbrand"><b>竹房知識站</b><p>只寫新竹。從南寮的海風到五峰的山，把每一區的實價登錄整理成看得懂的數字，給在這裡工作、成家的人參考。</p><p class="fnote">本站資料僅供參考，不構成估價或投資建議。實際成交請以內政部實價登錄及專業人員意見為準。</p></div>
-    <div><b>查行情</b><a href="/region/">各區房價</a><a href="/rent/">租金行情</a><a href="/presale/">預售建案</a><a href="/developer/">建商列表</a><a href="/areas/">生活圈</a></div>
+    <div><b>查行情</b><a href="/region/">各區房價</a><a href="/volume/">交易量</a><a href="/rent/">租金行情</a><a href="/presale/">預售建案</a><a href="/developer/">建商列表</a><a href="/areas/">生活圈</a></div>
     <div><b>新聞與政策</b><a href="/weekly/">房市週報</a><a href="/news/">新聞判讀</a><a href="/policy/">央行與貸款政策</a><a href="/calendar/">更新日曆</a></div>
     <div><b>學與問</b><a href="/tools/">房貸試算</a><a href="/guide/">買房指南</a><a href="/community/">交流平台</a><a href="/about/">關於創辦人</a><a href="/sources/">資料來源與更新方式</a></div>
   </div></footer>

@@ -1,0 +1,91 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { DISCLAIMER } from '../components/Parts';
+import { districts, districtUrl, md } from '../lib/data';
+import build from '../data/build.json';
+import OFF from '../data/transfers_official.json';
+
+const B: any = build;
+const V = B.volume as { years: number[]; lastA: string; lastB: string; rows: { r: 'city' | 'county'; dist: string; y: Record<string, [number, number]> }[] };
+const years = V.years;
+const curY = String(years[years.length - 1]);
+const fmt = (n?: number | null) => (n == null ? '—' : n.toLocaleString('en-US'));
+const chg = (a?: number, b?: number) => (a && b != null ? Math.round(((b - a) / a) * 100) : null);
+
+// 官方：季 → 年
+const offYear = (arr: number[]) => {
+  const o: Record<string, { v: number; q: number }> = {};
+  OFF.quarters.forEach((q, i) => { const y = String(+q.slice(0, 3) + 1911); (o[y] ??= { v: 0, q: 0 }); o[y].v += arr[i]; o[y].q++; });
+  return o;
+};
+const offC = offYear(OFF.county), offM = offYear(OFF.city);
+const lastQ = OFF.quarters[OFF.quarters.length - 1];
+const lastQLabel = `${+lastQ.slice(0, 3) + 1911} 年第 ${lastQ.slice(-1)} 季`;
+const yLabel = (y: string, q: number) => (q === 4 ? y : q === 2 ? `${y} 上半年` : `${y} 前 ${q} 季`);
+
+// 各區（實價登錄）
+const idOf = (name: string) => districts.find((d) => d.name === name);
+const rowsFor = (r: 'city' | 'county') =>
+  V.rows.filter((x) => x.r === r && x.dist && x.dist !== '新竹市')
+    .sort((a, b) => (b.y['2025']?.[0] ?? 0) - (a.y['2025']?.[0] ?? 0));
+const total = (r: 'city' | 'county') => {
+  const t: Record<string, [number, number]> = {};
+  for (const x of V.rows.filter((x) => x.r === r)) for (const [y, v] of Object.entries(x.y)) { t[y] ??= [0, 0]; t[y][0] += v[0]; t[y][1] += v[1]; }
+  return t;
+};
+const groups = [
+  { r: 'city' as const, name: '新竹市', rows: rowsFor('city'), total: total('city'), unmapped: V.rows.find((x) => x.r === 'city' && x.dist === '新竹市') },
+  { r: 'county' as const, name: '新竹縣', rows: rowsFor('county'), total: total('county'), unmapped: undefined },
+];
+const lastMonth = +V.lastA.slice(5, 7);
+const city2025 = OFF.cityDistricts['2025'] as Record<string, number>;
+---
+<Base title="新竹縣市交易量：建物買賣移轉棟數與各區成交量" description={`新竹縣、新竹市 2023～${curY} 年建物買賣移轉棟數（內政部）與各鄉鎮市區成屋買賣、預售屋簽約量（實價登錄），逐年比較。`} active="prices" crumbs={[['查房價', '/region/'], ['交易量']]}>
+  <div class="pagehead"><Icon name="vane" size={56} /><h1>新竹縣市交易量</h1></div>
+  <p class="lead">房價要配著量看。這頁整理 2023 年以來新竹縣市的建物買賣移轉棟數，以及各鄉鎮市區每年成交多少。</p>
+
+  <h2 id="official">建物買賣移轉棟數（內政部官方統計）</h2>
+  <div class="tw"><table>
+    <tr><th>縣市</th>{Object.entries(offC).map(([y, o]) => <th class="n">{yLabel(y, o.q)}</th>)}<th class="n">2025 年增減</th></tr>
+    {[['新竹縣', offC], ['新竹市', offM]].map(([n, o]: any) => (
+      <tr><td><b>{n}</b></td>{Object.values(o).map((x: any) => <td class="n">{fmt(x.v)} 棟</td>)}<td class:list={['n', (chg(o['2024'].v, o['2025'].v) ?? 0) < 0 ? 'down' : 'up']}>{chg(o['2024'].v, o['2025'].v)}%</td></tr>
+    ))}
+  </table></div>
+  <p class="note">依登記日期統計，含預售屋交屋、成屋與非住宅建物，以建號計棟。資料至 {lastQLabel}（內政部約季後兩個月公布）。新竹市 2025 年分區：東區 {fmt(city2025['東區'])} 棟、北區 {fmt(city2025['北區'])} 棟、香山區 {fmt(city2025['香山區'])} 棟（新竹市地政處）。新竹縣的鄉鎮別官方棟數沒有公開發布，所以各區請看下表。</p>
+
+  <h2 id="district">各鄉鎮市區每年成交量（實價登錄）</h2>
+  <p>每格上面是<b>成屋買賣的建物棟數</b>（中古屋與完工後才賣的新成屋），下面是<b>預售屋簽約戶數</b>（已扣除解約）。依成交或簽約日期歸年。</p>
+  {groups.map((g) => (
+    <div class="tw vol-t"><table>
+      <tr><th>{g.name}</th>{years.map((y) => <th class="n">{String(y) === curY ? `${y}（1–${lastMonth} 月）` : y}</th>)}<th class="n">成屋 2025 vs 2024</th></tr>
+      {g.rows.map((x) => {
+        const d = idOf(x.dist);
+        const c = chg(x.y['2024']?.[0], x.y['2025']?.[0]);
+        return <tr>
+          <td>{d ? <a href={districtUrl(d)}>{x.dist}</a> : x.dist}</td>
+          {years.map((y) => { const v = x.y[String(y)]; return <td class="n"><b>{fmt(v?.[0] ?? 0)}</b><small>預售 {fmt(v?.[1] ?? 0)}</small></td>; })}
+          <td class:list={['n', c == null ? '' : c < 0 ? 'down' : 'up']}>{c == null ? '—' : `${c > 0 ? '+' : ''}${c}%`}</td>
+        </tr>;
+      })}
+      <tr class="sum"><td><b>{g.name}合計</b></td>
+        {years.map((y) => { const v = g.total[String(y)]; return <td class="n"><b>{fmt(v?.[0] ?? 0)}</b><small>預售 {fmt(v?.[1] ?? 0)}</small></td>; })}
+        <td class="n">{(() => { const c = chg(g.total['2024']?.[0], g.total['2025']?.[0]); return c == null ? '—' : `${c > 0 ? '+' : ''}${c}%`; })()}</td></tr>
+    </table></div>
+  ))}
+  <p class="note">
+    {curY} 年成屋算到 {md(V.lastA)}、預售算到 {md(V.lastB)}；成屋在移轉登記後 30 天內才申報，最近兩個月的數字還會再增加。
+    新竹市的實價登錄原始資料不分區，本站用新竹市民政處門牌資料把地址對應到東區、北區、香山區，約 1% 地址無法判斷，只算進合計{groups[0].unmapped && `（${curY} 年 ${fmt(groups[0].unmapped.y[curY]?.[0] ?? 0)} 棟）`}。
+  </p>
+
+  <h2 id="diff">為什麼實價登錄的棟數比官方少？</h2>
+  <p>預售屋在簽約時就申報實價登錄，交屋辦移轉登記時不會再出現在成屋買賣資料裡；但內政部的移轉棟數是依登記計算，預售屋交屋也會算進去。2024～2025 年新竹縣市大量預售案完工交屋，所以官方棟數明顯高於實價登錄的成屋棟數。想看「市場上有多少人在買」，把成屋棟數與預售簽約戶數合起來看比較接近；想看「有多少房子完成過戶」，看官方移轉棟數。</p>
+  <p><a class="tag" href="/region/">各區房價</a><a class="tag" href="/presale/#volume">預售屋成交金額</a><a class="tag" href="/sources/">資料來源與計算方式</a></p>
+  <Fragment set:html={DISCLAIMER} />
+</Base>
+<style>
+  .vol-t td small{display:block;font-size:12px;color:var(--sub);font-weight:400}
+  .vol-t tr.sum td{border-top:2px solid var(--ink)}
+  .vol-t{margin-bottom:14px}
+  .vol-t th,.vol-t td{white-space:nowrap}
+</style>

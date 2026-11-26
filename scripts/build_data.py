@@ -18,6 +18,8 @@
 import argparse, csv, io, json, os, re, statistics, sys, urllib.request, zipfile
 from collections import defaultdict
 from datetime import date, timedelta
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from city_district import city_district
 
 URL = "https://plvr.land.moi.gov.tw/DownloadSeason?season={s}&type=zip&fileName=lvr_landcsv.zip"
 # 每 10 天（1、11、21 日）揭露的批次，季檔還沒出來前靠這些補上最新成交
@@ -26,7 +28,9 @@ CUR_URL = "https://plvr.land.moi.gov.tw/Download?{q}fileName={f}"
 CUR_FILES = [f"{p}_lvr_land_{k}.csv" for p in "oj" for k in ("a", "b", "b_park", "c")] + ["o_lvr_buildcase.csv", "j_lvr_buildcase.csv"]
 CITIES = {"o": "city", "j": "county"}           # 檔名前綴 → 站內 key
 PING = 3.30579
-EXCLUDE_NOTE = re.compile(r"親友|員工|特殊關係|債權|債務|增建|未登記|瑕疵|凶宅|毛胚|含.*裝潢|政府機關|法拍|急買急賣|共有物|持分")
+# 「其他增建」是申報表的勾選項（竹北約 3 成成交都有勾），不代表特殊交易，所以不排除；「未登記建物」仍排除
+EXCLUDE_NOTE = re.compile(r"親友|員工|特殊關係|債權|債務|未登記|瑕疵|凶宅|毛胚|含.*裝潢|政府機關|法拍|急買急賣|共有物|持分")
+START_SEASON = "112S1"   # 從 2023 年起，供建物移轉棟數逐年統計
 RES_TYPES = ("住宅大樓", "華廈", "公寓", "透天厝", "套房")
 DISTRICT_ID = {
     "竹北市": "zhubei", "湖口鄉": "hukou", "竹東鎮": "zhudong", "新豐鄉": "xinfeng", "芎林鄉": "qionglin",
@@ -45,6 +49,19 @@ def recent_seasons(n=9, today=None):
         if q == 0:
             y, q = y - 1, 4
     return out[::-1]
+
+
+def seasons_since(start=START_SEASON, today=None):
+    today = today or date.today()
+    y, q = int(start[:3]), int(start[-1])
+    ty, tq = today.year - 1911, (today.month - 1) // 3 + 1
+    out = []
+    while (y, q) <= (ty, tq):
+        out.append(f"{y}S{q}")
+        q += 1
+        if q == 5:
+            y, q = y + 1, 1
+    return out
 
 
 def recent_batches(today=None):
@@ -138,8 +155,18 @@ def parse_rows(zbytes, prefix, kind):
     return rows[1:]  # 第 2 列為英文欄名
 
 
-def unit_price(row):
-    """回傳每坪單價（萬），無法扣除車位或非住宅則回傳 None。"""
+PARK_MED = {}   # (行政區, 車位類別) → 單一車位價格中位數（元），用來扣除「車位未分開計價」的成交
+
+
+def n_parks(row):
+    m = re.search(r"車位(\d+)", col(row, "交易筆棟數"))
+    return int(m.group(1)) if m and int(m.group(1)) > 0 else 1
+
+
+def unit_price(row, dist=None):
+    """回傳每坪單價（萬），非住宅或無法合理扣除車位則回傳 None。
+    車位有成交但沒有分開標價時：若有車位面積、且同行政區同類車位有 5 筆以上分開標價的成交，
+    就用該中位數估算車位價格扣除；否則不納入。"""
     target = col(row, "交易標的")
     if "建物" not in target:
         return None
@@ -152,9 +179,12 @@ def unit_price(row):
     area = num(col(row, "建物移轉總面積"))
     p_area = num(col(row, "車位移轉總面積"))
     p_price = num(col(row, "車位總價"))
-    has_parking = bool(col(row, "車位類別").strip())
-    if has_parking and p_price <= 0:          # 車位未分離 → 不納入
-        return None
+    ptype = col(row, "車位類別").strip()
+    if ptype and p_price <= 0:                # 車位未分開標價 → 用同區同類車位中位數估算
+        est = PARK_MED.get((dist, ptype)) if dist else None
+        if not est or p_area <= 0:
+            return None
+        p_price = est * n_parks(row)
     a = area - p_area
     if total <= 0 or a <= 3:
         return None
@@ -275,12 +305,13 @@ def main():
     ap.add_argument("--local")
     ap.add_argument("--out", default="src/data/build.json")
     a = ap.parse_args()
-    seasons = a.seasons or (recent_seasons() + recent_batches())
+    seasons = a.seasons or (seasons_since() + recent_batches())
 
     deals = {"a": [], "b": []}   # (region, district, date, price)
     proj = defaultdict(lambda: {"ups": [], "tot": [], "dates": [], "n": 0})  # 預售建案統計
     builders = {}
     seen = set()
+    raw = []                     # (kind, region, district, date, row, parks)
     for s in seasons:
         print(f"→ {s}")
         z = load_zip_bytes(s, a.local)
@@ -296,19 +327,57 @@ def main():
                         continue
                     seen.add(key)
                     d = roc_date(col(row, "交易年月日"))
-                    up = unit_price(row)
-                    if d and up:
-                        deals[kind].append((region, col(row, "鄉鎮市區"), d, up))
-                    name = col(row, "建案名稱").strip() if kind == "b" else ""
-                    if name and d:
-                        k = (region, col(row, "鄉鎮市區"), name)
-                        P = proj[k]
-                        P["n"] += 1
-                        P["dates"].append(d)
-                        P.setdefault("deals", []).append(deal_detail(row, d, up, parks.get(key, [])))
-                        if up:
-                            P["ups"].append(up)
-                            P["tot"].append(num(col(row, "總價元")) / 1e4)
+                    if not d:
+                        continue
+                    dn = col(row, "鄉鎮市區")
+                    if region == "city":     # 新竹市原始資料不分區，用門牌地址判斷東區／北區／香山區
+                        dn = city_district(col(row, "土地位置建物門牌")) or "新竹市"
+                    raw.append((kind, region, dn, d, row, parks.get(key, [])))
+
+    # 先算各行政區「分開標價」的單一車位價格中位數（近兩年），給車位未分開標價的成交估算扣除
+    last = max(x[3] for x in raw)
+    pk = defaultdict(list)
+    for kind, region, dn, d, row, _ in raw:
+        if kind != "a" or d < last - timedelta(days=730):
+            continue
+        t, pp = col(row, "車位類別").strip(), num(col(row, "車位總價元"))
+        if t and pp > 0:
+            pk[(dn, t)].append(pp / n_parks(row))
+    PARK_MED.clear()
+    PARK_MED.update({k: statistics.median(v) for k, v in pk.items() if len(v) >= 5})
+
+    pm = defaultdict(lambda: {"city": [0.0, 0], "county": [0.0, 0]})   # 月 → 縣市 → [總價萬元, 戶數]
+    bulk = 0
+    years = defaultdict(lambda: defaultdict(lambda: [0, 0]))   # (region, dist) → year → [成屋買賣建物棟數, 預售簽約戶數]
+    for kind, region, dn, d, row, prk in raw:
+        up = unit_price(row, dn if kind == "a" else None)
+        if up:
+            deals[kind].append((region, dn, d, up))
+        if d.year >= 2023:
+            if kind == "a":
+                m = re.search(r"建物(\d+)", col(row, "交易筆棟數"))
+                if m and int(m.group(1)) > 0:
+                    years[(region, dn)][d.year][0] += int(m.group(1))
+            elif not col(row, "解約情形").strip():
+                years[(region, dn)][d.year][1] += 1
+        # 預售屋每月成交總金額：排除解約、單筆 500 坪以上的整棟或廠辦交易
+        if kind == "b" and not col(row, "解約情形").strip():
+            if num(col(row, "建物移轉總面積")) / PING >= 500:
+                bulk += 1
+            else:
+                o = pm[d.strftime("%Y-%m")][region]
+                o[0] += num(col(row, "總價元")) / 1e4
+                o[1] += 1
+        name = col(row, "建案名稱").strip() if kind == "b" else ""
+        if name:
+            k = (region, col(row, "鄉鎮市區"), name)
+            P = proj[k]
+            P["n"] += 1
+            P["dates"].append(d)
+            P.setdefault("deals", []).append(deal_detail(row, d, up, prk))
+            if up:
+                P["ups"].append(up)
+                P["tot"].append(num(col(row, "總價元")) / 1e4)
 
     if not deals["a"]:
         sys.exit("沒有取得任何資料，請確認網路或改用 --local 指定已下載的 zip。")
@@ -344,6 +413,16 @@ def main():
             "presale": med(pre) if len(pre) >= 5 else None, "pn": len(pre),
             "tier": "main" if n >= 20 else "ref" if n >= 5 else "low",
         }
+
+    # 各行政區逐年交易量（依成交／簽約日期）：成屋買賣建物棟數、預售屋簽約戶數
+    lastA = max(d for k, _, _, d, _, _ in raw if k == "a")
+    out["volume"] = {"years": list(range(2023, lastA.year + 1)), "lastA": lastA.isoformat(),
+                     "lastB": max(d for k, _, _, d, _, _ in raw if k == "b").isoformat(),
+                     "rows": [{"r": r, "dist": dn, "y": {str(y): v for y, v in sorted(ys.items())}}
+                              for (r, dn), ys in sorted(years.items())]}
+
+    out["presaleMonthly"] = {"bulkExcluded": bulk,
+                             "months": {m: {r: [round(v[0]), v[1]] for r, v in x.items()} for m, x in sorted(pm.items())}}
 
     # 預售建案：近兩年有揭露成交者
     cutoff = latest - timedelta(days=730)
