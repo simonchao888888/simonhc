@@ -1,0 +1,24 @@
+# 圖片清單有變動時：從 Wikimedia Commons 下載開放授權圖片、轉 AVIF/WebP、更新 src/data/images.json
+name: Fetch images
+on:
+  workflow_dispatch:
+  push:
+    paths: ['scripts/data/image_sources.json', 'scripts/fetch_images.py']
+permissions:
+  contents: write
+concurrency: { group: fetch-images-${{ github.ref }}, cancel-in-progress: false }
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -q "pillow>=11.3"
+      - run: python3 scripts/fetch_images.py
+      - name: 提交圖片與圖片資料庫
+        run: |
+          git add public/img src/data/images.json
+          git diff --cached --quiet && exit 0
+          git -c user.name=data-bot -c user.email=data-bot@users.noreply.github.com commit -qm "images: 更新圖片資料庫"
+          git push
