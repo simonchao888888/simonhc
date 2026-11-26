@@ -191,6 +191,8 @@ def unit_price(row, dist=None):
         return None
     if EXCLUDE_NOTE.search(col(row, "備註")):
         return None
+    if "農" in col(row, "主要用途"):          # 農舍：總價含大面積農地，換算建物單價會嚴重失真
+        return None
     total = num(col(row, "總價元"))
     area = num(col(row, "建物移轉總面積"))
     p_area = num(col(row, "車位移轉總面積"))
@@ -485,7 +487,13 @@ def main():
         xs = [x for x in sdeals if x[0] == sid and x[2] >= since1y]
         v = [x[3] for x in xs]
         dv = [p for _, dn, d, p in deals["a"] if dn in ds and d >= since1y]
-        out["schools"][sid] = {"used": med(v) if len(v) >= 10 else None, "n": len(v), "distMed": med(dv), "distN": len(dv),
+        avg = lambda a: round(sum(a) / len(a), 1) if a else None
+        bands = {}
+        for k, _, _ in AGE_BANDS:
+            bv = [x[3] for x in xs if x[4] == k]
+            bands[k] = {"n": len(bv), "avg": avg(bv) if len(bv) >= 5 else None}
+        out["schools"][sid] = {"used": med(v) if len(v) >= 10 else None, "avg": avg(v) if len(v) >= 10 else None, "n": len(v),
+                               "distMed": med(dv), "distAvg": avg(dv), "distN": len(dv), "bands": bands,
                                "ages": age_stats([(None, None, x[2], x[3], x[4]) for x in xs])}
 
     # 各行政區逐年交易量（依成交／簽約日期）：成屋買賣建物棟數、預售屋簽約戶數

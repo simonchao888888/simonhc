@@ -29,24 +29,26 @@ const GROUPS: { t: string; city: string; dist: string; lead: string; rows: Row[]
     official: [['新竹縣國小學區（政府資料開放平臺）', 'https://data.gov.tw/dataset/109378'], ['新竹縣國中學區（政府資料開放平臺）', 'https://data.gov.tw/dataset/109362']] },
 ];
 const fmt = (v: number | null | undefined) => (v == null ? '—' : v.toFixed(1));
-const prem = (s: any) => (s?.used != null && s?.distMed ? Math.round((s.used / s.distMed - 1) * 100) : null);
-const all = GROUPS.flatMap((g) => g.rows.map((r) => ({ ...r, g: g.t, s: schoolStats[r.id] }))).filter((r) => r.s?.used != null).sort((a, b) => b.s.used - a.s.used);
-const max = Math.max(...all.map((r) => r.s.used));
+const prem = (s: any) => (s?.avg != null && s?.distAvg ? Math.round((s.avg / s.distAvg - 1) * 100) : null);
+const BANDS: [string, string][] = [['0-10', '10 年內'], ['11-20', '11～20 年'], ['21-30', '21～30 年'], ['31+', '30 年以上']];
+const band = (s: any, k: string) => s?.bands?.[k]?.avg;
+const all = GROUPS.flatMap((g) => g.rows.map((r) => ({ ...r, g: g.t, s: schoolStats[r.id] }))).filter((r) => r.s?.avg != null).sort((a, b) => b.s.avg - a.s.avg);
+const max = Math.max(...all.map((r) => r.s.avg));
 ---
-<Base title="新竹學區房價格｜竹北、新竹市、新豐熱門學區單價分析" description="新竹縣市熱門學區整理：竹北東興、成功、勝利、博愛，新竹市關埔、東門、新竹國小、金雅，新豐松林。附學區房近一年中古屋每坪中位數、10 年內屋單價、與行政區價差及官方學區查詢連結。" active="school" crumbs={[['學區房']]}>
-  <PageBanner img="zhubei-tofu" tone="life" kicker="新竹學區房" title="新竹熱門學區與學區房單價" lead="竹北、新竹市、新豐 11 個熱門國中小學區：各學區附近的中古屋單價、比行政區貴多少，以及官方學區要去哪裡查。" />
+<Base title="新竹學區房價格｜竹北、新竹市、新豐熱門學區單價分析" description="新竹縣市熱門學區整理：竹北東興、成功、勝利、博愛，新竹市關埔、東門、新竹國小、金雅，新豐松林。附學區房近一年中古屋平均單價、依屋齡（10 年內、11～20、21～30、30 年以上）分組單價、與行政區價差及官方學區查詢連結。" active="school" crumbs={[['學區房']]}>
+  <PageBanner img="zhubei-tofu" tone="life" kicker="新竹學區房" title="新竹熱門學區與學區房單價" lead="竹北、新竹市、新豐 11 個熱門國中小學區：依屋齡 10 年內、11～20 年、21～30 年、30 年以上看平均單價，比行政區貴多少，以及官方學區要去哪裡查。" />
 
   <div class="card sch-warn">
     <strong>看數字之前</strong>
-    <p>官方學區由縣市政府依「村里、鄰」劃分，每學年可能調整。實價登錄只有門牌、沒有村里，所以本頁的學區房單價是用各校周邊的<b>代表路段</b>歸類成交（近一年 {period}，中古屋、扣車位，少於 10 筆不給數字），屬於估算，<b>不是官方學區認定</b>。買房前請用門牌向戶政事務所確認村里鄰，再對照下方的官方學區表；總量管制學校另須確認設籍年限。</p>
+    <p>官方學區由縣市政府依「村里、鄰」劃分，每學年可能調整。實價登錄只有門牌、沒有村里，所以本頁的學區房單價是用各校周邊的<b>代表路段</b>歸類成交（近一年 {period}，中古屋、扣車位、不含農舍，算平均單價；整體少於 10 筆、各屋齡少於 5 筆不給數字），屬於估算，<b>不是官方學區認定</b>。買房前請用門牌向戶政事務所確認村里鄰，再對照下方的官方學區表；總量管制學校另須確認設籍年限。</p>
   </div>
 
-  <section class="sx t-life"><div class="sx-h"><h2>學區房單價排行</h2><p>近一年中古屋每坪中位數（萬元）</p></div>
+  <section class="sx t-life"><div class="sx-h"><h2>學區房單價排行</h2><p>近一年中古屋每坪平均單價（萬元）</p></div>
     <div class="sch-bars">{all.map((r) => (
       <a class="sch-bar" href={`#s-${r.id}`}>
         <span class="nm">{r.es.replace(/（.*?）/g, '')}<small>{r.g}・{r.area}</small></span>
-        <span class="tr"><span class="fl" style={`width:${(r.s.used / max) * 100}%`}></span></span>
-        <span class="v">{fmt(r.s.used)}</span>
+        <span class="tr"><span class="fl" style={`width:${(r.s.avg / max) * 100}%`}></span></span>
+        <span class="v">{fmt(r.s.avg)}</span>
       </a>
     ))}</div>
   </section>
@@ -55,19 +57,19 @@ const max = Math.max(...all.map((r) => r.s.used));
     <section class="sx t-life" id={g.t}><div class="sx-h"><h2>{g.t}學區</h2><p>{g.city}</p></div>
       <p class="sch-lead">{g.lead}</p>
       <div class="sch-wrap"><table class="sch-t">
-        <thead><tr><th>國小 → 國中</th><th>區域・代表路段</th><th class="r">學區房單價</th><th class="r">10 年內屋</th><th class="r">比行政區</th><th class="r">筆數</th></tr></thead>
+        <thead><tr><th>國小 → 國中</th><th>區域・代表路段</th><th class="r">整體平均</th>{BANDS.map(([, t]) => <th class="r">{t}</th>)}<th class="r">比行政區</th><th class="r">筆數</th></tr></thead>
         <tbody>{g.rows.map((r) => { const s = schoolStats[r.id]; const p = prem(s); return (
           <tr id={`s-${r.id}`}>
             <td><b>{r.es}</b><br />→ {r.js}{r.note && <span class="sch-flag">{r.note}</span>}</td>
             <td>{r.area}<br /><small class="note">{r.roads}</small></td>
-            <td class="r" data-l="學區房單價"><b>{s?.used != null ? fmt(s.used) : '樣本不足'}</b></td>
-            <td class="r" data-l="10 年內屋">{s?.ages?.['0-10']?.med != null && s.ages['0-10'].n >= 10 ? fmt(s.ages['0-10'].med) : '—'}</td>
+            <td class="r" data-l="整體平均"><b>{s?.avg != null ? fmt(s.avg) : '樣本不足'}</b></td>
+            {BANDS.map(([k, t]) => <td class="r" data-l={t}>{band(s, k) != null ? fmt(band(s, k)) : <span class="note" title={`${s?.bands?.[k]?.n ?? 0} 筆`}>—</span>}</td>)}
             <td class="r" data-l="比行政區">{p == null ? '—' : <span class={p > 0 ? 'up' : p < 0 ? 'dn' : ''}>{p > 0 ? '+' : ''}{p === 0 ? '持平' : `${p}%`}</span>}</td>
             <td class="r" data-l="筆數">{s?.n ?? 0}</td>
           </tr>
         ); })}</tbody>
       </table></div>
-      <p class="note">單價單位：萬元／坪。「比行政區」是學區房單價對比所在行政區同期整體中古屋中位數；「10 年內屋」少於 10 筆不顯示。官方學區：{g.official.map(([t, u], i) => <>{i > 0 && '、'}<a href={u} target="_blank" rel="noopener">{t}</a></>)}</p>
+      <p class="note">單價單位：萬元／坪，皆為平均單價。屋齡以成交日減建築完成日計算；「—」表示該屋齡近一年少於 5 筆成交。「比行政區」是整體平均對比所在行政區同期中古屋平均單價。官方學區：{g.official.map(([t, u], i) => <>{i > 0 && '、'}<a href={u} target="_blank" rel="noopener">{t}</a></>)}</p>
     </section>
   ))}
 
@@ -92,7 +94,7 @@ const max = Math.max(...all.map((r) => r.s.used));
   .sch-bar:hover .fl{background:var(--c-life,#2E7D6B)}
   .sch-bar .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
   .sch-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
-  .sch-t{min-width:640px}.sch-t td,.sch-t th{vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}
+  .sch-t{min-width:860px}.sch-t td,.sch-t th{vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}
   .sch-t .r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
   .sch-t tr:target td{background:#FFF8E6}
   .sch-flag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:4px;background:#FCEBDD;color:#9A4A10;font-size:.75em}

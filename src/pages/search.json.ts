@@ -29,7 +29,7 @@ export async function GET() {
   ];
   for (const [t, u, s] of pages) items.push({ t, u, k: '頁面', s, w: u === '/school/' ? '學區 學區房 國小 國中 明星學區 雙語 總量管制' : undefined });
   const SCH: [string, string, string][] = [['zb-dongxing','東興國小・東興國中','竹北高鐵特區'],['zb-xinglong','興隆國小・成功國中','竹北縣治二期'],['zb-shixing','十興國小・勝利國中','竹北遠百'],['zb-boai','博愛國小・博愛國中','竹北縣治一期'],['zb-old','竹北國小・新社國小・竹北國中','竹北舊市區'],['hc-guanpu','關埔國小・關東國小・光武國中','新竹市關埔'],['hc-dongmen','東門國小・三民國中','新竹市舊城'],['hc-hsinchu','新竹國小・育賢國中','新竹市南大路'],['hc-jinya','舊社國小・載熙國小・光華國中','新竹市金雅'],['hc-nanliao','南寮國小・南華國中','新竹市南寮'],['xf-songlin','松林國小・忠孝國中','新豐坪頂']];
-  for (const [id, t, s] of SCH) { const v = schoolStats[id]?.used; items.push({ t: t + ' 學區', u: `/school/#s-${id}`, k: '頁面', s: s + (v != null ? `・學區房 ${v} 萬/坪` : ''), w: '學區 學區房 ' + t }); }
+  for (const [id, t, s] of SCH) { const v = schoolStats[id]?.avg; items.push({ t: t + ' 學區', u: `/school/#s-${id}`, k: '頁面', s: s + (v != null ? `・學區房平均 ${v} 萬/坪` : ''), w: '學區 學區房 ' + t }); }
   // 生活圈與常用地名（搜尋「關埔」「巨城」也找得到）
   const zones: [string, string, string, string][] = [
     ['竹科・東區生活圈', '/areas/#tech', '東區、關埔、寶山', '關埔 關埔重劃區 竹科 園區 光復路 清大 交大 陽明交大'],
