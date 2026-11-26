@@ -2,6 +2,7 @@
 import Icon from '../components/Icon.astro';
 import Base from '../layouts/Base.astro';
 import { dist, districtUrl } from '../lib/data';
+const ZID = ['tech', 'zhubei-hsr', 'zhudong', 'hukou-xinfeng', 'old-city', 'xiangshan', 'hakka'];
 const zones: [string, string, string[]][] = [
   ['竹科・東區生活圈', '東區、關埔、寶山。離園區最近，關埔重劃區新案 5～6 字頭。', ['east', 'baoshan']],
   ['竹北・高鐵生活圈', '高鐵特區、縣治、台元。機能、學區最完整，全縣市單價最高。', ['zhubei']],
@@ -15,7 +16,7 @@ const zones: [string, string, string[]][] = [
 <Base title="新竹生活圈" description="用每天要去哪裡來選區域：竹科東區、竹北高鐵、竹東台68、湖口新豐、北區、香山七大新竹生活圈。" active="areas" crumbs={[['生活圈']]}>
   <div class="pagehead"><Icon name="map" size={56} /><h1>新竹生活圈</h1></div>
   <p class="lead">用「你每天要去哪裡」來選區域，而不是只看單價。</p>
-  <div class="grid g2">{zones.map(([t, d, ids]) => (
-    <div class="card"><h3 style="margin-top:0">{t}</h3><p>{d}</p><p>{ids.map((i) => <a class="tag" href={districtUrl(dist(i))}>{dist(i).name}{dist(i).used != null ? ` ${dist(i).used} 萬` : ''}</a>)}</p></div>
+  <div class="grid g2">{zones.map(([t, d, ids], i) => (
+    <div class="card" id={ZID[i]}><h3 style="margin-top:0">{t}</h3><p>{d}</p><p>{ids.map((i) => <a class="tag" href={districtUrl(dist(i))}>{dist(i).name}{dist(i).used != null ? ` ${dist(i).used} 萬` : ''}</a>)}</p></div>
   ))}</div>
 </Base>

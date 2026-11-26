@@ -2,165 +2,199 @@
 import Base from '../layouts/Base.astro';
 import Panorama from '../components/Panorama.astro';
 import TileMap from '../components/TileMap.astro';
-import Icon from '../components/Icon.astro';
+import Portrait from '../components/Portrait.astro';
 import { getCollection } from 'astro:content';
 import { regions, districts, districtUrl, regionUrl, meta, latestRelease, nextRelease, md } from '../lib/data';
-import { news, policyRate, mortgageRates, fmtDate } from '../lib/news';
+import { news, policyRate, mortgageRates } from '../lib/news';
 import { featured, f1 } from '../lib/presale';
+import { founder as F } from '../lib/founder';
+import OFF from '../data/transfers_official.json';
+import CON from '../data/construction.json';
+import PD from '../data/presale_deals.json';
 import { DISCLAIMER } from '../components/Parts';
-import Portrait from '../components/Portrait.astro';
-import { founder as F, community as C, fill } from '../lib/founder';
+
 const c = regions.city, k = regions.county;
 const zb = districts.find((d) => d.id === 'zhubei')!;
-const zd = districts.find((d) => d.id === 'zhudong')!;
-const pingZb = Math.round(1500 / zb.used!), pingZd = Math.round(1500 / zd.used!);
-const rate = mortgageRates.filter((r) => r[1] != null).at(-1)!;
-// 價格尺：中古（實心）與預售（空心）
-const rows = [
-  { name: '新竹市', used: c.used, pre: c.presale, href: regionUrl('city') },
-  ...districts.filter((d) => d.r === 'county' && d.used != null && d.tier !== 'low').sort((a, b) => b.used! - a.used!)
-    .map((d) => ({ name: d.name, used: d.used!, pre: d.presale ?? null, href: districtUrl(d) })),
-];
-const top = Math.ceil(Math.max(...rows.map((r) => Math.max(r.used, r.pre ?? 0))) / 10) * 10;
-const pct = (v: number) => (v / top) * 100;
-const latestNews = news.slice(0, 4);
-const active = featured.filter((p) => p.status.startsWith('2026')).slice(0, 7);
-import PD from '../data/presale_deals.json';
 const presaleLatest = Object.values(PD as Record<string, { d: string }[]>).flat().reduce((m, x) => (x.d > m ? x.d : m), '');
-const latestWeekly = (await getCollection('weekly')).sort((a, b) => b.id.localeCompare(a.id))[0];
-const posts = (await getCollection('guide')).sort((a, b) => a.data.order - b.data.order);
-// 首頁挑 6 篇：新手入門、稅、區域、學區、竹科、最新建案拆解
-const pickIds = ['first-time-buyer', 'property-tax-guide', 'hsinchu-development', 'school-district', 'tech-worker-buying'];
-const latestCase = posts.filter((p) => p.id.startsWith('case-')).sort((a, b) => b.id.localeCompare(a.id))[0];
-const picks = [...pickIds.map((id) => posts.find((p) => p.id === id)!).filter(Boolean), ...(latestCase ? [latestCase] : [])];
-const ld = { '@context': 'https://schema.org', '@type': 'WebSite', name: '竹房知識站', url: Astro.site?.href, inLanguage: 'zh-TW' };
+const half = (iso: string) => { const d = new Date(iso); d.setDate(d.getDate() - 183); return d.toISOString().slice(0, 10); };
+const period = `${md(half(meta.latestDeal))}～${md(meta.latestDeal)}`;
+
+// 季變化、年變化：用各縣市每季中古屋中位數（最新一季仍在申報期，改比上一個完整季）
+type Q = [string, number, number];
+const chg = (t: Q[]) => {
+  const full = t.slice(0, -1);                       // 去掉最新、仍在申報期的一季
+  const last = full.at(-1)!, prev = full.at(-2)!, yoy = full.find((q) => q[0] === `${+last[0].slice(0, 4) - 1}${last[0].slice(4)}`);
+  const p = (a: number, b: number) => +(((b - a) / a) * 100).toFixed(1);
+  return { q: last[0], qoq: p(prev[2], last[2]), yoy: yoy ? p(yoy[2], last[2]) : null };
+};
+const cc = chg(c.trend as Q[]), kc = chg(k.trend as Q[]);
+const arrow = (v: number | null) => (v == null ? '' : v > 0 ? 'up arrow-up' : v < 0 ? 'down arrow-down' : '');
+const sgn = (v: number | null) => (v == null ? '—' : `${Math.abs(v)}%`);
+
+// 官方建物買賣移轉棟數：最新一季與去年同季
+const n = OFF.quarters.length - 1;
+const qLabel = (q: string) => `${+q.slice(0, 3) + 1911} Q${q.slice(-1)}`;
+const offNow = OFF.city[n] + OFF.county[n], offYoy = OFF.city[n - 4] + OFF.county[n - 4];
+const offChg = +(((offNow - offYoy) / offYoy) * 100).toFixed(1);
+const rate = mortgageRates.filter((r) => r[1] != null).at(-1)!;
+
+const hot: [string, string][] = [['新竹市', regionUrl('city')], ['竹北', districtUrl(zb)], ['關埔', '/areas/#tech'], ['巨城', districtUrl(districts.find((d) => d.id === 'east')!)],
+  ['竹東', districtUrl(districts.find((d) => d.id === 'zhudong')!)], ['寶山', districtUrl(districts.find((d) => d.id === 'baoshan')!)],
+  ['湖口', districtUrl(districts.find((d) => d.id === 'hukou')!)], ['新豐', districtUrl(districts.find((d) => d.id === 'xinfeng')!)]];
+
+// 八大入口（圖示為同一組線條風格）
+const I: Record<string, string> = {
+  price: 'M4 19V9m5 10V5m5 14v-7m5 7V8M3 21h18', build: 'M5 21V8l7-5 7 5v13M9 21v-5h6v5M9 10h.01M15 10h.01', life: 'M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
+  news: 'M5 4h11v16H6a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1zM16 8h3v10a2 2 0 0 1-2 2M8 8h5M8 12h5M8 16h3', crane: 'M4 21h10M7 21V5l10 3M7 5h13M17 5v6m0 0-2 3h4zM7 9h4',
+  bank: 'M3 9 12 4l9 5M5 10v8m4-8v8m6-8v8m4-8v8M3 20h18', calc: 'M6 3h12v18H6zM9 7h6M9 11h1m2 0h1m2 0h.01M9 15h1m2 0h1m2 0h.01M9 18h1m2 0h1',
+  view: 'M4 5h16v11H8l-4 4zM8 9h8M8 12h5',
+};
+const hub: [string, string, string, string][] = [
+  ['/region/', '房價行情中心', '中古屋依屋齡、預售屋、交易量與租金，16 區一次看。', 'price'],
+  ['/presale/', '社區建案資料庫', '預售建案逐戶成交：樓層、坪數、車位價，2019 年起完整收錄。', 'build'],
+  ['/areas/', '新竹生活圈百科', '竹科東區、竹北高鐵、竹東、湖口新豐，用通勤選區域。', 'life'],
+  ['/news/', '房市新聞中心', '只收與新竹房市有關的新聞，每則附判讀與原文來源。', 'news'],
+  ['/construction/', '重大建設追蹤', '輕軌、大車站、AI 園區，標示官方進度與可能影響。', 'crane'],
+  ['/policy/', '房貸政策中心', '央行利率、信用管制、青安 3.0 條件與歷次會議。', 'bank'],
+  ['/tools/', '免費房產工具', '房貸月付、買房總成本、負擔能力，不用註冊。', 'calc'],
+  ['/viewpoint/', 'Simon 哥觀點', '選屋原則、建案拆解與每週市場觀察。', 'view'],
+];
+
+const cityD = districts.filter((d) => d.r === 'city');
+const countyD = districts.filter((d) => d.r === 'county').sort((a, b) => (b.n ?? 0) - (a.n ?? 0));
+const latestNews = news.slice(0, 5);
+const active = featured.filter((p) => p.status.startsWith('2026')).slice(0, 5);
+const weekly = (await getCollection('weekly')).sort((a, b) => b.id.localeCompare(a.id));
+const wk = weekly[0];
+const cases = (await getCollection('guide')).filter((p) => p.id.startsWith('case-')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const site = Astro.site?.href;
+const ld = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'SimonHC 新竹房產情報站', alternateName: 'Simon哥｜新竹房產情報站', url: site, inLanguage: 'zh-TW',
+  description: 'SimonHC 是專注新竹市與新竹縣的免費房地產資訊平台。' };
 ---
-<Base title="竹房知識站" description={`新竹縣市房價行情與買房知識。新竹市中古屋每坪中位數 ${c.used} 萬、新竹縣 ${k.used} 萬；竹北、東區、竹東、湖口各區行情、預售建案成交明細與房貸試算。`} jsonld={ld}>
-  <div class="skyband">
-  <section class="hero">
-    <div>
-      <h1>新竹的房子，<br />一區一區看清楚。</h1>
-      <p class="lead">同樣一千五百萬，在竹北大約買 {pingZb} 坪，到竹東可以買到 {pingZd} 坪左右。這裡把內政部實價登錄整理成各區看得懂的數字，再配上房貸試算和政策解讀。</p>
-      <div class="hsearch" data-hero-search>
-        <button type="button" class="hs-box" data-search-open><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM20 20l-4.8-4.8" /></svg><span>找區域、建案、建商或買房問題</span></button>
-        <div class="hs-pop"><span>常找：</span>{['竹北市', '新竹市', '竹東鎮', '寬限期', '房屋稅', '學區'].map((q) => <button type="button" data-q={q}>{q}</button>)}</div>
-      </div>
-      <a class="btn p" href="/tools/affordability/">算算我買得起哪一區</a><a class="btn s" href="/region/">看各區房價</a>
-    </div>
-    <div class="facts">
-      <a href={regionUrl('city')}><div class="k">新竹市 中古屋</div><div class="v">{c.used}<small> 萬/坪</small></div></a>
-      <a href={regionUrl('county')}><div class="k">新竹縣 中古屋</div><div class="v">{k.used}<small> 萬/坪</small></div></a>
-      <a href={districtUrl(zb)}><div class="k">竹北 預售屋</div><div class="v">{zb.presale}<small> 萬/坪</small></div></a>
-      <a href="/policy/"><div class="k">五大銀行房貸利率（{rate[0].replace('-', '/')}）</div><div class="v">{rate[1]}<small> %</small></div></a>
-    </div>
-  </section>
-  <p class="note" style="margin:10px 0 0">已收錄內政部 {md(latestRelease())} 公布的實價登錄（最新住宅成交 {md(meta.latestDeal)}、預售屋簽約 {md(presaleLatest)}）；下一批 {md(nextRelease())} 公布，本站隔天自動更新。<a href="/sources/#lag">為什麼有時間落差？</a></p>
+<Base title="新竹房價行情、實價登錄與房市資訊｜SimonHC 新竹房產情報站" description="SimonHC 是專注新竹市與新竹縣的免費房地產資訊平台，提供實價登錄、中古屋與預售屋房價、社區建案、生活圈、重大建設、房貸政策及 Simon 哥的房產實戰觀點。" jsonld={ld}>
 
-  <Panorama />
-  </div>
-
-  <section class="sec">
-  <h2>你現在想知道的是</h2>
-  <div class="intent">
-    <a href="/guide/first-time-buyer/"><Icon name="house" /><b>第一次買房</b><span class="note">竹科首購的預算怎麼抓、選哪一區</span><em>看首購指南</em></a>
-    <a href="/tools/mortgage-payment/"><Icon name="calc" /><b>房貸要繳多少</b><span class="note">寬限期前後的月付金差多少</span><em>開始試算</em></a>
-    <a href="/presale/"><Icon name="crane" /><b>預售屋值不值</b><span class="note">每個建案的樓層、坪數、車位價</span><em>查預售建案</em></a>
-    <a href="/rent/"><Icon name="key" /><b>租還是買</b><span class="note">各區月租和租金報酬率</span><em>看租金行情</em></a>
-    <a href="/guide/school-district/"><Icon name="map" /><b>學區房</b><span class="note">總量管制、設籍時間怎麼排</span><em>讀學區指南</em></a>
-    <a href="/policy/"><Icon name="vane" /><b>政策風向</b><span class="note">央行、房貸成數、青安 3.0</span><em>看最新政策</em></a>
-  </div>
+  <section class="h2-hero">
+    <span class="eyebrow">在地觀察 × 房產數據 × 實戰經驗</span>
+    <h1>關於新竹房地產，你想知道的都在這裡。</h1>
+    <p class="lead">免費查詢新竹縣市房價、實價登錄、社區建案、生活圈、房市新聞及重大建設。</p>
+    <button type="button" class="bigsearch" data-search-open><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM20 20l-4.8-4.8" /></svg><span>搜尋行政區、生活圈、建案名稱、路段或文章</span></button>
+    <div class="hotq"><span>熱門：</span>{hot.map(([t, u]) => <a href={u}>{t}</a>)}</div>
   </section>
 
-  <section class="band bamboo">
-  <h2>一把尺量完各區房價</h2>
-  <div class="split">
-    <div class="ruler">
-      <div class="legend"><span><i></i>中古屋</span><span><i class="pre"></i>預售屋</span><span>近半年每坪中位數，萬元</span></div>
-      {rows.map((r) => (
-        <a class="row" href={r.href}>
-          <span class="nm">{r.name}</span>
-          <span class="track">
-            {r.pre != null && <span class="link" style={`left:${pct(Math.min(r.used, r.pre))}%;width:${Math.abs(pct(r.pre) - pct(r.used))}%`}></span>}
-            <span class="dot" style={`left:${pct(r.used)}%`}></span>
-            {r.pre != null && <span class="dot pre" style={`left:${pct(r.pre)}%`}></span>}
-          </span>
-          <span class="val"><b>{r.used}</b>{r.pre != null ? ` / ${r.pre}` : ''}</span>
-        </a>
-      ))}
-      <div class="scale"><span></span><div><span>0</span><span>{top / 2}</span><span>{top}</span></div><span></span></div>
+  <section class="sec2" aria-labelledby="dash-h">
+    <div class="hd2"><h2 id="dash-h">新竹房市觀測</h2><a href="/sources/">統計方法</a>
+      <p>依內政部實價登錄計算，單價已扣除車位；成交後 30 天內申報、每 10 天公布，不是當日即時行情。季、年變化比的是最近一個完整季的中位數，會受當季成交的屋齡與產品組成影響。</p></div>
+    <div class="dash">
+      <a class="dcard" href={regionUrl('city')}><span class="k">新竹市 中古屋</span><span class="v">{c.used}<small>萬/坪</small></span>
+        <span class="chg"><span>{cc.q} 比上季 <b class={arrow(cc.qoq)}>{sgn(cc.qoq)}</b></span><span>比去年同季 <b class={arrow(cc.yoy)}>{sgn(cc.yoy)}</b></span></span>
+        <span class="meta">{period}・{c.usedN} 筆・中位數</span></a>
+      <a class="dcard" href={regionUrl('county')}><span class="k">新竹縣 中古屋</span><span class="v">{k.used}<small>萬/坪</small></span>
+        <span class="chg"><span>{kc.q} 比上季 <b class={arrow(kc.qoq)}>{sgn(kc.qoq)}</b></span><span>比去年同季 <b class={arrow(kc.yoy)}>{sgn(kc.yoy)}</b></span></span>
+        <span class="meta">{period}・{k.usedN} 筆・中位數</span></a>
+      <a class="dcard" href={districtUrl(zb)}><span class="k">竹北市 中古屋</span><span class="v">{zb.used}<small>萬/坪</small></span>
+        <span class="chg">10 年內新古屋 {f1(zb.ages?.['0-10']?.med ?? null)} 萬</span>
+        <span class="meta">{period}・{zb.n} 筆・中位數</span></a>
+      <a class="dcard" href="/volume/"><span class="k">建物買賣移轉（縣市合計）</span><span class="v">{offNow.toLocaleString()}<small>棟</small></span>
+        <span class="chg">比去年同季 <b class={arrow(offChg)}>{sgn(offChg)}</b></span>
+        <span class="meta">{qLabel(OFF.quarters[n])}・內政部官方統計・含預售交屋</span></a>
+      <a class="dcard" href="/presale/"><span class="k">新竹市 預售屋</span><span class="v">{c.presale}<small>萬/坪</small></span>
+        <span class="chg">與中古屋價差 {f1(c.presale! - c.used!)} 萬</span>
+        <span class="meta">{period}・{c.presaleN} 筆・中位數</span></a>
+      <a class="dcard" href="/presale/"><span class="k">新竹縣 預售屋</span><span class="v">{k.presale}<small>萬/坪</small></span>
+        <span class="chg">與中古屋價差 {f1(k.presale! - k.used!)} 萬</span>
+        <span class="meta">{period}・{k.presaleN} 筆・中位數</span></a>
+      <a class="dcard" href="/policy/"><span class="k">五大銀行新承作房貸利率</span><span class="v">{rate[1]}<small>%</small></span>
+        <span class="chg">央行重貼現率 {policyRate.discount}%</span>
+        <span class="meta">{rate[0].replace('-', ' 年 ')} 月・中央銀行</span></a>
+      <a class="dcard olive" href="/calendar/"><span class="k">資料更新</span><span class="v">{md(latestRelease())}<small>公布批次</small></span>
+        <span class="chg">最新中古成交 {md(meta.latestDeal)}・預售簽約 {md(presaleLatest)}</span>
+        <span class="meta">下一批 {md(nextRelease())} 公布，隔天自動更新・同步 {meta.synced}</span></a>
     </div>
-    <div>
-      <TileMap />
-      <p class="note">點任一格進入該區：中古、預售行情與當地建案。</p>
-    </div>
-  </div>
   </section>
 
-  <section class="band sky">
-  <h2>這幾週的房市與政策</h2>
-  {latestWeekly && (
-    <a class="wk-home" href={`/weekly/${latestWeekly.id}/`}>
-      <span class="tag">本週更新</span>
-      <span><b>{latestWeekly.data.title}</b><span class="note">{latestWeekly.data.description}</span></span>
-    </a>
-  )}
-  <div class="split">
-    <div class="dlist">
-      {latestNews.map((n) => {
-        const [y, m, d] = n.date.split('-');
-        return <a href={`/news/${n.id}/`}><div class="when"><b>{+m}/{+d}</b>{y} <span class={`k-${n.cat}`}>{n.cat}</span></div><div><h3>{n.title}</h3><div class="note">{n.take.slice(0, 70)}…</div></div></a>;
-      })}
-      <p><a href="/news/">全部新聞判讀</a></p>
-    </div>
-    <div>
-      <div class="out">
-        <div class="note">央行政策利率</div>
-        <div class="big">{policyRate.discount}%</div>
-        <div class="kv"><span>已連續維持</span><b>{policyRate.freezeCount} 季</b></div>
-        <div class="kv"><span>第 2 戶房貸成數上限</span><b>7 成，無寬限期</b></div>
-        <div class="kv"><span>青安 3.0 新竹總價上限</span><b>2,500 萬</b></div>
-        <div class="kv"><span>下一次理監事會</span><b>12 月中旬</b></div>
-      </div>
-      <p><a href="/policy/">看信用管制與青安條件</a></p>
-    </div>
-  </div>
+  <section class="sec2" aria-labelledby="hub-h">
+    <div class="hd2"><h2 id="hub-h">八大房產資訊入口</h2></div>
+    <div class="hub">{hub.map(([u, t, d, ic]) => (
+      <a href={u}><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={I[ic]} /></svg></span><b>{t}</b><span>{d}</span></a>
+    ))}</div>
   </section>
 
-  <section class="band persimmon">
-  <h2>還在賣的預售案</h2>
-  <p class="lead">2026 年仍有成交的主要建案，單價已扣除車位。點進去可以看每一戶的樓層、坪數和車位價格。</p>
-  <div class="tw"><table>
-    <tr><th>建案</th><th>區域</th><th>起造人</th><th class="n">每坪中位數</th><th class="n">成交</th><th>最近一筆</th></tr>
-    {active.map((p) => <tr><td><a href={`/presale/${p.id}/`}><b>{p.name}</b></a></td><td>{p.dist || '新竹市'}</td><td class="note">{p.dev || '—'}</td><td class="n"><b>{f1(p.med)}</b> 萬</td><td class="n">{p.n} 筆</td><td class="date">{p.latest}</td></tr>)}
-  </table></div>
-  <p><a href="/presale/">全部預售建案</a></p>
-  </section>
-
-  <section class="band sky">
-    <h2>寫這個網站的人</h2>
-    <div class="founder-band">
-      <Portrait size={150} />
+  <section class="sec2 panel2" aria-labelledby="dist-h">
+    <div class="hd2"><h2 id="dist-h">新竹行政區探索</h2><a href="/region/">各區完整比較</a>
+      <p>點選行政區，看中古屋依屋齡、預售屋、租金、交易量與當地建案。數字為近半年中古屋每坪中位數。</p></div>
+    <div class="split">
       <div>
-        <p style="font-family:var(--hand);font-size:22px;margin:0 0 6px">{F.tagline}</p>
-        <p class="note" style="font-size:15px;max-width:40em" set:html={fill(F.intro[0].slice(0, 90)) + '…'} />
-        <a class="btn s" href="/about/">認識創辦人</a><a class="btn p" href="/community/">到交流平台發問</a>
+        <div class="dgrid">
+          <span class="grp">新竹市</span>
+          {cityD.map((d) => <a href={districtUrl(d)}><b>{d.name}</b><span>{d.used != null ? `${d.used} 萬・${d.n} 筆` : '樣本不足'}</span></a>)}
+          <span class="grp">新竹縣</span>
+          {countyD.map((d) => <a href={districtUrl(d)}><b>{d.name}</b><span>{d.used != null && (d.n ?? 0) >= 10 ? `${d.used} 萬・${d.n} 筆` : '樣本不足'}</span></a>)}
+        </div>
       </div>
+      <div><TileMap /></div>
     </div>
-    <h3 style="margin-top:30px">大家正在聊</h3>
-    <p>{C.boards.map((b) => <a class="tag" href={`/community/${b.slug}/`}>{b.name}</a>)}</p>
+    <Panorama />
   </section>
 
-  <section class="sec">
-  <div class="sechead"><h2>慢慢讀的買房筆記</h2><a href="/guide/">全部 {posts.length} 篇指南</a></div>
-  <div class="pcards">
-    {picks.map((p) => (
-      <a class={`pc pc-${p.data.category}`} href={`/guide/${p.id}/`}>
-        <span class={`tag c-${p.data.category}`}>{p.data.category}</span>
-        <b>{p.data.title}</b>
-        <span class="note">{p.data.description}</span>
-      </a>
-    ))}
-  </div>
+  <section class="sec2" aria-labelledby="news-h">
+    <div class="hd2"><h2 id="news-h">新竹房市最新動態</h2><a href="/news/">全部新聞</a></div>
+    <div class="split">
+      <div class="feed2">
+        {latestNews.map((x) => (
+          <a href={`/news/${x.id}/`}>
+            <div class="dt"><b>{+x.date.slice(5, 7)}/{+x.date.slice(8, 10)}</b>{x.date.slice(0, 4)}</div>
+            <div><h3><span class="cat">{x.cat}</span>{x.title}</h3><div class="src">來源：{x.sources.map((s: string[]) => s[0]).join('、')}</div></div>
+          </a>
+        ))}
+      </div>
+      <div>
+        <h3 style="margin-top:0">重大建設進度</h3>
+        <div class="feed2">{CON.items.map((x) => (
+          <a href={`/construction/#${x.id}`}><div class="dt"><span class="cat">{x.status}</span></div><div><h3>{x.name}</h3><div class="src">{x.dist}・{x.agency}</div></div></a>
+        ))}</div>
+        <h3>2026 年仍在賣的預售案</h3>
+        <div class="feed2">{active.map((p) => (
+          <a href={`/presale/${p.id}/`}><div class="dt"><b>{f1(p.med)}</b>萬/坪</div><div><h3>{p.name}</h3><div class="src">{p.dist || '新竹市'}・{p.n} 筆・最近 {p.latest}</div></div></a>
+        ))}</div>
+      </div>
+    </div>
   </section>
+
+  {wk && (
+  <section class="sec2" aria-labelledby="wk-h">
+    <div class="hd2"><h2 id="wk-h">Simon 新竹房市週報</h2><a href="/weekly/">歷期週報</a><p>每週一更新：成交行情、預售屋、房貸環境與重大建設，完整免費閱讀。</p></div>
+    <div class="wk2">
+      <a class="main" href={`/weekly/${wk.id}/`}><span class="cat">本週</span><span class="date">{wk.data.period}</span>
+        <h3 style="font-size:20px;margin:8px 0 6px">{wk.data.title}</h3><p class="note" style="margin:0">{wk.data.description}</p>
+        <p class="byline" style="margin:12px 0 0">SimonHC 編輯部整理</p></a>
+      <div>
+        <b>往期</b>
+        <ul>{weekly.slice(1, 5).map((w) => <li><a href={`/weekly/${w.id}/`}>{w.data.title}</a></li>)}</ul>
+      </div>
+    </div>
+  </section>
+  )}
+
+  <section class="sec2" aria-labelledby="view-h">
+    <div class="hd2"><h2 id="view-h">Simon 哥的房產觀點</h2><a href="/viewpoint/">更多觀點</a></div>
+    <div class="views">
+      {F.principles.slice(0, 2).map(([t, d]: [string, string]) => <a href="/viewpoint/"><b>{t}</b><span class="note">{d}</span><span class="byline">作者：<b>Simon 哥</b></span></a>)}
+      {cases.slice(0, 2).map((p) => <a href={`/guide/${p.id}/`}><b>{p.data.title}</b><span class="note">{p.data.description}</span><span class="byline">作者：<b>SimonHC 編輯部</b>（AI 輔助整理）</span></a>)}
+    </div>
+  </section>
+
+  <section class="sec2" aria-labelledby="fd-h">
+    <h2 id="fd-h">為什麼我創立 SimonHC 新竹房產情報站？</h2>
+    <div class="fnd2">
+      <Portrait size={200} />
+      <div>
+        <div class="facts2"><span>2010 年投入房地產</span><span>250+ 間買賣實戰</span><span>土生土長新竹人</span><span>中古屋投資</span><span>老屋翻新與價值再造</span></div>
+        <blockquote>大家好，我是 Simon 哥。從 2010 年開始投入房地產投資，至今累積超過 250 間房屋的買賣實戰經驗。一路走來，我深刻體會到，資訊不對稱往往是影響一般民眾判斷的重要因素。所以我想建立一個專注新竹縣市的免費房地產資訊平台，讓每一位關心新竹房地產的人，都能更容易取得有價值的資訊，做出更有依據的決策。</blockquote>
+        <p class="sign">深耕新竹，讓房產資訊更透明。看懂價差，先算風險。</p>
+        <a class="btn p" href="/about/">認識 Simon 哥</a><a class="btn s" href="/community/#ask">問 Simon 哥一個問題</a>
+      </div>
+    </div>
+  </section>
+
   <Fragment set:html={DISCLAIMER} />
 </Base>

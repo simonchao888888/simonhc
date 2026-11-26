@@ -8,7 +8,7 @@ export function getStaticPaths() {
 }
 const { m } = Astro.props as { m: Meeting };
 const others = meetings.filter((x) => x.id !== m.id);
-const ld = { '@context': 'https://schema.org', '@type': 'Article', headline: m.title, datePublished: m.date, inLanguage: 'zh-TW', publisher: { '@type': 'Organization', name: '竹房知識站' } };
+const ld = { '@context': 'https://schema.org', '@type': 'Article', headline: m.title, datePublished: m.date, inLanguage: 'zh-TW', publisher: { '@type': 'Organization', name: 'SimonHC 新竹房產情報站' } };
 ---
 <Base title={m.title} description={`${fmtDate(m.date)} 央行理監事會議：${m.rate}；信用管制：${m.credit}。對新竹房市的判讀。`} active="policy" crumbs={[['央行與貸款政策', '/policy/'], [fmtDate(m.date) + ' 理監事會']]} jsonld={ld}>
   <span class="tag">央行理監事會</span> <span class="date">{fmtDate(m.date)}</span>

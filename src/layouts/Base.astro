@@ -1,39 +1,62 @@
 ---
 import '../styles/global.css';
-interface Props { title: string; description: string; active?: string; crumbs?: [string, string?][]; jsonld?: object }
-const { title, description, active = '', crumbs = [], jsonld } = Astro.props;
-const SITE = '竹房知識站';
-const fullTitle = title === SITE ? `${SITE}｜新竹縣市房價行情與買房知識` : `${title}｜${SITE}`;
+interface Props { title: string; description: string; active?: string; crumbs?: [string, string?][]; jsonld?: object; noindex?: boolean }
+const { title, description, active = '', crumbs = [], jsonld, noindex = false } = Astro.props;
+import F from '../data/founder.json';
+const SITE = 'SimonHC 新竹房產情報站';
+const HOME_TITLE = '新竹房價行情、實價登錄與房市資訊｜SimonHC 新竹房產情報站';
+const fullTitle = title === SITE || title === HOME_TITLE ? HOME_TITLE : `${title}｜${SITE}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-// 主選單：分組，每一項附一句說明，讓第一次來的人知道點進去會看到什麼
+const ogImage = new URL('/og.png', Astro.site).href;
+// 手機抽屜選單：分組，每一項附一句說明（桌機改用下方攤開的分類列，不用下拉選單）
 type Item = [string, string, string]; // [網址, 名稱, 說明]
 const groups: { id: string; label: string; items: Item[] }[] = [
-  { id: 'market', label: '查行情', items: [
-    ['/region/', '各區房價', '中古屋、預售屋每坪中位數'],
-    ['/rent/', '租金行情', '各區月租與租金報酬率'],
+  { id: 'market', label: '房價行情', items: [
+    ['/region/', '各區房價', '中古屋依屋齡、預售屋每坪中位數'],
     ['/volume/', '交易量', '各區每年成交棟數與官方移轉棟數'],
-    ['/presale/', '預售建案', '每一戶的樓層、坪數、車位價'],
-    ['/areas/', '生活圈', '竹科、高鐵特區、舊城怎麼選'],
+    ['/rent/', '租金行情', '各區月租、逐年變化與租金報酬率'],
+    ['/presale/', '社區建案', '預售建案每一戶的樓層、坪數、車位價'],
+    ['/areas/', '新竹生活圈', '竹科、高鐵特區、舊城怎麼選'],
   ] },
-  { id: 'policy', label: '新聞與政策', items: [
-    ['/weekly/', '房市週報', '每週實價登錄、預售成交與新聞整理'],
-    ['/news/', '新聞判讀', '每則新聞對新竹買方的意義'],
-    ['/policy/', '央行與貸款政策', '利率、房貸成數、青安'],
+  { id: 'news', label: '新聞與政策', items: [
+    ['/news/', '房市新聞', '每則新聞對新竹買方的意義'],
+    ['/weekly/', 'Simon 新竹房市週報', '每週一整理成交、預售與新聞'],
+    ['/construction/', '重大建設', '交通、園區、重劃區的官方進度'],
+    ['/policy/', '房貸政策', '央行利率、房貸成數、青安'],
     ['/calendar/', '更新日曆', '實價登錄與政策發布日期'],
   ] },
+  { id: 'learn', label: '工具與觀點', items: [
+    ['/tools/', '免費工具', '房貸、負擔能力、買房總成本試算'],
+    ['/viewpoint/', 'Simon 哥觀點', '實戰案例、建案拆解與市場觀察'],
+    ['/guide/', '買房指南', '首購、稅費、學區、驗屋'],
+    ['/community/', '交流平台', '問站長、討論區'],
+  ] },
+  { id: 'about', label: '關於', items: [
+    ['/about-simonhc/', '關於 SimonHC', '網站使命、編輯方式與透明度'],
+    ['/about/', '關於 Simon 哥', '創辦人背景與實戰經驗'],
+    ['/sources/', '資料來源與統計方法', '每個數字怎麼算出來的'],
+  ] },
 ];
-const direct: Item[] = [['/tools/', '房貸試算', ''], ['/guide/', '買房指南', ''], ['/community/', '交流平台', ''], ['/about/', '創辦人', '']];
+const direct: Item[] = [];
 // 依網址第一段判斷目前在哪個區塊（不用每頁傳 active）
-const segOf = (u: string) => { const s = u.split('/')[1] || ''; return ({ developer: 'presale', tag: 'guide', sources: 'about' } as Record<string, string>)[s] ?? s; };
+const SEG: Record<string, string> = { volume: 'region', rent: 'region', developer: 'presale', weekly: 'news', calendar: 'news', tag: 'viewpoint', guide: 'viewpoint',
+  about: 'about-simonhc', sources: 'about-simonhc', editorial: 'about-simonhc', privacy: 'about-simonhc', terms: 'about-simonhc', report: 'about-simonhc' };
+const segOf = (u: string) => { const s = u.split('/')[1] || 'home'; return SEG[s] ?? s; };
 const cur = segOf(Astro.url.pathname);
 const isOn = (u: string) => segOf(u) === cur;
-// 分類列：所有分類直接攤開，不收進下拉選單，新手一眼就看得到
+// 分類列：品牌規劃的十個入口，直接攤開
 const catnav: (Item | null)[] = [
-  ['/region/', '查房價', ''], ['/volume/', '交易量', ''], ['/rent/', '租金行情', ''], ['/presale/', '預售建案', ''], ['/areas/', '生活圈', ''], null,
-  ['/weekly/', '房市週報', ''], ['/news/', '新聞判讀', ''], ['/policy/', '央行政策', ''], ['/calendar/', '更新日曆', ''], null,
-  ['/tools/', '房貸試算', ''], ['/guide/', '買房指南', ''], null,
-  ['/community/', '交流平台', ''], ['/about/', '創辦人', ''],
+  ['/', '首頁', ''], ['/region/', '房價行情', ''], ['/presale/', '社區建案', ''], ['/areas/', '新竹生活圈', ''], ['/news/', '房市新聞', ''],
+  ['/construction/', '重大建設', ''], ['/policy/', '房貸政策', ''], ['/tools/', '免費工具', ''], ['/viewpoint/', 'Simon哥觀點', ''], ['/about-simonhc/', '關於我們', ''],
 ];
+const C = F.contact as Record<string, string>;
+const social: [string, string | undefined][] = [['Facebook', C.facebook], ['Instagram', C.instagram], ['YouTube', C.youtube], ['Threads', C.threads], ['TikTok', C.tiktok], ['LINE', C.line]];
+const orgLd = {
+  '@context': 'https://schema.org', '@type': 'Organization', name: 'SimonHC 新竹房產情報站', alternateName: ['SimonHC', 'Simon哥｜新竹房產情報站'],
+  url: Astro.site?.href, logo: new URL('/favicon.svg', Astro.site).href, slogan: '深耕新竹，讓房產資訊更透明。',
+  founder: { '@type': 'Person', name: 'Simon 哥（Simon Chao）', url: new URL('/about/', Astro.site).href },
+  sameAs: social.map(([, u]) => u).filter(Boolean),
+};
 const tabs: [string, string, string][] = [['/region/', '房價', 'M3 20V9l9-6 9 6v11h-6v-6H9v6z'], ['/presale/', '預售', 'M4 21V7h4V3h8v4h4v14M9 11h2m2 0h2m-6 4h2m2 0h2'], ['', '搜尋', 'M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM20 20l-4.8-4.8'], ['/tools/', '試算', 'M6 3h12v18H6zM9 7h6M9 11h1m2 0h1m2 0h0M9 15h1m2 0h1m2 0h0'], ['/guide/', '指南', 'M4 5c3-1 6-1 8 1 2-2 5-2 8-1v14c-3-1-6-1-8 1-2-2-5-2-8-1zM12 6v14']];
 const crumbLd = crumbs.length ? {
   '@context': 'https://schema.org', '@type': 'BreadcrumbList',
@@ -50,21 +73,28 @@ const crumbLd = crumbs.length ? {
   <title>{fullTitle}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={canonical} />
+  {noindex && <meta name="robots" content="noindex,follow" />}
   <meta property="og:type" content="website" />
   <meta property="og:title" content={fullTitle} />
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonical} />
   <meta property="og:locale" content="zh_TW" />
+  <meta property="og:site_name" content="SimonHC 新竹房產情報站" />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#35452F" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
   {crumbLd && <script type="application/ld+json" set:html={JSON.stringify(crumbLd)} />}
   {jsonld && <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />}
 </head>
 <body>
   <a class="skip" href="#content">跳到主要內容</a>
   <header class="hd"><div class="hd-in">
-    <a class="logo" href="/"><img src="/favicon.svg" width="34" height="34" alt="" /><div><span>竹房知識站</span><small>新竹縣市的房價與買房知識</small></div></a>
+    <a class="logo" href="/" aria-label="SimonHC 新竹房產情報站 首頁"><span class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" fill="none" stroke="#DDE5BE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9h12v-9" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M9 16l2.2-2.4 1.8 1.6L15.5 12" fill="none" stroke="#DDE5BE" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b class="wm">SIMONHC</b><small class="wm-sub">Simon哥｜新竹房產情報站</small></div></a>
     <nav class="mainnav" id="mainnav" aria-label="主選單">
       {groups.map((g) => (
         <div class:list={['grp', { on: g.items.some(([u]) => isOn(u)) }]}>
@@ -89,12 +119,21 @@ const crumbLd = crumbs.length ? {
     )}
     <slot />
   </main>
-  <footer><div class="in">
-    <div class="fbrand"><b>竹房知識站</b><p>只寫新竹。從南寮的海風到五峰的山，把每一區的實價登錄整理成看得懂的數字，給在這裡工作、成家的人參考。</p><p class="fnote">本站資料僅供參考，不構成估價或投資建議。實際成交請以內政部實價登錄及專業人員意見為準。</p></div>
-    <div><b>查行情</b><a href="/region/">各區房價</a><a href="/volume/">交易量</a><a href="/rent/">租金行情</a><a href="/presale/">預售建案</a><a href="/developer/">建商列表</a><a href="/areas/">生活圈</a></div>
-    <div><b>新聞與政策</b><a href="/weekly/">房市週報</a><a href="/news/">新聞判讀</a><a href="/policy/">央行與貸款政策</a><a href="/calendar/">更新日曆</a></div>
-    <div><b>學與問</b><a href="/tools/">房貸試算</a><a href="/guide/">買房指南</a><a href="/community/">交流平台</a><a href="/about/">關於創辦人</a><a href="/sources/">資料來源與更新方式</a></div>
-  </div></footer>
+  <footer>
+    <div class="ft">
+      <div class="fbrand">
+        <div class="wm">SIMONHC</div>
+        <div class="tag-line">Simon哥｜新竹房產情報站・Hsinchu Real Estate Insights</div>
+        <p>深耕新竹，讓房產資訊更透明。免費整理新竹縣市實價登錄、預售建案、租金、生活圈與政策資訊，不收費、不需註冊。</p>
+        <p>看懂價差，先算風險。— Simon 哥</p>
+        <div class="soc">{social.filter(([, u]) => u).map(([n, u]) => <a href={u} rel="me noopener" target="_blank">{n}</a>)}{C.email && <a href={`mailto:${C.email}`}>Email</a>}</div>
+      </div>
+      <div><b>房產資訊</b><a href="/region/">房價行情</a><a href="/volume/">交易量</a><a href="/rent/">租金行情</a><a href="/presale/">社區建案</a><a href="/areas/">新竹生活圈</a><a href="/construction/">重大建設</a></div>
+      <div><b>新聞與工具</b><a href="/news/">房市新聞</a><a href="/weekly/">房市週報</a><a href="/policy/">房貸政策</a><a href="/tools/">免費工具</a><a href="/viewpoint/">Simon 哥觀點</a><a href="/community/">交流平台</a></div>
+      <div><b>關於與政策</b><a href="/about-simonhc/">關於 SimonHC</a><a href="/about/">關於 Simon 哥</a><a href="/sources/">資料來源與統計方法</a><a href="/editorial/">內容編輯政策</a><a href="/privacy/">隱私權政策</a><a href="/terms/">使用條款與免責聲明</a><a href="/report/">資料錯誤回報</a></div>
+    </div>
+    <div class="ft-bottom"><span>© {new Date().getFullYear()} SimonHC 新竹房產情報站・非政府官方網站，資料僅供一般參考，不構成估價或投資建議。</span><span>網站更新：{new Date().toISOString().slice(0, 10)}</span></div>
+  </footer>
   <nav class="tabbar" aria-label="快速導覽">
     {tabs.map(([u, t, d]) => u
       ? <a class:list={{ on: isOn(u) }} href={u}><svg viewBox="0 0 24 24" aria-hidden="true"><path d={d} /></svg>{t}</a>

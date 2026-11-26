@@ -1,4 +1,7 @@
-# 竹房知識站（新竹縣市房地產知識平台）
+> 品牌：SimonHC／Simon哥｜新竹房產情報站。文件：CHANGELOG.md、ROADMAP.md、DATA_SOURCES.md、DATA_METHODOLOGY.md、SEO_CHECKLIST.md、AUTOMATION.md、BRAND_GUIDELINES.md、QA_REPORT.md、docs/AUDIT.md。
+> 測試：`npm run build && node tests/tools.test.mjs && python3 tests/consistency.py`
+
+# SimonHC 新竹房產情報站（新竹縣市房地產知識平台）
 
 只聚焦新竹市、新竹縣的房價行情與買房知識網站。Astro 靜態網站，每個行政區都有獨立網址，資料每旬自動更新。
 

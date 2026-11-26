@@ -163,6 +163,6 @@
  "form": {
   "_說明": "讀者提問表單寄信服務（FormSubmit，免費、免後端）。第一次送出後到信箱點「Activate Form」即啟用；啟用信中會提供一組隨機代碼網址，換掉下面的 endpoint 就能隱藏你的 Email。",
   "endpoint": "https://formsubmit.co/simonchao888@gmail.com",
-  "subject": "【竹房知識站】讀者提問"
+  "subject": "【SimonHC】讀者提問"
  }
 }

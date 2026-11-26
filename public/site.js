@@ -1,4 +1,4 @@
-/* 竹房知識站：選單、站內搜尋、頁面小功能（不依賴任何套件） */
+/* SimonHC 新竹房產情報站：選單、站內搜尋、頁面小功能（不依賴任何套件） */
 (function () {
   'use strict';
   var $ = function (s, r) { return (r || document).querySelector(s); };

@@ -133,7 +133,7 @@ const towers = [[700, 196, 34], [742, 168, 30], [780, 150, 36], [824, 182, 28], 
     <a href={p.href} aria-label={`${p.name}，中古屋（全部屋齡）每坪中位數 ${p.b.all ?? '—'} 萬`}>
       <path d={`M${p.x} ${p.y + 62}V${Math.min(p.y + 150, 320)}`} stroke={ink} stroke-width="1" stroke-dasharray="2 4" />
       <g class="pin">
-        <rect x={p.x - 70} y={p.y - 10} width="140" height="72" rx="4" fill="#1D3445" />
+        <rect x={p.x - 70} y={p.y - 10} width="140" height="72" rx="6" fill="#35452F" />
         <rect x={p.x - 70} y={p.y - 10} width="5" height="72" rx="2" fill={persimmon} />
         <text x={p.x} y={p.y + 12} text-anchor="middle" fill="#fff" font-size="19" font-family="LXGW WenKai TC, serif">{p.name}</text>
         <text class="pv" x={p.x} y={p.y + 35} text-anchor="middle" fill="#F6D9A8" font-size="16" font-family="Noto Sans TC, sans-serif"

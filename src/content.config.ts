@@ -10,6 +10,9 @@ const guide = defineCollection({
     tags: z.array(z.string()).default([]),
     pubDate: z.coerce.date(),
     order: z.number().default(99),
+    // Simon 哥本人審閱後改成 true，署名才會顯示「Simon 哥」
+    reviewed: z.boolean().default(false),
+    updated: z.coerce.date().optional(),
   }),
 });
 
