@@ -52,7 +52,6 @@ const catnav: (Item | null)[] = [
   ['/construction/', '重大建設', 'con'], ['/policy/', '房貸政策', 'policy'], ['/tools/', '免費工具', 'tool'], ['/viewpoint/', 'Simon 哥觀點', 'view'],
 ];
 const upd = DM.synced;
-const ASSET_V = Date.now().toString(36);
 const C = F.contact as Record<string, string>;
 const social: [string, string | undefined][] = [['Facebook', C.facebook], ['Instagram', C.instagram], ['YouTube', C.youtube], ['Threads', C.threads], ['TikTok', C.tiktok], ['LINE', C.line]];
 const orgLd = {
@@ -163,7 +162,7 @@ const crumbLd = crumbs.length ? {
       <div class="srch-ft"><span><kbd>↑</kbd><kbd>↓</kbd> 選擇</span><span><kbd>Enter</kbd> 打開</span><span><kbd>Esc</kbd> 關閉</span></div>
     </div>
   </div>
-  <script is:inline src={`/site.js?v=${ASSET_V}`} defer></script>
+  <script is:inline src="/site.js" defer></script>
   <script is:inline src="/visits.js" defer></script>
 </body>
 </html>

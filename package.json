@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/hash_assets.mjs",
     "preview": "astro preview",
     "data": "python3 scripts/build_data.py --out src/data/build.json"
   },
