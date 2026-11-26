@@ -125,9 +125,9 @@ const ld = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'SimonH
     <div class="split">
       <div>
         <div class="dgrid">
-          <span class="grp">新竹市</span>
+          <span class="dgrp">新竹市</span>
           {cityD.map((d) => <a href={districtUrl(d)}><b>{d.name}</b><span>{d.used != null ? `${d.used} 萬・${d.n} 筆` : '樣本不足'}</span></a>)}
-          <span class="grp">新竹縣</span>
+          <span class="dgrp">新竹縣</span>
           {countyD.map((d) => <a href={districtUrl(d)}><b>{d.name}</b><span>{d.used != null && (d.n ?? 0) >= 10 ? `${d.used} 萬・${d.n} 筆` : '樣本不足'}</span></a>)}
         </div>
       </div>
