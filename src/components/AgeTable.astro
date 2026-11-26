@@ -1,0 +1,26 @@
+---
+// 中古屋依屋齡分組的每坪中位數（近半年、已扣車位）
+import { AGE_LABEL, type AgeBands } from '../lib/data';
+interface Row { name: string; href?: string; ages?: AgeBands; all?: number | null; strong?: boolean }
+interface Props { rows: Row[]; note?: boolean }
+const { rows, note = true } = Astro.props;
+const shown = rows.filter((r) => r.ages && AGE_LABEL.some(([k]) => r.ages![k].med != null));
+---
+{shown.length > 0 && <>
+<div class="tw age-t"><table>
+  <tr><th>區域</th><th class="n">全部屋齡</th>{AGE_LABEL.map(([, l]) => <th class="n">{l}</th>)}</tr>
+  {shown.map((r) => (
+    <tr class:list={{ strong: r.strong }}>
+      <td>{r.href ? <a href={r.href}>{r.name}</a> : r.name}</td>
+      <td class="n">{r.all != null ? r.all.toFixed(1) : '—'}</td>
+      {AGE_LABEL.map(([k]) => { const b = r.ages![k]; return <td class="n">{b.med != null ? <b>{b.med.toFixed(1)}</b> : '—'}<small>{b.n} 筆</small></td>; })}
+    </tr>
+  ))}
+</table></div>
+{note && <p class="note">單位：萬元/坪，近半年中古屋（成屋）成交，已扣車位。屋齡 = 成交日 − 建築完成日；「10 年內」含未滿 1 年的新成屋。單一屋齡區間少於 5 筆不顯示中位數。</p>}
+</>}
+<style>
+  .age-t td small{display:block;font-size:12px;color:var(--sub);font-weight:400}
+  .age-t th,.age-t td{white-space:nowrap}
+  .age-t tr.strong td{background:var(--paper2)}
+</style>

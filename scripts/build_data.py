@@ -295,6 +295,18 @@ def deal_detail(row, d, up, parks):
     }
 
 
+AGE_BANDS = [("0-10", 0, 10), ("11-20", 11, 20), ("21-30", 21, 30), ("31+", 31, 999)]
+
+
+def age_band(row, d):
+    """屋齡（交易日 − 建築完成日，取整數年）所屬區間；無建築完成日回傳 None"""
+    b = roc_date(col(row, "建築完成"))
+    if not b or b > d:
+        return "0-10" if b else None
+    y = (d - b).days // 365
+    return next(k for k, lo, hi in AGE_BANDS if lo <= y <= hi or (k == "0-10" and y < 0))
+
+
 def quarter(d):
     return f"{d.year}Q{(d.month - 1) // 3 + 1}"
 
@@ -348,11 +360,14 @@ def main():
 
     pm = defaultdict(lambda: {"city": [0.0, 0], "county": [0.0, 0]})   # 月 → 縣市 → [總價萬元, 戶數]
     bulk = 0
+    ages = []   # 中古屋（成屋）依屋齡分組：(region, dist, date, 單價, 屋齡區間)
     years = defaultdict(lambda: defaultdict(lambda: [0, 0]))   # (region, dist) → year → [成屋買賣建物棟數, 預售簽約戶數]
     for kind, region, dn, d, row, prk in raw:
         up = unit_price(row, dn if kind == "a" else None)
         if up:
             deals[kind].append((region, dn, d, up))
+            if kind == "a":
+                ages.append((region, dn, d, up, age_band(row, d)))
         if d.year >= 2023:
             if kind == "a":
                 m = re.search(r"建物(\d+)", col(row, "交易筆棟數"))
@@ -388,6 +403,14 @@ def main():
     def med(vals):
         return round(statistics.median(vals), 1) if vals else None
 
+    def age_stats(xs):
+        """各屋齡區間的每坪中位數；少於 5 筆不給中位數"""
+        o = {}
+        for k, _, _ in AGE_BANDS:
+            v = [x[3] for x in xs if x[4] == k]
+            o[k] = {"n": len(v), "med": med(v) if len(v) >= 5 else None}
+        return o
+
     out = {"meta": {"synced": date.today().isoformat(), "latestDeal": latest.isoformat(),
                     "note": "由 build_data.py 依內政部實價登錄原始資料計算（新竹市 O、新竹縣 J）。"},
            "regions": {}, "districts": {}}
@@ -401,7 +424,8 @@ def main():
                 byq[quarter(d)].append(p)
         cur_q = quarter(latest)
         trend = [[q, len(v), med(v)] for q, v in sorted(byq.items()) if q != cur_q and len(v) >= 5][-8:]
-        out["regions"][region] = {"used": med(used), "usedN": len(used),
+        out["regions"][region] = {"ages": age_stats([x for x in ages if x[0] == region and x[2] >= since]),
+                                  "used": med(used), "usedN": len(used),
                                   "presale": med(pre), "presaleN": len(pre), "trend": trend}
 
     for name, did in DISTRICT_ID.items():
@@ -409,6 +433,7 @@ def main():
         pre = [p for _, dn, d, p in deals["b"] if dn == name and d >= since]
         n = len(used)
         out["districts"][did] = {
+            "ages": age_stats([x for x in ages if x[1] == name and x[2] >= since]),
             "used": med(used) if n >= 5 else None, "n": n,
             "presale": med(pre) if len(pre) >= 5 else None, "pn": len(pre),
             "tier": "main" if n >= 20 else "ref" if n >= 5 else "low",

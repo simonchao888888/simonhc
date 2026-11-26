@@ -20,6 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from build_data import load_zip_bytes, recent_seasons, recent_batches  # noqa: E402
+from city_district import city_district  # noqa: E402
 
 PING = 3.30579
 SEED = Path(__file__).parent.parent / "src/data/seed.json"
@@ -109,7 +110,7 @@ def main():
         return groups.setdefault(key, {"perPing": [], "apt": [], "rooms": {"1": [], "2": [], "3": [], "4+": []},
                                        "suite": [], "house": []})
 
-    latest, seen, recs = "", set(), []
+    latest, earliest, seen, recs = "", "9999", set(), []
     for (s, p), text in sorted(files.items()):
         region = "city" if p == "o" else "county"
         for r in rows_from_csv(text):
@@ -123,6 +124,8 @@ def main():
             d = roc(r.get("租賃年月日"))
             if d and d > latest:
                 latest = d
+            if d and d < earliest:
+                earliest = d
             rent = num(r.get("總額元")) - num(r.get("車位總額元"))
             area = num(r.get("建物總面積平方公尺")) / PING
             if not (2000 <= rent <= 300000):
@@ -148,7 +151,8 @@ def main():
             continue
         if True:  # noqa: 保持區塊縮排
             targets = [] if r.get("鄉鎮市區") in skewed_names else [g(region)]
-            did = name2id.get(r.get("鄉鎮市區")) if region == "county" else None
+            # 新竹市原始資料不分區，用門牌地址判斷東區／北區／香山區
+            did = name2id.get(r.get("鄉鎮市區") if region == "county" else city_district(r.get("土地位置建物門牌")))
             if did:
                 targets.append(g(did))
             for t in targets:
@@ -176,6 +180,7 @@ def main():
         "meta": {
             "seasons": sorted({s for s, _ in files}),
             "latest": latest,
+            "earliest": earliest,
             "note": "由 build_rent.py 依內政部實價登錄租賃資料計算；只含住宅，排除特殊關係租約，皆為中位數。",
         },
         "regions": {k: summary(groups[k]) for k in ("city", "county") if k in groups},

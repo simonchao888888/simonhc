@@ -8,11 +8,13 @@ const rows = yieldRows();
 const zb = rentDistrict('zhubei')!;
 const roomsLabel: Record<string, string> = { '1': '1 房', '2': '2 房', '3': '3 房', '4+': '4 房以上' };
 const skewed = Object.entries((await import('../data/rent.json')).districts).filter(([, v]: any) => v.skewed).map(([id]) => id);
-const period = `${seasonLabel(rentMeta.seasons[0])}～${seasonLabel(rentMeta.seasons[rentMeta.seasons.length - 1])}`;
+// 用租約日期表示期間（季別清單最後一項是「本期」CUR，不能轉成季度文字）
+const ymd = (s?: string) => (s ? `${+s.slice(0, 4)} 年 ${+s.slice(5, 7)} 月 ${+s.slice(8, 10)} 日` : '');
+const period = rentMeta.earliest ? `${ymd(rentMeta.earliest)}～${ymd(rentMeta.latest)}簽約的租約` : `${seasonLabel(rentMeta.seasons[0])}起`;
 ---
 <Base title="新竹租金行情" description={`新竹縣市住宅租金中位數：新竹市整戶出租月租 ${wan(c.apt)}、每坪 ${c.perPing} 元；新竹縣 ${wan(k.apt)}、每坪 ${k.perPing} 元。依房數、套房、各鄉鎮整理，附毛租金報酬率。`} active="rent" crumbs={[['查房價', '/region/'], ['租金行情']]}>
   <div class="pagehead"><Icon name="key" size={56} /><h1>新竹租金行情</h1></div>
-  <p class="lead">用內政部實價登錄的租賃資料，整理新竹縣市住宅的月租中位數。資料期間 {period}，最新租約 {rentMeta.latest}。</p>
+  <p class="lead">用內政部實價登錄的租賃資料，整理新竹縣市住宅的月租中位數。資料期間為 {period}，約近一年。</p>
 
   <div class="grid g4">
     <div class="card"><div class="note">新竹市整戶出租月租</div><div class="stat">{wan(c.apt)}</div><div class="note">每坪 {c.perPing} 元／{c.aptN} 筆</div></div>
@@ -39,7 +41,7 @@ const period = `${seasonLabel(rentMeta.seasons[0])}～${seasonLabel(rentMeta.sea
       <tr><td><a href={x.href}>{x.name}</a>{x.tier === 'ref' && <span class="note">（樣本少）</span>}</td><td class="n">{x.n}</td><td class="n">{x.perPing ?? '—'}</td><td class="n">{wan(x.three)}</td><td class="n">{x.used ?? '—'}</td><td class="n">{x.y == null ? '—' : x.y.toFixed(1) + '%'}</td></tr>
     ))}
   </table></div>
-  <p class="note">新竹市的實價登錄沒有分東區、北區、香山區，所以只能看全市。{skewed.length > 0 && '關西鎮的租約多為少數企業整批包租，每坪租金明顯偏高，不列入比較。'}樣本少於 20 筆的鄉鎮請只當參考。</p>
+  <p class="note">新竹市的實價登錄原始資料不分區，本站依門牌地址判斷東區、北區、香山區。{skewed.length > 0 && '關西鎮的租約多為少數企業整批包租，每坪租金明顯偏高，不列入比較。'}樣本少於 20 筆的鄉鎮請只當參考。</p>
 
   <h2>怎麼用這些數字</h2>
   <div class="grid g3">

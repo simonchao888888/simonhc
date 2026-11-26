@@ -12,6 +12,7 @@
    "CUR"
   ],
   "latest": "2026-10-10",
+  "earliest": "2025-11-11",
   "note": "由 build_rent.py 依內政部實價登錄租賃資料計算；只含住宅，排除特殊關係租約，皆為中位數。"
  },
  "regions": {
@@ -321,6 +322,90 @@
    "suite": null,
    "houseN": 2,
    "house": null,
+   "skewed": false
+  },
+  "east": {
+   "aptN": 348,
+   "apt": 24000,
+   "perPing": 668,
+   "rooms": {
+    "1": {
+     "n": 7,
+     "rent": 19900
+    },
+    "2": {
+     "n": 65,
+     "rent": 22000
+    },
+    "3": {
+     "n": 222,
+     "rent": 23000
+    },
+    "4+": {
+     "n": 54,
+     "rent": 40500
+    }
+   },
+   "suiteN": 449,
+   "suite": 9500,
+   "houseN": 21,
+   "house": 27000,
+   "skewed": false
+  },
+  "north": {
+   "aptN": 205,
+   "apt": 18200,
+   "perPing": 550,
+   "rooms": {
+    "1": {
+     "n": 4,
+     "rent": null
+    },
+    "2": {
+     "n": 58,
+     "rent": 16800
+    },
+    "3": {
+     "n": 123,
+     "rent": 18200
+    },
+    "4+": {
+     "n": 20,
+     "rent": 24000
+    }
+   },
+   "suiteN": 209,
+   "suite": 10000,
+   "houseN": 16,
+   "house": 24500,
+   "skewed": false
+  },
+  "xiangshan": {
+   "aptN": 48,
+   "apt": 16800,
+   "perPing": 529,
+   "rooms": {
+    "1": {
+     "n": 1,
+     "rent": null
+    },
+    "2": {
+     "n": 10,
+     "rent": 15000
+    },
+    "3": {
+     "n": 36,
+     "rent": 18000
+    },
+    "4+": {
+     "n": 1,
+     "rent": null
+    }
+   },
+   "suiteN": 50,
+   "suite": 7000,
+   "houseN": 17,
+   "house": 27000,
    "skewed": false
   },
   "emei": {

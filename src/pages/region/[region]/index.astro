@@ -2,6 +2,7 @@
 import Base from '../../../layouts/Base.astro';
 import DistrictTable from '../../../components/DistrictTable.astro';
 import Faq from '../../../components/Faq.astro';
+import AgeTable from '../../../components/AgeTable.astro';
 import { regions, districts, districtUrl, pct, fmt, type RegionKey } from '../../../lib/data';
 import { trendSvg, DISCLAIMER, faqItems, faqLd } from '../../../components/Parts';
 
@@ -36,6 +37,8 @@ const desc = `${R.name}近半年中古屋每坪中位數 ${R.used} 萬、預售�
     </div>
     <h2>主要排行與參考區</h2>
     <DistrictTable rows={ranked} />
+    <h2 id="age">依屋齡分：中古屋每坪中位數</h2>
+    <AgeTable rows={[{ name: R.name, ages: R.ages, all: R.used, strong: true }, ...[...ranked].sort((a, b) => b.n! - a.n!).map((d) => ({ name: d.name, href: districtUrl(d), ages: d.ages, all: d.used }))]} />
   </>}
 
   {key === 'city' && ranked.length === 0 && <>

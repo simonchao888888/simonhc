@@ -2,7 +2,7 @@
 import Base from '../../../layouts/Base.astro';
 import Faq from '../../../components/Faq.astro';
 import TileMap from '../../../components/TileMap.astro';
-import { regions, districts, districtUrl, regionUrl, pct, fmt, type District } from '../../../lib/data';
+import { regions, districts, districtUrl, regionUrl, pct, fmt, AGE_LABEL, type District } from '../../../lib/data';
 import { DISCLAIMER, faqItems, faqLd } from '../../../components/Parts';
 import { featuredByDist, allByDist, f1 } from '../../../lib/presale';
 import { rentDistrict, usable, grossYield, wan } from '../../../lib/rent';
@@ -47,6 +47,18 @@ const rentOk = usable(rs);
   ) : (
     <div class="card"><b>近半年樣本：{d.n ?? 0} 筆</b><p class="note">樣本不足 5 筆，中位數沒有代表性，本站不顯示。建議直接查詢內政部實價登錄的單筆成交，並比對同路段、同屋齡物件。</p></div>
   )}
+
+  {d.ages && AGE_LABEL.some(([k]) => d.ages![k].med != null) && <>
+    <h2>{d.name}中古屋依屋齡分</h2>
+    <div class="grid g4">
+      {AGE_LABEL.map(([k, l]) => { const b = d.ages![k], rb = R.ages?.[k]; return (
+        <div class="card"><div class="note">屋齡 {l}</div>
+          <div class="stat sm">{b.med != null ? b.med.toFixed(1) : '—'}<small>{b.med != null ? ' 萬/坪' : ''}</small></div>
+          <div class="note">{b.n} 筆{b.med == null && b.n > 0 ? '・樣本少不計' : ''}{rb?.med != null && `・${R.name} ${rb.med} 萬`}</div></div>
+      ); })}
+    </div>
+    <p class="note">近半年成交、已扣車位；屋齡 = 成交日 − 建築完成日，「10 年內」含未滿 1 年的新成屋。各區比較見<a href="/region/#age">依屋齡分的房價表</a>。</p>
+  </>}
 
   {rentOk && <>
     <h2>{d.name}租金行情</h2>

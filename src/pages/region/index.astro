@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import DistrictTable from '../../components/DistrictTable.astro';
 import TileMap from '../../components/TileMap.astro';
+import AgeTable from '../../components/AgeTable.astro';
 import { regions, districts, districtUrl, regionUrl, fmt } from '../../lib/data';
 import { DISCLAIMER } from '../../components/Parts';
 const c = regions.city, k = regions.county;
@@ -16,6 +17,14 @@ const cityDs = districts.filter((d) => d.r === 'city');
     <a class="card" href={regionUrl('county')}><b>新竹縣</b><div class="stat">{k.used}<small> 萬/坪・中古（{k.usedN} 筆）</small></div><div>預售 {k.presale} 萬/坪（{k.presaleN} 筆）</div><div class="note">竹北・湖口・竹東・新豐等 13 鄉鎮市</div></a>
   </div>
   <p class="note">想知道各區每年成交多少棟、和官方移轉棟數差多少，請看<a href="/volume/">交易量</a>。</p>
+  <h2 id="age">依屋齡分：中古屋每坪中位數</h2>
+  <p>「中古屋」涵蓋各種屋齡，新古屋和 30 年老公寓價格差很多，所以再依屋齡拆成四段比較。</p>
+  <AgeTable rows={[
+    { name: '新竹市', href: regionUrl('city'), ages: c.ages, all: c.used, strong: true },
+    ...districts.filter((d) => d.r === 'city').map((d) => ({ name: '　' + d.name, href: districtUrl(d), ages: d.ages, all: d.used })),
+    { name: '新竹縣', href: regionUrl('county'), ages: k.ages, all: k.used, strong: true },
+    ...districts.filter((d) => d.r === 'county').sort((a, b) => (b.n ?? 0) - (a.n ?? 0)).map((d) => ({ name: '　' + d.name, href: districtUrl(d), ages: d.ages, all: d.used })),
+  ]} />
   <h2>各區位置與價格</h2>
   <TileMap />
   <h2>新竹縣各鄉鎮市（近半年中古屋）</h2>

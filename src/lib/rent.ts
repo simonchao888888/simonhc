@@ -7,7 +7,7 @@ export interface RentStat {
   rooms: Record<'1' | '2' | '3' | '4+', { n: number; rent: number | null }>;
   suiteN: number; suite: number | null; houseN: number; house: number | null; skewed?: boolean;
 }
-export const rentMeta: { seasons: string[]; latest: string; note: string } = R.meta;
+export const rentMeta: { seasons: string[]; latest: string; earliest?: string; note: string } = R.meta;
 export const rentRegion = (k: RegionKey) => (R.regions as Record<string, RentStat>)[k];
 export const rentDistrict = (id: string): RentStat | undefined => (R.districts as Record<string, RentStat>)[id];
 export const usable = (s?: RentStat) => !!s && !s.skewed && s.aptN >= 5 && s.perPing != null;
@@ -22,7 +22,7 @@ export const yieldRows = () => {
     const s = rentRegion(k);
     rows.push({ name: regions[k].name + '（全區）', href: `/region/${regions[k].slug}/`, n: s.aptN, perPing: s.perPing, three: s.rooms['3'].rent, used: regions[k].used, y: grossYield(s.perPing, regions[k].used), tier: 'main' });
   }
-  districts.filter((d: District) => d.r === 'county').forEach((d) => {
+  districts.filter((d: District) => d.r === 'city').concat(districts.filter((d: District) => d.r === 'county')).forEach((d) => {
     const s = rentDistrict(d.id);
     if (!usable(s)) return;
     rows.push({ name: d.name, href: `/region/${regions[d.r].slug}/${d.id}/`, n: s!.aptN, perPing: s!.perPing, three: s!.rooms['3'].rent, used: d.used ?? null, y: grossYield(s!.perPing, d.used), tier: s!.aptN >= 20 ? 'main' : 'ref' });

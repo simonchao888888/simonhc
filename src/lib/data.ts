@@ -3,14 +3,17 @@ import seed from '../data/seed.json';
 import build from '../data/build.json';
 
 export type RegionKey = 'city' | 'county';
+export type AgeBands = Record<'0-10' | '11-20' | '21-30' | '31+', { n: number; med: number | null }>;
+export const AGE_LABEL: [keyof AgeBands, string][] = [['0-10', '10 年內'], ['11-20', '11～20 年'], ['21-30', '21～30 年'], ['31+', '30 年以上']];
 export interface Region {
+  ages?: AgeBands;
   name: string; slug: string; used: number; usedN: number; presale: number; presaleN: number;
   trend: [string, number, number][]; trendNote: string;
 }
 export interface District {
   id: string; r: RegionKey; name: string; tier: string; intro: string; points: string[];
   used?: number; n?: number; presale?: number; pn?: number; avg5m?: number; yoy?: number;
-  bld2025?: number; land2025?: number; share?: number;
+  bld2025?: number; land2025?: number; share?: number; ages?: AgeBands;
 }
 
 const D: any = structuredClone(seed);
