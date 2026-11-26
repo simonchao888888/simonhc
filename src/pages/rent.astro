@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
+import RentTrend from '../components/RentTrend.astro';
 import { regions } from '../lib/data';
 import { rentRegion, rentMeta, yieldRows, wan, seasonLabel, rentDistrict } from '../lib/rent';
 const c = rentRegion('city'), k = rentRegion('county');
@@ -32,6 +33,8 @@ const period = rentMeta.earliest ? `${ymd(rentMeta.earliest)}～${ymd(rentMeta.l
     ))}
   </table></div>
   <p class="note">透天厝整棟出租月租中位數：新竹市 {wan(c.house)}（{c.houseN} 筆）、新竹縣 {wan(k.house)}（{k.houseN} 筆）。</p>
+
+  <RentTrend />
 
   <h2>各區租金與毛租金報酬率</h2>
   <p>毛租金報酬率 = 每坪月租 × 12 ÷ 每坪中古屋單價。這是還沒扣管理費、稅、空租期和修繕的數字，實際淨報酬會更低。</p>

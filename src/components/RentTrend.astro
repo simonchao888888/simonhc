@@ -1,0 +1,97 @@
+---
+// 租金逐年變化長條圖：依房數、依屋齡；新竹市／新竹縣切換
+import T from '../data/rent_trend.json';
+import { AGE_LABEL } from '../lib/data';
+const years = T.meta.years.map(String);
+const lastY = years[years.length - 1];
+const latest = T.meta.latest;
+const yLabel = (y: string) => (y === lastY ? `${y}（至 ${+latest.slice(5, 7)}/${+latest.slice(8, 10)}）` : y);
+const COLORS = ['#A9C4DC', '#5B8DBA', '#1D3445', '#E07A2F'];
+const wan = (v: number) => `${(v / 10000).toFixed(2)}萬`;
+type Cell = { n: number; rent: number | null; pp?: number | null };
+const R = T.regions as Record<'city' | 'county', Record<string, { all: Cell; rooms: Record<string, Cell>; ages: Record<string, Cell> }>>;
+const ROOMS: [string, string][] = [['1', '1 房'], ['2', '2 房'], ['3', '3 房'], ['4+', '4 房以上']];
+const AGES: [string, string][] = AGE_LABEL.map(([k, l]) => [k, l]);
+
+function chart(region: 'city' | 'county', dim: 'rooms' | 'ages') {
+  const cats = dim === 'rooms' ? ROOMS : AGES;
+  const vals = cats.flatMap(([k]) => years.map((y) => R[region][y][dim][k].rent ?? 0));
+  const max = Math.max(...vals, 1);
+  const step = [5000, 10000, 20000].find((s) => max / s <= 5) ?? 50000;
+  let ymax = Math.ceil(max / step) * step;
+  if (max / ymax > 0.88) ymax += step;   // 最高的長條上方留空間放數字
+  const W = 900, H = 300, left = 52, top = 26, bottom = 36;
+  const slot = (W - left - 10) / cats.length;
+  const bw = Math.min(54, (slot - 24) / years.length);
+  const y = (v: number) => top + (H - top - bottom) * (1 - v / ymax);
+  const ticks = Array.from({ length: ymax / step + 1 }, (_, i) => i * step);
+  const groups = cats.map(([k, label], i) => {
+    const cx = left + slot * i + slot / 2;
+    const x0 = cx - (bw * years.length + 4 * (years.length - 1)) / 2;
+    return { label, cx, bars: years.map((yy, j) => ({ yy, x: x0 + j * (bw + 4), c: R[region][yy][dim][k], color: COLORS[j] })) };
+  });
+  return { W, H, left, bottom, ticks, y, bw, groups };
+}
+const pct = (a?: number | null, b?: number | null) => (a && b ? `${b >= a ? '+' : ''}${(((b - a) / a) * 100).toFixed(0)}%` : '—');
+const sets = (['city', 'county'] as const).map((r) => ({ r, name: r === 'city' ? '新竹市' : '新竹縣', rooms: chart(r, 'rooms'), ages: chart(r, 'ages') }));
+---
+<section id="trend" class="rtr">
+  <h2>2024 年起每年租金變化</h2>
+  <p>整戶出租的大樓、華廈、公寓，依租約日期歸年，看月租中位數怎麼變。{lastY} 年只算到 {latest}，之後還會補上新簽的租約。</p>
+  <div class="rtr-bar">
+    <div class="filter" id="rtf" role="group" aria-label="切換縣市">
+      <button class="on" data-r="city" aria-pressed="true">新竹市</button><button data-r="county" aria-pressed="false">新竹縣</button>
+    </div>
+    <div class="rtr-key">{years.map((y, j) => <span><i style={`background:${COLORS[j]}`}></i>{yLabel(y)}</span>)}</div>
+  </div>
+  {sets.map((s) => (
+    <div class="rtr-set" data-r={s.r} hidden={s.r !== 'city'}>
+      {([['rooms', '依房數'], ['ages', '依屋齡']] as const).map(([dim, title]) => { const c = s[dim]; return <>
+        <h3>{s.name}・{title}（月租中位數）</h3>
+        <div class="rtr-wrap"><svg viewBox={`0 0 ${c.W} ${c.H}`} role="img" aria-label={`${s.name}${title}每年月租中位數長條圖`}>
+          {c.ticks.map((t) => <g class="gy"><line x1={c.left} x2={c.W} y1={c.y(t)} y2={c.y(t)} /><text x={c.left - 6} y={c.y(t) + 4}>{t === 0 ? '0' : `${t / 10000}萬`}</text></g>)}
+          {c.groups.map((g) => <g>
+            {g.bars.map((b) => b.c.rent != null ? (
+              <g class="b" tabindex="0"><title>{`${s.name} ${g.label} ${b.yy}：月租中位數 ${b.c.rent.toLocaleString()} 元（${b.c.n} 筆）`}</title>
+                <rect x={b.x} y={c.y(b.c.rent)} width={c.bw} height={c.y(0) - c.y(b.c.rent)} rx="2" fill={b.color} opacity={b.yy === lastY ? 0.9 : 1} />
+                <text class="vl" x={b.x + c.bw / 2} y={c.y(b.c.rent) - 5}>{wan(b.c.rent)}</text></g>
+            ) : <text class="na" x={b.x + c.bw / 2} y={c.y(0) - 6}>樣本少</text>)}
+            <text class="xl" x={g.cx} y={c.H - c.bottom + 18}>{g.label}</text>
+          </g>)}
+        </svg></div>
+      </>; })}
+      <details class="rtr-t"><summary>看數字表（含筆數、每坪月租、年變化）</summary>
+        <div class="tw"><table>
+          <tr><th>{s.name}</th>{years.map((y) => <th class="n">{yLabel(y)}</th>)}<th class="n">{years[1]} vs {years[0]}</th>{years[2] && <th class="n">{years[2]} vs {years[1]}</th>}</tr>
+          {[['全部', (yy: string) => R[s.r][yy].all], ...ROOMS.map(([k, l]) => [l, (yy: string) => R[s.r][yy].rooms[k]]), ...AGES.map(([k, l]) => [`屋齡 ${l}`, (yy: string) => R[s.r][yy].ages[k]])].map(([l, f]: any) => (
+            <tr><td>{l}</td>{years.map((yy) => { const c: Cell = f(yy); return <td class="n">{c.rent != null ? `${c.rent.toLocaleString()} 元` : '—'}<small>{c.n} 筆{c.pp ? `・每坪 ${c.pp} 元` : ''}</small></td>; })}
+              <td class="n">{pct(f(years[0]).rent, f(years[1]).rent)}</td>{years[2] && <td class="n">{pct(f(years[1]).rent, f(years[2]).rent)}</td>}</tr>
+          ))}
+        </table></div>
+      </details>
+    </div>
+  ))}
+  <p class="note">月租已扣車位租金，依租約日期歸年；屋齡 = 簽約日 − 建築完成日。單格少於 5 筆標「樣本少」；1 房整戶出租本來就少（每年 6～17 筆），變化僅供參考。新竹縣排除{T.meta.skewedExcluded.join('、')}（多為企業整批包租，租金偏高）。不同年份成交的房子組成不同（例如某年新大樓出租多），中位數變化不完全等於同一間房子漲跌。</p>
+</section>
+<script>
+  const rb = document.querySelectorAll<HTMLButtonElement>('#rtf button');
+  rb.forEach((b) => b.addEventListener('click', () => {
+    rb.forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); });
+    document.querySelectorAll<HTMLElement>('.rtr-set').forEach((s) => { s.hidden = s.dataset.r !== b.dataset.r; });
+  }));
+</script>
+<style>
+  .rtr-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
+  .rtr-key{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--sub)}
+  .rtr-key i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  .rtr-wrap{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:8px 6px 2px}
+  .rtr-wrap svg{display:block;width:100%;height:auto;min-width:620px}
+  .rtr h3{margin:18px 0 8px;font-size:16px}
+  .gy line{stroke:var(--line)} .gy text{font-size:12px;fill:var(--sub);text-anchor:end}
+  .vl{font-size:12.5px;fill:var(--ink);text-anchor:middle;font-variant-numeric:tabular-nums}
+  .na{font-size:11px;fill:var(--sub);text-anchor:middle}
+  .xl{font-size:14px;fill:var(--ink);text-anchor:middle}
+  .b:hover rect,.b:focus rect{filter:brightness(.88)} .b:focus{outline:none}
+  .rtr-t{margin:10px 0 4px} .rtr-t summary{cursor:pointer;color:var(--acc);font-size:14px}
+  .rtr-t td small{display:block;font-size:12px;color:var(--sub)} .rtr-t th,.rtr-t td{white-space:nowrap}
+</style>

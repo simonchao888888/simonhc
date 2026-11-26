@@ -19,10 +19,12 @@ jobs:
         run: python3 scripts/build_data.py --out src/data/build.json
       - name: 計算新竹縣市租金行情
         run: python3 scripts/build_rent.py --out src/data/rent.json
+      - name: 計算 2024 年起每年租金變化
+        run: python3 scripts/build_rent_trend.py --out src/data/rent_trend.json
       - name: 有變動才提交
         run: |
           git config user.name "data-bot"
           git config user.email "data-bot@users.noreply.github.com"
-          git add src/data/build.json src/data/presale_deals.json src/data/rent.json
+          git add src/data/build.json src/data/presale_deals.json src/data/rent.json src/data/rent_trend.json
           git diff --cached --quiet || git commit -m "data: 更新實價登錄 $(date +%F)"
           git push
