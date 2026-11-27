@@ -1,19 +1,23 @@
 {
- "updated": "2026-11-27 20:23",
+ "updated": "2026-11-28 05:58",
  "rules": "新竹相關優先；全國只收央行、房貸、青安、稅制等影響新竹買方的政策；排除海外與只談其他縣市的報導；同一事件合併",
  "items": [
   {
    "title": "房貸資金仍緊俏 一銀估明年房市逐步止跌回穩",
-   "link": "https://news.google.com/rss/articles/CBMiTEFVX3lxTE5IdTU3QmJGdXM0d19JSk9OcU9EaGpRNnQwa2tZdm15dXU4ME5SSnJGOGgtTTU4SHliYmdKOXc4VkpGSl9ETTF3aWw3MEs?oc=5",
-   "source": "聚財網",
+   "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE5IRVRQY3pLRzZmcnZKanBicWRrM2N0aHRsTGR1eDhxQklzUjc3X0h4YVJ2a1pHUnVYdnVFNkpRT3hKX1lpUkI5RGFlMFIyblZKZC1NbWtRVjM?oc=5",
+   "source": "自由時報",
    "date": "2026-11-27",
-   "time": "20:11",
+   "time": "23:31",
    "topic": "房貸利率",
    "scope": "national",
    "also": [
     {
      "source": "鉅亨網",
-     "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE9YdlZ6Mnh4czBtUF9xYmtKczdGNjJobVFsSHprUmwtQkg2YkxodGNiWUZiNlV3T3Y1WG1hYUxmZ3B2N0huY0ttWFN5bGJRZ1k?oc=5"
+     "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTFBMV01acmlKd3hpajJvU21BQVFxU3oyMzJCNW9KaTRrblpWX0o5T1FXSTJYNE4tNXlNOWNrV3BQbExlRzctMGpsZjZhWVI1LVE?oc=5"
+    },
+    {
+     "source": "TradingView",
+     "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFBMVzJFVFBaNjhBczZaX3JkRmd3NmhnNjZyWnQ5c01sWk5ZaUY4U0t3SkZTQUZxSkhyTmZnUzdkTXRkaGVkNTFrLTZISXBMV0dFOEJ5MGdyT3E3YmgyN2ZZV3lGUk0?oc=5"
     },
     {
      "source": "Yahoo股市",
@@ -30,20 +34,37 @@
    "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE5xSXdsU0w4bUgzclV6eEEtQjFnVlA4R2s1a1NTUVhuS3FOTjMtM2hkbWFINWJ6ZE1JdmdUZEdudUtkS3BvcWtITXVGaVBpcm5Obmc?oc=5",
    "source": "蕃新聞",
    "date": "2026-11-27",
-   "time": "18:08",
+   "time": "17:04",
    "topic": "房貸利率",
    "scope": "national",
    "also": []
   },
   {
-   "title": "多元住房方案迎新春！新竹老爺酒店「羊享團圓」專案開跑 官網限定早鳥專案現折600元",
-   "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE5Ua1EyRUN2bzllZTB3NEl0dXlFbkxra3dEOEl5VUVIbnVqRzZIVEZMY0NQVjlZS2otSlBtZ21KcGV5bnVrdFc0UThiRV9RQ1lCN1Vleg?oc=5",
-   "source": "住展雜誌",
+   "title": "小宅成主流 永慶房屋：2房單價普遍高於3房 新竹總價5年飆600萬",
+   "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE9YbVBNYWdORFQ0cnN0TUtzV0x6UGZoMDd2TUNkMWtaT2FDN0dRaTI4b3FMcHExWWljU0o2aURrSzcwVW9RaEEtdEsxbmpsMGZ6bFE?oc=5",
+   "source": "蕃新聞",
    "date": "2026-11-27",
-   "time": "12:07",
+   "time": "16:01",
    "topic": "新竹房市",
    "scope": "hsinchu",
-   "also": []
+   "also": [
+    {
+     "source": "民視財經網",
+     "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9XWFZJU3VERHEtR18zRUFSeFBNOGpncmVzN0RGcXhiaWg3SHNwMS05cUcxTVJRb0F6QUJJNl8yb1RwTGJDMWNGUzdIbTBUZ3dhWmNPX2ZTS29rb1hyOE03UktyNV8yZw?oc=5"
+    },
+    {
+     "source": "Yahoo新聞",
+     "link": "https://news.google.com/rss/articles/CBMi_wJBVV95cUxOTFgySFB3eFdwaVplMjE5bXFnbWR3RnRhTzBfcGtveTRBQ1Rra0I5RmhPazFxYmZseXVvbjhydDRNaV8zQk84NEZhZndWYUhqVDJUUF9fc2p0Z0Z0aDZqeVZOeHFsTnlGMDdTdlBRdTdFNUhJT2p1aUxpRUI5TmJHMzREenFsT3JSUjNWVnZPMV9yMEphUXhxaDlXak0xMENFWTlYMEk5WEl6WjJMZDBzNFN3M19hZmN0YXpMdjkwQkdWZTk2VFNibUwxeWZISE1DQkJ6ajdfSFBSeHMxUWxZR2wwQUN3YmtoRElEb1BBNlBBUTZZRzkzcmltSy1SdlBGRk5Nd01DUW9zdWZ0RW9pM2xFWGdodjFiblJOLTNSN3dIWkMxNmw0Qm8xS2hXemtlOHZ0bXc3Yk4xNEE1Q1RYZDFwak1sSWZtRDlabFJGVWlUNXZ0Um5waEVBME1iZ0RpVWJfVlQ4c2doYzk3Q0dhZ3VXNWljZ1NVS0ZYUDNocw?oc=5"
+    },
+    {
+     "source": "鉅亨網",
+     "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTFB1andOMnItbm1McTBvdlB1OUduYW9yRzJNVlliSlhUWXVtOXJpbUhvLW9pYXdVM0puazM3eVVMQ0VDc0xnR3M2STZSUXAxNG8?oc=5"
+    },
+    {
+     "source": "中時新聞網",
+     "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE94Y09KX3JoVWxoTUs2VFI1SldCR3ZVYzRPUkc1VlRycE1vRngtTVZOb3VWZnFjUVBCZEswZXhKRU5DbW5vT0hRMnBmaDVoOEEtdVlDQXRiZWxrcENvYVgzMmJqc1RPdmUySzRqWUJR?oc=5"
+    }
+   ]
   },
   {
    "title": "小宅需求真的是剛需？還是囤房稅分戶造成的？",
@@ -53,6 +74,36 @@
    "time": "11:54",
    "topic": "稅制與法規",
    "scope": "national",
+   "also": []
+  },
+  {
+   "title": "1圖搞懂新舊差異！新青安2.0更名青安3.0　排富、排老、婚育加碼8月開跑",
+   "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE1ZeXloZ0QwNnBmbWN6Vnc1UE0xS19kVU5lekx2Qk9OSXA3alEzMlBncDVpcHlKSUd5OWk4bUZIb19hR1R6RFJuRNIBTEFVX3lxTE5wcnBrZUxhQmM2Qzgxdmh3UVpTeFhsUm03Q25WUUdaR0ZOTmtMS0cwOHBVRXZ6NlJoUExkdWhFSTZ0ampLb2lwUGc4MDU?oc=5",
+   "source": "三立新聞",
+   "date": "2026-11-27",
+   "time": "11:45",
+   "topic": "青安貸款",
+   "scope": "national",
+   "also": []
+  },
+  {
+   "title": "討論牆 | 第六波選擇性信用管制出爐 央行打炒房「這招」引關注",
+   "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTE9VOFVrbndBY0FKRmpZSVBnS2diMDdIN2xBcjhtNXd6dUpkVUVqRDZyME1nUFY5d1hjQWdsQUN4OFcyNWRERFp5ZjF4b2MwRTRjRkJ4U0VHVWdqYWZlZDRQMHo2UlE3TXRmOGRBaEdwNmdZN0N6VmVpXw?oc=5",
+   "source": "LINE TODAY",
+   "date": "2026-11-27",
+   "time": "03:58",
+   "topic": "央行",
+   "scope": "national",
+   "also": []
+  },
+  {
+   "title": "全台鳥籠化加劇！不到25坪住宅10年爆增42萬戶　桃園、新竹縣最誇張",
+   "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE45UkNMTGF3UHV5dHNYT0JQOWREbjBPY29tblhUc1MweVR6TnY4SUZoRXJ1Y3RqZzlGVUlrVk04OVU3UGtSUDc1WNIBTEFVX3lxTFBNRG9mdFpVR0VPR0FKQnNWaGszYXpienlBTEV3TGdnS3plSGxncERJT2VZa29VY1FMOFBaS29rX0xFclgzTzdtYUJqcmY?oc=5",
+   "source": "三立新聞",
+   "date": "2026-11-27",
+   "time": "00:17",
+   "topic": "新竹房市",
+   "scope": "hsinchu",
    "also": []
   },
   {
@@ -76,6 +127,21 @@
    "also": []
   },
   {
+   "title": "專題／買房族拼死趕十月底撥款 後續申貸如何自保？ 專家剖析三大原則",
+   "link": "https://news.google.com/rss/articles/CBMihARBVV95cUxNLXJ6RDZTRWJqb0otaHF3Mk5XdmVWNG13YUtTNTIyUmJGTXB6Vzk3OEFra1ViQ0RSVURvNm9YV2tFOFN5d2tXOF9xa2dzeU5TaF9RSDJDeFVsYmdCQzFIT1NfUGNiN2U2QVBabXd2d3A3b0E4dG1YZHpsZ2h4N09UTXYyN1ItVHBnWEN4S1ozZlhFa2RLVTNLMDhvU3NWSU9kZ3AyOTIzbE51YS1IMkR0bVRDLU1DLU5odGZKNTFHVHduVk1vR3VZcV9yTVNSSUg2MzM0TTJjM2d4TUI0aHMtdm8wUlNvaXEweWNMZlZXSS1TeXFBQnpwOHBSWWl1RFR2aW1zcWNERFZsRHNuT09KeUJZTGxLQUUzTWY3QlpVS3h6MkVqbzkzWlg4WjV4SU5xbzNqUnhubnNhVWhPYU1GbGZZN2R5QmgxOUE2cGtza2xZcVU4VjJzdUltYmVMUWdydkJXTGJhWXRTMXhvZkVsVVdPRGp5NTlyQXRZekdEcDdjWHNRNHd6VUVfWDM4WlFkSXM3X0ZQT1VPMEhsaFlDcG1MMUhqaGY4aWRtVnM0bjhuVnp2eXo0ZDFVc1hDTnhSdXBBVUFHUXFkMi1YZms1YXphYkdtSUVxVzZjNGRqZmhnNU5NRWdNVkp6cm5senJYX1ROSi1kUjdZOW9iNlVHd3hPTjU?oc=5",
+   "source": "台灣好新聞",
+   "date": "2026-11-26",
+   "time": "17:50",
+   "topic": "房貸利率",
+   "scope": "national",
+   "also": [
+    {
+     "source": "好房網News",
+     "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5tV3RrMUtKZThKVkZZWGEyNUg2TTAxOFdKTG0wNkI0SkJDN1FxamFYMDFxZGVJOG9qR3NQSHVOSk1VcDZ3WTZjcUhsd2FYb2NIcnl3V01NZ3o3d3dGQ25yakRWTVhoVnJIeFJYY0pwM3TSAXBBVV95cUxObVd0azFLSmU4SlZGWVhhMjVINk0wMThXSkxtMDZCNEpCQzdRcWphWDAxcWRlSThvakdzUEh1TkpNVXA2d1k2Y3FIbHdhWG9jSHJ5d1dNTWd6N3d3RkNucmpEVk1YaFZySHhSWGNKcDN0?oc=5"
+    }
+   ]
+  },
+  {
    "title": "資金面變化如何牽動房價？銀行資金轉向 購屋成本仍承壓",
    "link": "https://news.google.com/rss/articles/CBMiuwNBVV95cUxQVTEtTkYxeVotc3NCZkY3a3Y2NVhPT2x5cWhTVE1kSDQ0OHkyd2g1TlJqY2E3cG9rLTRqNHZQUmdhSVQ4NFlGM0I1VmZHMXV4MXBST3pqdWQ2T1paVHRoTlJqRUtNd2VYc1dUb1NtNk9YZXFTTHpZX1RCcmxTbmM3dldaMmstdU9RU3Rka2FGYlprdXlVbWdVa3cyN3VCY0ZGZE1JbG9fWjc5c0dLTndPdEZzbTctWDBFWk9saUE1NGR1N2VwUzFocnZ0aWtLVUxJYUVXRWdtRGY4LVQyektsdl83VWkyS2VWODh0cVRDYU9RZTNpYnYxSTBGa2VqZERObm9zOUZLR3JCT0ZnYWZSQllQN2RuTkltQkU3VWNyUGxfaS1tNHdEekloZXQzN1d1V3R2Q291aXVBRmRMUmUyVFllQXRFQ2JNVmZfaWgwRFpuelRFeV9fUE1iOWJNZnFJREMyUmtvLTRndjgwa1pWWW1YOGVXMmFJT3NYRjlLOGZFbzF2T1dPWnk0UmhEb2FkTDhFUmNCck1CczVScHBYS1c0ekNsTU5ZaUk0R2FKc1NRS0k2RnlwVkM1Yw?oc=5",
    "source": "台灣好新聞",
@@ -91,6 +157,26 @@
    ]
   },
   {
+   "title": "央行鬆綁房市2件事　專家指將有2變化：建商鬆口氣、民眾買房少備250萬",
+   "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE5yTWRRR01lWV9ITjJDQldvNHlvUHJ1T3IxTjI4Q0lQN04zbWJXeUdxZW5ON1VOZ0FTRWRwSEY1UkdqVVhnZTlIY9IBTEFVX3lxTFBTZHZVUUd5amZSLUs2Vi1VSDE0QWhHVUxCZEk1Rk9ULXZ2TmtuTm05OTRCQThGZ2E1eWFQZmxxMGFPdHRXNWN0SUNWZlI?oc=5",
+   "source": "三立新聞",
+   "date": "2026-11-26",
+   "time": "17:38",
+   "topic": "央行",
+   "scope": "national",
+   "also": []
+  },
+  {
+   "title": "租屋族想買房卻只剩嘆息！小宅房價飆漲超大宅　新竹5年暴漲7成6最扯",
+   "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE93eUlPUVppR0tNV19WbmF0Y3Fld1FtYndTc0NNajVKN0hlQm12N096WjFkRW5nTFJlYUVIaGt5TzlXQ01Rcnh4M9IBTEFVX3lxTFBBRERXODA0RWJYUTVyakhBVVlJUm0zcTNoOWExeG8wT0xFYlpjdmpOaWp0bmNrV19feFdRSC0ybVlzU3pkT0lOZXlQMjI?oc=5",
+   "source": "三立新聞",
+   "date": "2026-11-26",
+   "time": "17:10",
+   "topic": "新竹房市",
+   "scope": "hsinchu",
+   "also": []
+  },
+  {
    "title": "新竹房市回溫了？建商保留好戶別3大熱區曝光",
    "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE92UVRwMWNBTnpIeWJ2ZVFubDNSN05yeXl2OFpFam5PaDJvNTVhNXRYYUoyS2lJZU5Lbk9teU9GMldROExic3pBcGxReWFGUDQzbXVBVVgzUkp1bWZ2N3dz?oc=5",
    "source": "中時新聞網",
@@ -101,13 +187,13 @@
    "also": []
   },
   {
-   "title": "新竹慈雲空橋11／27竣工 串聯Costco商圈、改善通學安全",
-   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9TVEVqek1vZjZKOVNxRTFFbUhLLVdsNmhscU1qMlRHc0x4SlZfM09TRFJLTnh4TUhJbHpndUlmTGJoMGRpTXVidWc0ZkpZNVJpcXJ5a0V3WXRrNW11RmwtYnpYYllZaDZ0MDd5aXpR?oc=5",
-   "source": "中時新聞網",
+   "title": "討論牆 | 青安貸款3.0方案 育兒家庭 六年利息省33萬",
+   "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE1wT3V2Z1p4LXNxZnlwWThsemRjdVJCYUVuNGVULThid2NNSHlkcjJYTGtUU05iSncxYVNheTdDaTZMSVF6RFFyazNBY25PSDJaNWtuZ1dKaS1JemJJaGhIU2QtazM?oc=5",
+   "source": "LINE TODAY",
    "date": "2026-11-26",
-   "time": "14:18",
-   "topic": "新竹房市",
-   "scope": "hsinchu",
+   "time": "14:44",
+   "topic": "青安貸款",
+   "scope": "national",
    "also": []
   },
   {
@@ -127,26 +213,6 @@
    "date": "2026-11-26",
    "time": "12:39",
    "topic": "青安貸款",
-   "scope": "national",
-   "also": []
-  },
-  {
-   "title": "買房越來越難！新竹大樓五年暴漲逾600萬 2房總價竟超車新北",
-   "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxObVYzNkRiM2NEUF8zLV9waGxzbzdjQUlvYUtOZXFoWkkxWnRyT2h6aGFldE03d2FXVEZkbnpXLTBXNVlFaHRpUnlpX2NCRG5ld1I0UzNCYkV2UW44bm1oa3FaeXgwUTJ0ZUhHb1VHU0tBWHBYQlJscFNEZWZaZ2tLWE9acw?oc=5",
-   "source": "壹蘋新聞網",
-   "date": "2026-11-26",
-   "time": "10:30",
-   "topic": "新竹房市",
-   "scope": "hsinchu",
-   "also": []
-  },
-  {
-   "title": "房市沒崩、股市先炸了！他質疑楊金龍限貸政策　留言掀兩派論戰",
-   "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTFA0Tk0xa1hhLTlRMjlwRmtGckxRXzBCbDNiT2oxa2NEdHpkN3A1MkRKaG94MXpFUGZzaWVfUDFNMndBYmlfeVRkZS1UY0Uwc1Ata1NoRG5iTTh0N3pSMXUyUmNaTnQ4dFZKUnJYR2FlNmbSAXBBVV95cUxQNE5NMWtYYS05UTI5cEZrRnJMUV8wQmwzYk9qMWtjRHR6ZDdwNTJESmhveDF6RVBmc2llX1AxTTJ3QWJpX3lUZGUtVGNFMHNQLWtTaERuYk04dDd6UjF1MlJjWk50OHRWSlJyWEdhZTZm?oc=5",
-   "source": "好房網News",
-   "date": "2026-11-26",
-   "time": "09:42",
-   "topic": "央行",
    "scope": "national",
    "also": []
   },
@@ -210,29 +276,6 @@
    "also": []
   },
   {
-   "title": "小宅成主流 永慶房屋：2房單價普遍高於3房 新竹總價5年飆600萬",
-   "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE9YbVBNYWdORFQ0cnN0TUtzV0x6UGZoMDd2TUNkMWtaT2FDN0dRaTI4b3FMcHExWWljU0o2aURrSzcwVW9RaEEtdEsxbmpsMGZ6bFE?oc=5",
-   "source": "蕃新聞",
-   "date": "2026-11-25",
-   "time": "18:09",
-   "topic": "新竹房市",
-   "scope": "hsinchu",
-   "also": [
-    {
-     "source": "Yahoo新聞",
-     "link": "https://news.google.com/rss/articles/CBMi_wJBVV95cUxOTFgySFB3eFdwaVplMjE5bXFnbWR3RnRhTzBfcGtveTRBQ1Rra0I5RmhPazFxYmZseXVvbjhydDRNaV8zQk84NEZhZndWYUhqVDJUUF9fc2p0Z0Z0aDZqeVZOeHFsTnlGMDdTdlBRdTdFNUhJT2p1aUxpRUI5TmJHMzREenFsT3JSUjNWVnZPMV9yMEphUXhxaDlXak0xMENFWTlYMEk5WEl6WjJMZDBzNFN3M19hZmN0YXpMdjkwQkdWZTk2VFNibUwxeWZISE1DQkJ6ajdfSFBSeHMxUWxZR2wwQUN3YmtoRElEb1BBNlBBUTZZRzkzcmltSy1SdlBGRk5Nd01DUW9zdWZ0RW9pM2xFWGdodjFiblJOLTNSN3dIWkMxNmw0Qm8xS2hXemtlOHZ0bXc3Yk4xNEE1Q1RYZDFwak1sSWZtRDlabFJGVWlUNXZ0Um5waEVBME1iZ0RpVWJfVlQ4c2doYzk3Q0dhZ3VXNWljZ1NVS0ZYUDNocw?oc=5"
-    },
-    {
-     "source": "鉅亨網",
-     "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTFB1andOMnItbm1McTBvdlB1OUduYW9yRzJNVlliSlhUWXVtOXJpbUhvLW9pYXdVM0puazM3eVVMQ0VDc0xnR3M2STZSUXAxNG8?oc=5"
-    },
-    {
-     "source": "中時新聞網",
-     "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE94Y09KX3JoVWxoTUs2VFI1SldCR3ZVYzRPUkc1VlRycE1vRngtTVZOb3VWZnFjUVBCZEswZXhKRU5DbW5vT0hRMnBmaDVoOEEtdVlDQXRiZWxrcENvYVgzMmJqc1RPdmUySzRqWUJR?oc=5"
-    }
-   ]
-  },
-  {
    "title": "上萬字預售屋合約看不完？官方推「AI審約神器」揪出違規條款",
    "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBhX0dhb1ZZcFQ1NG1RcnVyMUJqOHhXX3NBMTBQMms1U24xQVB4eXFNcEREUDlJMXljVjhDSjk3SW1XQnpUOC04WUg1TEJEWlpD?oc=5",
    "source": "自由時報",
@@ -254,6 +297,10 @@
     {
      "source": "Yahoo新聞",
      "link": "https://news.google.com/rss/articles/CBMi8wJBVV95cUxOVHRDbnpqYVdtZmRweU8tbU95Q3hLblN1Yk0tOE4yR3NuVFdNTjlaWnZXQ2VGalc3OTAxVTNRQ3ZZcG4tNEtOaU1GeUFDTWNOdWNtaHB5d1ppWWFxWGNOWWxfV094TmRwa1hzU3JZanRCN0lMWjYyc1U3VTJQcTNUdGIxSDFLSUZ0cTRDbnlHZnhHZzhURHFaa19Od1RhQnJ4dy1BTTNval9FVklWUnNLQ2EwUlVsTV9udTg2TFJTZ3M2U2pvVzd6MVZodWM2TTRFSEI0SFh6dWRpak1DVVJHTTl4NFFMS1dOOTlRQTdtblJGdHBPanRWdEhZVTBFcnIyV0k5ZlJtZzBFUGI4UmZKZlpmNlg0aC1tWGc0czFJdEhXaWNjWVJyUU5uTlB4aGJ3cjB3MXdpak43MzVHSENIb2RnT0hmcl9mTlpncTVyQnBfX2FfS0RRSXdpcV96RjZNVzJnVEtGRU8yeENCVDJudTZSWQ?oc=5"
+    },
+    {
+     "source": "鏡週刊Mirror Media",
+     "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTFBaTnRPS0tIWWlwTkFDVlVrSUZNS3Z3MzlkeENtZnJ0cnZXLXhvdE1Tcmp2Q2tFZFdTUE0tbmJILUhQdTBxM1FaU2Y4aHp2b2JJbkVmNDU5elFGNlcz?oc=5"
     }
    ]
   },
@@ -275,16 +322,6 @@
    "time": "16:12",
    "topic": "新竹房市",
    "scope": "hsinchu",
-   "also": []
-  },
-  {
-   "title": "專題／買房族拼死趕十月底撥款　後續申貸如何自保？　專家剖析三大原則",
-   "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5tV3RrMUtKZThKVkZZWGEyNUg2TTAxOFdKTG0wNkI0SkJDN1FxamFYMDFxZGVJOG9qR3NQSHVOSk1VcDZ3WTZjcUhsd2FYb2NIcnl3V01NZ3o3d3dGQ25yakRWTVhoVnJIeFJYY0pwM3TSAXBBVV95cUxObVd0azFLSmU4SlZGWVhhMjVINk0wMThXSkxtMDZCNEpCQzdRcWphWDAxcWRlSThvakdzUEh1TkpNVXA2d1k2Y3FIbHdhWG9jSHJ5d1dNTWd6N3d3RkNucmpEVk1YaFZySHhSWGNKcDN0?oc=5",
-   "source": "好房網News",
-   "date": "2026-11-25",
-   "time": "15:13",
-   "topic": "房貸利率",
-   "scope": "national",
    "also": []
   },
   {
@@ -328,32 +365,12 @@
    "also": []
   },
   {
-   "title": "現在買新竹中古屋別追高！專家揭「2024高點沒人買單」 曝3大熱區真實成交價",
-   "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5GdHhnTGFqZXBJNFpMUjlOR0lzcWVtU25qRHNFMG5GcTM4V3F0aUVDaHBPZ1ZxY2dqanVDX3BwUWpKZVItbTFDME5mbEZGbHBx?oc=5",
-   "source": "自由時報",
-   "date": "2026-11-25",
-   "time": "09:50",
-   "topic": "新竹房市",
-   "scope": "hsinchu",
-   "also": []
-  },
-  {
    "title": "新青安為何要排隊3個月？帥過頭揭銀行算盤：電子業3.8%搶貸誰要做賠錢房貸",
    "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTFBaa2NxcDF6Yi1aZ1lTVHBqWWJCbVc1emlfWUVCNXFTajY3ZUdXNnJwZ1c5eURjZ2lsYXZkbU4xZ3VUUlJLdjRtVUc0bXZvMEt1LV8zblUzdUN5RlVt0gFiQVVfeXFMTWR6MmVkN3RDTjhseG1VT3IzRUJBUl9keTlTZ2xfZWNQdmlXUlhxUkZ6NHNTRFplRXh3WWlPZ21VM2oyQnpQa05fNUE5N2x4SEhxRnp4UVI2cHdwMm1obnF4NkE?oc=5",
    "source": "udn房地產",
    "date": "2026-11-25",
    "time": "09:40",
    "topic": "青安貸款",
-   "scope": "national",
-   "also": []
-  },
-  {
-   "title": "央行理監事會本週登場！升息降息？信用管制鬆綁？能買房子了？市調出爐",
-   "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE5JSWlZMkt6UjkzYUtaU2ZfQjRJaG9VSXloS1NDcC1UcmJyVlI2aHczeXRQaGlnT0xiaDJhWm1DaHhzOFRvWlpxYtIBTEFVX3lxTE5uV2JkUHlQUmo0TVVmVFl6eUZnaUgwMlZSOWFjNWFqTjU2SmlaamI2S0l5blV6RkQ2ZGlFcXlaNmdpdHRISWV6WWlpc2E?oc=5",
-   "source": "三立新聞",
-   "date": "2026-11-24",
-   "time": "22:15",
-   "topic": "央行",
    "scope": "national",
    "also": []
   },
@@ -393,26 +410,6 @@
    "also": []
   },
   {
-   "title": "關新里換屋族撐盤 信義房屋解析新竹各區房市動向",
-   "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE14WWJsa052RWwwUjAycXo2UWFpVmxXNjB5SEpWRGJrZEtlS1EzWGN1RGY1TE5mc1plVW1nUmRiT29ndTlMNm1lM2JOMjdPWjd4a3o0YV9B0gFWQVVfeXFMTXhZYmxrTnZFbDBSMDJxejZRYWlWbFc2MHlISlZEYmtkS2VLUTNYY3VEZjVMTmZzWmVVbWdSZGJPb2d1OUw2bWUzYk4yN09aN3hrejRhX0E?oc=5",
-   "source": "UDN",
-   "date": "2026-11-24",
-   "time": "16:36",
-   "topic": "新竹房市",
-   "scope": "hsinchu",
-   "also": []
-  },
-  {
-   "title": "獨家／青安3.0惹議！專家直言排富排老非痛點　高房價與公平性才是關鍵",
-   "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE51d0FOTGczaWFKYUEzeG5XUjhfSENUS1RTcnM5ZmRyV0o4Z3lfTU4zX3p2UTI1U09uY095ZFBXNEVET28zbDZoNNIBTEFVX3lxTFBEa2cwUzhPTWhmWmFWTUYwMlpseXBPVUNxUFFHUHFqZTdsMG1RYkgzZXpmc0N2bHlYSHJJMzh6S3VCNVRTSlhEVVNRZHY?oc=5",
-   "source": "三立新聞",
-   "date": "2026-11-24",
-   "time": "16:25",
-   "topic": "青安貸款",
-   "scope": "national",
-   "also": []
-  },
-  {
    "title": "討論牆 | 央行理監事會下週四登場 楊金龍：房市管制就到這裡",
    "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE9nNFUyMXFYQ09kN0ltYjdodVlUOEgxYXZlUXhHOEY0aHV5SThlOGwyRUNUX0VpOXJXUEVLNlBuN2tOdlBNeU1UWTNxbHpqYXhxR1BrQUE2dmZXQ2Rkc2ZnREJHOTg?oc=5",
    "source": "LINE TODAY",
@@ -433,22 +430,22 @@
    "also": []
   },
   {
+   "title": "2027房市看法兩極！交屋潮恐壓房價、捷運宅仍搶手 首購族陷買房兩難",
+   "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE9nckxocjFYRlU3OXQtMzV2c2VXTFhCWUcza0JWYzVYSjI1M3lsUUJQeXY0OXRsczJXdWtqSzRpdGlXcGM2OEFfalpURnMyN0REc05YQ2VtcW9COERS0gFiQVVfeXFMUDdxMTdnV3psRkRySTNrOVlqeDFCQmxPTDlOS3NhSkpFR3luMUtORkRIOEIxUTJ4YktYeGduNXZHSDVPTmF6VG1icmlPRXRVUzlqcTlfNVN2M3FjVzVmU2tiaVE?oc=5",
+   "source": "udn房地產",
+   "date": "2026-11-24",
+   "time": "12:41",
+   "topic": "房貸利率",
+   "scope": "national",
+   "also": []
+  },
+  {
    "title": "經濟成長14%，房市為何沒量？信用管制下被關小的交易水龍頭",
    "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE1Zc1J6VXpIblpKLTZiOEJXQjFoSnZaODhTVGdNN1FWOWZ5eWo0OVV3TWhwXzdhaTlMLWZhQVJyNWlEYTE5SVF2MQ?oc=5",
    "source": "PeoPo 公民新聞",
    "date": "2026-11-24",
    "time": "12:29",
    "topic": "央行",
-   "scope": "national",
-   "also": []
-  },
-  {
-   "title": "房貸難…沒塞車卻等很久",
-   "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE9iQmE5a1c1WGNXVEdjZmVmVktSOHUyLU01Um9qNHl2ZTZUTFJxMF94bkpGelBVYlhXX1Fqb0RfaDJDU3B3U3Vvb0x5UGpILTZhUTYtUnRJOTQzLXJTNHNuZnh5Z3laNWs?oc=5",
-   "source": "台灣房屋",
-   "date": "2026-11-24",
-   "time": "09:37",
-   "topic": "房貸利率",
    "scope": "national",
    "also": []
   },
@@ -464,22 +461,8 @@
     {
      "source": "UDN",
      "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5HZWdlVmNrdExLbVZFNTRfaUM1QWpoZmQ0Tl9Cc09ScEIzMnV4bFZvRnlzMU1lVE1pc2RQSDA5YTZFTmlFNjdJWWNtQkNBWS1k0gFWQVVfeXFMUGhrdnIzRmRzMnVYZUxPSkdvS3RGNE4yNk96Ty1maUJ2SmZpMWU1X0lWTE9GNjhDa3RjVFRwdHlDZDlKQTFxNnZnRERqZGlHc09NNGlOVmc?oc=5"
-    },
-    {
-     "source": "udn房地產",
-     "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNSGJGbTkzWF84YU5pbHMtT3h2Tk5Za19fUlNtUndIa3VVSDVkeG9FRURhRnJaUy1wX1Nvem1fM1FfNTU3TWJvWWlsVDF4M3hVZ285Z0lsMGstTlNzOXY0UDNBeC14UW13TTZidzZvVWxVQWsxdzY2Q2tBRG9PV0J6c0g4UQ?oc=5"
     }
    ]
-  },
-  {
-   "title": "青安3.0將上路！房貸補貼3＋3年　1圖看懂新舊制7年利率變化",
-   "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTFBfSnBCaHo4SzV0dmNBMm52d1lJZ1hnZXpWNUwycGs2UGIzTUJKc3lici1vUm1PRVlydjZYQkhPcXJacnZpWVFMcNIBTEFVX3lxTFBaSXlZN1RhWDVxTXJqRW1uYjR1NXlieUdRbnFKUEhlWXNBWDItMU95cGlRWkVvLUVVNFdMejI0Y1lpdUFzUEVDQ3ZjTjE?oc=5",
-   "source": "三立新聞",
-   "date": "2026-11-24",
-   "time": "07:26",
-   "topic": "青安貸款",
-   "scope": "national",
-   "also": []
   },
   {
    "title": "七都購屋自備款十年大漲，新竹逼近300萬元",
@@ -522,16 +505,6 @@
    "also": []
   },
   {
-   "title": "等了40年！竹市2大重劃案通過審查　最快12月啟動",
-   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE43SEQzQXlqSC1HdHVmMXRwb0xDRTJkMVZMWjl5UlN5RnhSazRvZUR4bXhTSkpEWmFvWUZOOFUxcDFkR3NjaU8wSVpscG1jeVd3elh2VGJLU1lFbFB6WkFuY2NkQTlfemJDSkgw0gFwQVVfeXFMTVI5czZ1cmVjV1J0M01jcEpXZ3RRYlZreEFmeFpvc3R3aS05T01ieElkUlB1aEk5MTBxX0FhZ0VDZ3VBWGN2Q3NDX0RrNDQ5d3hEMUZXZXRYZ3lmU3NkNVZRb0VkU05TcEVhX29aTHhRaw?oc=5",
-   "source": "好房網News",
-   "date": "2026-11-23",
-   "time": "09:29",
-   "topic": "新竹房市",
-   "scope": "hsinchu",
-   "also": []
-  },
-  {
    "title": "AI也能審核契約！新竹市用科技把關 守護預售屋交易安全",
    "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE5WaUNFUF9xWHota0JnYUJfRHd4aUI2eVN2Z0xFdVExZE1TVERhNi1NRW91R052YXBtRE0wTzRsV296amFzbUtudDFuRHZUeHZtLWJUWW1iVFV2VW94cWpUUk44WXRoQ0k4VUhlaF93?oc=5",
    "source": "元丰傳媒",
@@ -542,23 +515,14 @@
    "also": []
   },
   {
-   "title": "購屋辛苦！北市平均自備款竟破800萬 新竹市10年多掏近300萬",
-   "link": "https://news.google.com/rss/articles/CBMiSkFVX3lxTE52NnVpQVFDclNaMERJZi1SaUhrQjZrTGhwbVpwemo2anlhSDAwdmhKQmhpVXM1dWc3VXFlZnpVN3NNYW1wXzdrc3Jn?oc=5",
-   "source": "威傳媒",
+   "title": "買房晚十年多掏近300萬！新竹市頭期款暴增294.6萬 台北購屋最燒錢",
+   "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE1GY0YyaDJwNUM2Vms2NENkSE9CZkZoSkowbHBUM0IxUV9BcTI5a1NzRk9xSU8xUDVyRUJTbGZ4QUVKVHJSYzlrTkhkblJscGhZNlE?oc=5",
+   "source": "蕃新聞",
    "date": "2026-11-21",
    "time": "12:27",
    "topic": "新竹房市",
    "scope": "hsinchu",
-   "also": [
-    {
-     "source": "蕃新聞",
-     "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE1GY0YyaDJwNUM2Vms2NENkSE9CZkZoSkowbHBUM0IxUV9BcTI5a1NzRk9xSU8xUDVyRUJTbGZ4QUVKVHJSYzlrTkhkblJscGhZNlE?oc=5"
-    },
-    {
-     "source": "UDN",
-     "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE9tckw4SDRkdnBsczF2VzdETWthbWtGZzc0VVlyeGN6VDhvTjFERGZ2M2VUX3VZUzRLeEJtSFNMWTNYbVFBQXZaVUd5cW1qa29i0gFWQVVfeXFMTUpxZVo1T2ZCdDZxSjF1MVJYdlc1TTIzSEU5SGZtTkRhZnpMZEJCZExKMXNheFNvY3NTaXpCdFRoZmpnZDR1RTdFMGdPSDhRM3pqNXVjLUE?oc=5"
-    }
-   ]
+   "also": []
   },
   {
    "title": "新竹2處土地閒置40年終於解編！4.7公頃重劃案過關 地主平均負擔約44%",
@@ -568,12 +532,7 @@
    "time": "00:03",
    "topic": "新竹房市",
    "scope": "hsinchu",
-   "also": [
-    {
-     "source": "住展雜誌",
-     "link": "https://news.google.com/rss/articles/CBMiekFVX3lxTE5SWFMzMFlqSVdRcDNzQUlMMXlqT0o1alNHYzBLSm9pX0d5MFlqNzY2SU10OEZud2xhVHJWRlVUUUZLd3BnU0Q3MUdsZk5QWWY5WmM0WHZUZXRHeU84dy1aZ1MtcXFGNjVGa0lQbldvbXVmVmxQdkt0MzJR?oc=5"
-    }
-   ]
+   "also": []
   },
   {
    "title": "竹市購屋自備款近9年增294.6萬超車新北市- 生活新聞",
@@ -597,26 +556,18 @@
     {
      "source": "LINE TODAY",
      "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE1zaDgxN0pkTWR2cUhGeVB6RjV6QkZHQy0tTThuRkZrc2JRMkk1VlVHejItYjdhWFpLc3JZSnk3WlFyMU8wUTFVX1h6ZVpvSVRsaFB5MUxn?oc=5"
-    },
-    {
-     "source": "PChome Online 新聞",
-     "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQOHZsdC05cFFuWEkzQW1YNlFTMng5TVU1aUF4SkFEdWxzV2lnLVIxMlFYNFJRY0RfcVp5c2dzaUZoaEVVUTU0YlVObE5tZEdQcmpNbUZya2h6em5oRzhhdV92XzRqWENnRzdaMFlpWU1MTldMTGI3RFJvM3ZFa21HeHV3RHdIdlBfanZmNXI2S3RZdw?oc=5"
     }
    ]
   },
   {
-   "title": "晚十年買房多準備一台雙B！新竹自備款增幅冠七都",
-   "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFBPQXdld05aVGp1bHU2MlRtVEphNkpGMElzeFczY203RGRnamhRZ3pwdmExMVBpbERXX1RrbUdqUXNmb29OOWJ6cXZUT3dyOFBnWEVETHpPU0FCUdIBX0FVX3lxTE5sTTJfVVllMlBXelhWRGplZU5mQVRHeUs2UUpDNTg0ZzRnVXFDTlRzbnIzVEg4ejJQYUVHLVZBeUVpczlqRUppMTZtR1ZxQjJFRWphT01WYWt6bzhheVNR?oc=5",
-   "source": "經濟日報",
+   "title": "晚近10年買房代價驚人！　新竹自備款「多噴一台雙B豪車」",
+   "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE9HdFYwc2Z1Q0xNZ2RvUmNjYW02TlcwblhHbWlmV3lPaVJmVGd3S0N6QUpBUUtPUklZMjBMSlQxZFpVbS05T1VTVE1KY00wS0HSAU5BVV95cUxOcXlKTmVqYjlJZ3RJS3ZURWpTdWFmNm5IZTBCR2NOV2NZNnozVXZvZW9GSVZuTGUzQWkxS0xiY2E2UlVUaUs4aFNSRk5fTEE?oc=5",
+   "source": "ETtoday房產雲",
    "date": "2026-11-19",
    "time": "16:00",
    "topic": "新竹房市",
    "scope": "hsinchu",
    "also": [
-    {
-     "source": "ETtoday房產雲",
-     "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE9HdFYwc2Z1Q0xNZ2RvUmNjYW02TlcwblhHbWlmV3lPaVJmVGd3S0N6QUpBUUtPUklZMjBMSlQxZFpVbS05T1VTVE1KY00wS0HSAU5BVV95cUxOcXlKTmVqYjlJZ3RJS3ZURWpTdWFmNm5IZTBCR2NOV2NZNnozVXZvZW9GSVZuTGUzQWkxS0xiY2E2UlVUaUs4aFNSRk5fTEE?oc=5"
-    },
     {
      "source": "udn房地產",
      "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE9URHRkS3Nnb29tTGNXMHBKbW8zR01iQnQtRFNoYmg5endRU1ljcXVSUGVmSWpyTWY3TmZPc3JQUC1jd0pwbnRxZzY0R3NZemdjY3FWQzJ4WmpoUlhS?oc=5"
@@ -624,6 +575,21 @@
     {
      "source": "Yahoo股市",
      "link": "https://news.google.com/rss/articles/CBMisANBVV95cUxNSWdGbHA3NlFMNFVYSW81Z3dIdHNaYkQwcTJ3MGIxS0pmZlNUdGVOOE1BVGxSYVpoNVBXdHRoOXFPMlpoZUQ0aHNZUGpQN2YzWjlZdzNBaFhXeUUtYlJ0U1JVTk91RV96REF0dGF1NE11aEdxQlp2UElUVHJ4YUQtN0NlV3dwYzNzaTJueDRBNGljbFkxQzBFQU5yV3hMeW9jYk1fLUxRMDl1WjkyT1pONjY5QU45RTdNRzJ3bVA4SWhoVl9NVmZlUmFqSkFqT1FUVlI1VkF5eEJYbzhPSmFRdDdEQ0w1V1hxRVNLMjBWeklEek5IVi1mc1ZTTW1xb1lsZV8xNlVucC1ZVGE2S2ppQVlyT2dQc19RVFRWNm4xWWh4QWFGUlRxZXB5amhOVV92bnVFalhGU1ZvZmcxWktXU3RRYi00ZHF1MzJHZUk3eU1HbWpFaHI5ek5xc3BsR3p5YmNmU1czQWlLR0tlMHNpY3d4NjBoaFRjTzlka21JSjcycXlUem1JTmVjRmNwZ25wMlZLNXNQdHZEalRwNF9CNFFBaE51UzFKN2lJZWN1WFk?oc=5"
+    }
+   ]
+  },
+  {
+   "title": "買房自備款 台北壓力全台最高新竹人晚10年進場多掏近300萬",
+   "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE92VHZJd0x2SHVOa09KbWcybDN5QVBXWjJqakYxM2dhQmVaYTNmczZua3h4XzlxVWRwUzVlZmlaYXdtd0VJMEhhRFZPT3JlTlZWc2NYaFprNFI5QXNQeVYzaVRhaw?oc=5",
+   "source": "AN不動產新聞網",
+   "date": "2026-11-19",
+   "time": "14:55",
+   "topic": "新竹房市",
+   "scope": "hsinchu",
+   "also": [
+    {
+     "source": "UDN",
+     "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE9tckw4SDRkdnBsczF2VzdETWthbWtGZzc0VVlyeGN6VDhvTjFERGZ2M2VUX3VZUzRLeEJtSFNMWTNYbVFBQXZaVUd5cW1qa29i0gFWQVVfeXFMTUpxZVo1T2ZCdDZxSjF1MVJYdlc1TTIzSEU5SGZtTkRhZnpMZEJCZExKMXNheFNvY3NTaXpCdFRoZmpnZDR1RTdFMGdPSDhRM3pqNXVjLUE?oc=5"
     }
    ]
   }
