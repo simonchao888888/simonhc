@@ -1,5 +1,16 @@
 [
  {
+  "at": "2026-11-27 10:51",
+  "status": "ok",
+  "run": "45930755960",
+  "fetched": 288,
+  "dropped": 160,
+  "merged": 43,
+  "hsinchu": 21,
+  "national": 30,
+  "errors": 0
+ },
+ {
   "at": "2026-11-27 04:12",
   "status": "ok",
   "run": "45889263721",
