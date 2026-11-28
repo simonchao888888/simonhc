@@ -1,0 +1,38 @@
+# 新竹房產情報站 Hsinchu Real Estate Insights（simonhc.com，由 Simon 哥創立）
+
+> 專注新竹市與新竹縣的免費房地產資訊網站。依內政部實價登錄等官方公開資料計算各區中古屋（依屋齡分段）、預售屋、租金與交易量，並整理房貸政策、重大建設與新聞判讀。創辦人 Simon 哥，2010 年起投入房地產，累積超過 250 間買賣實戰經驗。非政府官方網站。
+
+資料同步日期：2026-11-26；最新中古屋成交日：2026-10-26。單價皆已扣除車位，為近半年中位數。
+
+## 主要頁面
+- [各區房價](https://simonhc.com/region/)：新竹市、新竹縣 16 個行政區中古屋與預售屋每坪中位數、依屋齡分段
+- [交易量](https://simonhc.com/volume/)：內政部建物買賣移轉棟數與各區逐年成交量
+- [租金行情](https://simonhc.com/rent/)：各區月租中位數、2024 年起逐年變化、租金報酬率
+- [社區建案](https://simonhc.com/presale/)：預售建案逐戶成交（2019 年起）
+- [重大建設](https://simonhc.com/construction/)：輕軌、新竹大車站、AI 智慧園區進度
+- [房貸政策](https://simonhc.com/policy/)：央行利率、信用管制、青安
+- [資料來源與統計方法](https://simonhc.com/sources/)
+- [內容編輯政策](https://simonhc.com/editorial/)
+
+## 行政區
+- [新竹市](https://simonhc.com/region/hsinchu-city/)：中古屋 35.7 萬/坪
+- [新竹縣](https://simonhc.com/region/hsinchu-county/)：中古屋 36.4 萬/坪
+- [竹北市](https://simonhc.com/region/hsinchu-county/zhubei/)：中古屋 54 萬/坪（320 筆）
+- [湖口鄉](https://simonhc.com/region/hsinchu-county/hukou/)：中古屋 23.1 萬/坪（115 筆）
+- [竹東鎮](https://simonhc.com/region/hsinchu-county/zhudong/)：中古屋 24.9 萬/坪（77 筆）
+- [新豐鄉](https://simonhc.com/region/hsinchu-county/xinfeng/)：中古屋 24 萬/坪（40 筆）
+- [芎林鄉](https://simonhc.com/region/hsinchu-county/qionglin/)：中古屋 24.1 萬/坪（19 筆）
+- [關西鎮](https://simonhc.com/region/hsinchu-county/guanxi/)：中古屋 23.6 萬/坪（8 筆）
+- [新埔鎮](https://simonhc.com/region/hsinchu-county/xinpu/)：中古屋 34.2 萬/坪（21 筆）
+- [北埔鄉](https://simonhc.com/region/hsinchu-county/beipu/)
+- [寶山鄉](https://simonhc.com/region/hsinchu-county/baoshan/)：中古屋 31.2 萬/坪（14 筆）
+- [橫山鄉](https://simonhc.com/region/hsinchu-county/hengshan/)
+- [峨眉鄉](https://simonhc.com/region/hsinchu-county/emei/)
+- [五峰鄉](https://simonhc.com/region/hsinchu-county/wufeng/)
+- [尖石鄉](https://simonhc.com/region/hsinchu-county/jianshi/)
+- [東區](https://simonhc.com/region/hsinchu-city/east/)：中古屋 42.7 萬/坪（263 筆）
+- [北區](https://simonhc.com/region/hsinchu-city/north/)：中古屋 33.2 萬/坪（175 筆）
+- [香山區](https://simonhc.com/region/hsinchu-city/xiangshan/)：中古屋 29.8 萬/坪（90 筆）
+
+## 引用格式
+資料來源：新竹房產情報站（simonhc.com），原始資料來源及統計期間詳見報告。
