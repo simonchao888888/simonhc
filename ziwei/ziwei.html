@@ -110,6 +110,30 @@ table.rank{width:100%;border-collapse:collapse;font-size:13px;font-variant-numer
 .god .glist .gname{font-size:20px}
 .god.sub .glist .gname{font-size:16px}
 .gnote{font-size:12px;color:var(--muted)}
+.cell.ruinT{box-shadow:inset 0 0 0 3px var(--ji)}
+.cell.ruinS{box-shadow:inset 0 0 0 2px var(--ji);outline:2px dashed var(--ji);outline-offset:-6px}
+.rb{font-size:10px;background:var(--ji);color:#fff;border-radius:2px;padding:0 4px;margin-left:4px;vertical-align:2px;font-weight:700}
+.rb.src{background:transparent;color:var(--ji);border:1px solid var(--ji)}
+.rlamp{width:12px;height:12px;border-radius:50%;background:var(--ji);box-shadow:0 0 8px var(--ji);display:inline-block;flex:0 0 auto}
+.rlamp.l2{opacity:.6;box-shadow:none}.rlamp.l1{background:var(--lamp-off);box-shadow:none}
+.verdict{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-left:4px solid var(--ji);padding:6px 12px;background:var(--bg);border-radius:0 4px 4px 0}
+.verdict b{font-family:var(--f-display);font-size:18px}
+.verdict.ok{border-color:var(--lu)}.verdict.mid{border-color:var(--accent)}
+.dacai{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.dacai .btn{display:inline-flex;align-items:center;gap:8px;background:var(--ji)}
+.dacai p{margin:0;flex:1;min-width:240px;font-size:13px;max-width:75ch}
+.money-in{display:flex;gap:10px 14px;flex-wrap:wrap;align-items:flex-end}
+.tbl{overflow-x:auto}
+table.rt{border-collapse:collapse;width:100%;min-width:820px;font-size:13px;font-variant-numeric:tabular-nums}
+.rt th,.rt td{padding:6px 8px;border-bottom:1px solid var(--hair);text-align:right;white-space:nowrap}
+.rt th{font-size:12px;color:var(--muted);font-weight:500}
+.rt th:nth-child(-n+2),.rt td:nth-child(-n+2){text-align:left}
+.rt tr.base td{color:var(--muted);background:var(--bg)}
+.rt tr.now td{background:var(--accent-soft)}
+.rt td.why{white-space:normal;text-align:left;min-width:260px;font-size:12px}
+.rbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:2px 9px 2px 5px;font-size:12px}
+.rbtn[aria-pressed="true"]{border-color:var(--ji);color:var(--ji)}
+.up{color:var(--lu)}.dn{color:var(--ji)}
 .fine{font-size:12px;color:var(--muted);margin:0}
 .btnrow{display:flex;gap:8px;flex-wrap:wrap}
 .ptag{display:inline-block;font-size:10px;font-weight:700;border-radius:2px;padding:0 3px;margin-left:4px;line-height:15px;border:1px solid var(--line);color:var(--muted)}
@@ -184,6 +208,7 @@ table.rank{width:100%;border-collapse:collapse;font-size:13px;font-variant-numer
     </aside>
   </div>
   <section class="luck" id="luck" aria-label="大運流年財運"></section>
+  <section class="luck" id="ruin" aria-label="破財指標"></section>
   <p class="fine">排盤採三合派常用安星法（十四主星、六吉、六煞、祿存、天馬），四化採通行版本；閏月前半月算本月、後半月算下月。主星對應神明為民間流傳說法，各派不一，僅供參考。財運分數以 60 分為基準，依大限／流年四化落宮、財帛宮星曜與疊宮加減分，為簡化的參考模型。</p>
 </div>
 
@@ -224,7 +249,7 @@ const hourSel=$('hour');
 HOURS.forEach((h,i)=>{const o=document.createElement('option');o.value=i;o.textContent=h;if(i===4)o.selected=true;hourSel.appendChild(o)});
 $('cal').addEventListener('change',()=>{$('leapBox').hidden=$('cal').value!=='lunar'});
 
-let chart=null, active=null, records={}, selDx=null, selYear=null;
+let chart=null, active=null, records={}, selDx=null, selYear=null, ruin=null, baseInc=100, baseSpend=60, unit=10;
 
 function sihua(){const t=JSON.parse(JSON.stringify(SIHUA_BASE));t['庚'][2]=$('geng').value;return t}
 
@@ -278,7 +303,7 @@ function build(){
   const SHENZHU=['火星','天相','天梁','天同','文昌','天機','火星','天相','天梁','天同','文昌','天機'];
   chart={pal,pos,ming,shen,ju:ju[1],ys,yb,sex,yang,lunar,birthSolar,hi,month,day,leap,
     mingzhu:MINGZHU[ming],shenzhu:SHENZHU[yb],lunarYear:lunar.getYear()};
-  active=null; records={};
+  active=null; records={}; ruin=null;
   const nowY=new Date().getFullYear(), age=nowY-chart.lunarYear+1;
   const dxList=Object.values(pal).sort((a,b)=>a.dx[0]-b.dx[0]);
   const cur=dxList.find(p=>age>=p.dx[0]&&age<=p.dx[1])||(age<dxList[0].dx[0]?dxList[0]:dxList[11]);
@@ -292,7 +317,7 @@ function flyTargets(b){
 }
 
 function fly(b){
-  active=b;
+  active=b; ruin=null;
   const tg=flyTargets(b);
   const hits=tg.filter(t=>MONEY.includes(chart.pal[t.to].name));
   records[b]=hits.map(t=>({...t,from:b}));
@@ -303,10 +328,11 @@ function render(){
   const el=$('chart'); el.innerHTML='';
   const lit={}; let tg=[];
   if(active!==null){tg=flyTargets(active);tg.forEach(t=>{(lit[t.star]=lit[t.star]||[]).push(t.hua)})}
+  if(ruin) lit[ruin.star]=[3];
   for(let b=0;b<12;b++){
     const p=chart.pal[b], [r,c]=GRID[b];
     const cell=document.createElement('div');
-    cell.className='cell'+(active===b?' src':'')+(selDx===b?' curdx':'');
+    cell.className='cell'+(active===b?' src':'')+(selDx===b?' curdx':'')+(ruin&&ruin.to===b?' ruinT':'')+(ruin&&ruin.src===b?' ruinS':'');
     cell.style.gridRow=r;cell.style.gridColumn=c;
     const money=MONEY.includes(p.name);
     const stars=p.stars.map(s=>{
@@ -317,7 +343,7 @@ function render(){
     cell.innerHTML=`<div class="stars">${stars}</div>
       <div class="dx">${p.dx[0]}–${p.dx[1]} 歲<span class="ptag d" title="大限${PALACES[m12(selDx-b)]}">限${ABBR[m12(selDx-b)]}</span><span class="ptag y" title="${selYear}流年${PALACES[m12(m12(selYear-4)-b)]}">年${ABBR[m12(m12(selYear-4)-b)]}</span></div>
       <div class="foot">
-        <div><span class="pname${money?' money':''}">${p.name}</span>${chart.shen===b?'<span class="shen">身</span>':''}<br>
+        <div><span class="pname${money?' money':''}">${p.name}</span>${chart.shen===b?'<span class="shen">身</span>':''}${ruin&&ruin.to===b?'<span class="rb">忌入・破財</span>':''}${ruin&&ruin.src===b?'<span class="rb src">'+ruin.label+'</span>':''}<br>
         <button type="button" class="fly" data-b="${b}" aria-label="從${p.name}宮干${GAN[p.stem]}飛化">
           <span class="lamps">${[0,1,2,3].map(k=>`<i class="lamp on${k}"></i>`).join('')}</span>飛化</button></div>
         <div class="gz">${GAN[p.stem]}${ZHI[b]}</div>
@@ -346,6 +372,7 @@ function render(){
   el.querySelectorAll('.fly').forEach(btn=>btn.addEventListener('click',()=>fly(+btn.dataset.b)));
   renderSide();
   renderLuck();
+  renderRuin();
 }
 
 /* ===== 大運・流年財運 ===== */
@@ -514,6 +541,88 @@ document.addEventListener('click',e=>{
   if(c.dataset.dx!==undefined){selDx=+c.dataset.dx;selYear=chart.lunarYear+chart.pal[selDx].dx[0]-1}
   if(c.dataset.yr!==undefined) selYear=+c.dataset.yr;
   render();
+});
+
+/* ===== 破財指標 ===== */
+const RUIN={
+  '遷移':[3,'命宮','錢留在外面，外面的開銷比較大（交際、出差、旅遊、外地生活），賺到的錢不容易帶回家。'],
+  '夫妻':[3,'官祿','創業不好做，投資股票容易判斷錯誤，事業上的大決策要多聽第二意見。'],
+  '子女':[3,'田宅','物慾太強、財庫守不住，合夥也不建議，避免為了子女或玩樂動用存款。'],
+  '福德':[3,'財帛','不要亂投資，除非你做的是十年起跳的長線投資；短線、投機、聽明牌最傷。'],
+  '財帛':[2,'福德','為錢操心、賺得辛苦，容易花錢買安心，現金流要抓緊。'],
+  '交友':[2,'兄弟','被朋友、客戶拖累或倒帳，人情借貸開銷大，週轉吃緊。'],
+  '田宅':[2,'子女','家中修繕、置產或家人開銷大，財庫有破洞。'],
+  '命宮':[1,'遷移','自己就是花錢的源頭，花錢憑感覺，向外發展機會較少。'],
+  '兄弟':[1,'交友','手足、同事之間有金錢往來，人情開銷要節制。'],
+  '疾厄':[1,'父母','健康或醫療支出，合約與信用也要留意。'],
+  '官祿':[1,'夫妻','工作變動影響收入，家庭開銷也被牽動。'],
+  '父母':[1,'疾厄','合約、稅務、罰款或長輩醫療支出。']};
+const LV=['','低','中','高'];
+function ruinOf(srcB,label){
+  const st=GAN[chart.pal[srcB].stem], star=sihua()[st][3], to=chart.pos[star].b, natal=chart.pal[to].name, r=RUIN[natal];
+  return {src:srcB,label,st,star,to,natal,lvl:r[0],chong:r[1],txt:r[2]};
+}
+function dxOfAge(age){const d=Object.values(chart.pal).sort((a,b)=>a.dx[0]-b.dx[0]);return d.find(p=>age>=p.dx[0]&&age<=p.dx[1])||(age<d[0].dx[0]?d[0]:d[11])}
+function yearData(y){
+  const age=y-chart.lunarYear+1, dp=dxOfAge(age), dres=analyze(dp.b,dp.stem,'大限');
+  const lb=m12(y-4), inc=analyze(lb,(y-4)%10,'流年',dres).score;
+  const nian=ruinOf(m12(lb-4),'年財'), da=ruinOf(m12(dp.b-4),'大財');
+  const yJi=chart.pos[sihua()[GAN[(y-4)%10]][3]].b;
+  let r=[0,5,10,15][nian.lvl], why=[`年財忌入${nian.natal}（${LV[nian.lvl]}）+${[0,5,10,15][nian.lvl]}`];
+  if(nian.to===da.to){r+=8;why.push('與大財忌同宮 +8')}
+  r+=da.lvl*2; why.push(`大財忌入${da.natal} +${da.lvl*2}`);
+  if(MONEY.includes(chart.pal[yJi].name)){r+=5;why.push(`流年干忌入本命${chart.pal[yJi].name} +5`)}
+  return {y,age,inc,ruin:r,nian,da,why};
+}
+const fmt=v=>`${Math.round(v).toLocaleString('zh-TW')} 萬`;
+const sgn=v=>v>0?`<span class="up">+${v}</span>`:v<0?`<span class="dn">${v}</span>`:'0';
+function renderRuin(){
+  const box=$('ruin'), nowY=new Date().getFullYear();
+  const rows=[]; for(let y=nowY-1;y<=nowY+9;y++) rows.push(yearData(y));
+  rows.forEach((r,i)=>{
+    if(!i){r.income=baseInc;r.spend=baseSpend;return}
+    const p=rows[i-1]; r.dInc=r.inc-p.inc; r.dRuin=r.ruin-p.ruin;
+    r.income=p.income+r.dInc*unit; r.spend=p.spend+r.dRuin*unit});
+  rows.forEach(r=>{r.income=Math.max(0,r.income);r.spend=Math.max(0,r.spend)});
+  const ten=rows.slice(1), hi=ten.filter(r=>r.nian.lvl===3), sel=chart.pal[selDx], da=ruinOf(m12(selDx-4),'大財');
+  const totIn=ten.reduce((a,r)=>a+r.income,0), totOut=ten.reduce((a,r)=>a+r.spend,0);
+  const curDa=ruinOf(m12(dxOfAge(nowY-chart.lunarYear+1).b-4),'大財');
+  const v=(curDa.lvl===3||hi.length>=3)?['', '近十年有明顯破財風險']:hi.length?['mid','近十年有幾個破財年要小心']:['ok','近十年破財風險偏低'];
+  box.innerHTML=`<h2>破財指標</h2>
+    <div class="verdict ${v[0]}"><b>${v[1]}</b><span>${nowY}–${nowY+9} 年共有 ${hi.length} 個高風險年${hi.length?'（'+hi.map(r=>r.y).join('、')+'）':''}；目前大財化忌入先天${curDa.natal}，風險${LV[curDa.lvl]}。十年估計共賺 ${fmt(totIn)}、花 ${fmt(totOut)}。</span></div>
+    <div class="dacai">
+      <button type="button" class="btn" data-ruin="dx" aria-pressed="${!!(ruin&&ruin.label==='大財')}"><i class="rlamp l${da.lvl}"></i>大財</button>
+      <p><strong>${GAN[sel.stem]}${ZHI[sel.b]}大限（${sel.dx[0]}–${sel.dx[1]} 歲）</strong>的大限財帛在本命${chart.pal[m12(selDx-4)].name}（${da.st}干），化忌 <strong>${da.star}</strong> 入先天<strong style="color:var(--ji)">${da.natal}</strong>，沖${da.chong}：${da.txt} <span class="fine">破財風險：${LV[da.lvl]}。按「大財」在命盤上亮紅燈；上方切換大運可看其他十年。</span></p>
+    </div>
+    <div class="money-in">
+      <div class="fld"><label for="baseInc">${nowY-1} 年收入（萬）</label><input type="number" id="baseInc" value="${baseInc}" min="0" step="1" style="width:110px"></div>
+      <div class="fld"><label for="baseSpend">${nowY-1} 年支出（萬）</label><input type="number" id="baseSpend" value="${baseSpend}" min="0" step="1" style="width:110px"></div>
+      <div class="fld"><label for="unit">1 分等於（萬）</label><input type="number" id="unit" value="${unit}" min="1" step="1" style="width:90px"></div>
+      <p class="fine" style="flex:1;min-width:220px">財運分比去年多 1 分＝多賺 ${unit} 萬；破財分比去年多 1 分＝多花 ${unit} 萬。預設金額為範例，請改成你自己的數字。</p>
+    </div>
+    <div class="tbl"><table class="rt"><thead><tr><th>年份</th><th>年財化忌入先天（按下亮燈）</th><th>財運分</th><th>較去年</th><th>賺多少</th><th>破財分</th><th>較去年</th><th>花多少</th><th>結餘</th><th>破財分依據</th></tr></thead><tbody>
+    ${rows.map((r,i)=>`<tr class="${!i?'base':r.y===nowY?'now':''}"><td>${r.y}${!i?'（基準）':''}<br><span class="fine">${GAN[(r.y-4)%10]}${ZHI[m12(r.y-4)]}・${r.age} 歲</span></td>
+      <td><button type="button" class="rbtn" data-ruin="${r.y}" aria-pressed="${!!(ruin&&ruin.y===r.y)}"><i class="rlamp l${r.nian.lvl}"></i>${r.nian.star}忌入${r.nian.natal}・沖${r.nian.chong}</button></td>
+      <td>${r.inc}</td><td>${i?sgn(r.dInc):'—'}</td><td>${fmt(r.income)}</td>
+      <td>${r.ruin}</td><td>${i?sgn(r.dRuin):'—'}</td><td>${fmt(r.spend)}</td>
+      <td class="${r.income-r.spend<0?'dn':''}">${fmt(r.income-r.spend)}</td>
+      <td class="why">${r.why.join('、')}</td></tr>`).join('')}
+    </tbody></table></div>
+    ${ruin?`<p style="margin:0;font-size:13px"><span class="rb">${ruin.label}${ruin.y?' '+ruin.y:''}</span> ${ruin.star}化忌入先天<strong style="color:var(--ji)">${ruin.natal}</strong>，沖${ruin.chong}：${ruin.txt}</p>`:''}`;
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-ruin]'); if(!b) return;
+  const k=b.dataset.ruin;
+  if(k==='dx') ruin=ruinOf(m12(selDx-4),'大財');
+  else {const y=+k; ruin={...yearData(y).nian,y}}
+  active=null; render();
+  document.getElementById('chart').scrollIntoView({behavior:'smooth',block:'start'});
+});
+document.addEventListener('change',e=>{
+  const id=e.target.id; if(!['baseInc','baseSpend','unit'].includes(id)) return;
+  const v=Math.max(id==='unit'?1:0,+e.target.value||0);
+  if(id==='baseInc')baseInc=v; else if(id==='baseSpend')baseSpend=v; else unit=v;
+  renderRuin();
 });
 
 function attribute(r){
