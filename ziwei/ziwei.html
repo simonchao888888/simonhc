@@ -137,6 +137,7 @@ table.rt{border-collapse:collapse;width:100%;min-width:820px;font-size:13px;font
 .wbar{display:inline-block;width:90px;height:8px;background:var(--hair);border-radius:4px;overflow:hidden;vertical-align:middle}
 .wbar i{display:block;height:100%}
 .wbar i.pos{background:var(--lu)}.wbar i.neg{background:var(--ji)}
+.act{font:inherit;font-size:12px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:2px 4px}
 .fine{font-size:12px;color:var(--muted);margin:0}
 .btnrow{display:flex;gap:8px;flex-wrap:wrap}
 .ptag{display:inline-block;font-size:10px;font-weight:700;border-radius:2px;padding:0 3px;margin-left:4px;line-height:15px;border:1px solid var(--line);color:var(--muted)}
@@ -252,15 +253,13 @@ const hourSel=$('hour');
 HOURS.forEach((h,i)=>{const o=document.createElement('option');o.value=i;o.textContent=h;if(i===4)o.selected=true;hourSel.appendChild(o)});
 $('cal').addEventListener('change',()=>{$('leapBox').hidden=$('cal').value!=='lunar'});
 
-let chart=null, active=null, records={}, selDx=null, selYear=null, ruin=null;
+let chart=null, active=null, records={}, selDx=null, selYear=null, ruin=null, ruinMode='ten';
 
 function sihua(){const t=JSON.parse(JSON.stringify(SIHUA_BASE));t['庚'][2]=$('geng').value;return t}
 
-function build(){
-  const [y,mo,d]=$('date').value.split('-').map(Number);
-  const hi=+hourSel.value, sex=$('sex').value;
+function computeChart({y,mo,d,cal,leapIn,hi,sex,geng}){
   let solar;
-  if($('cal').value==='lunar'){solar=Lunar.fromYmd(y,$('leap').checked?-mo:mo,d).getSolar()}
+  if(cal==='lunar'){solar=Lunar.fromYmd(y,leapIn?-mo:mo,d).getSolar()}
   else solar=Solar.fromYmd(y,mo,d);
   const birthSolar=solar;
   if(hi===12) solar=solar.next(1);
@@ -295,7 +294,7 @@ function build(){
   put('火星',fl[0]+h,'s');put('鈴星',fl[1]+h,'s');
   put('地空',11-h,'s');put('地劫',11+h,'s');
   const birthHua={};SIHUA_BASE[GAN[ys]].forEach((s,i)=>birthHua[s]=i);
-  if(GAN[ys]==='庚'){delete birthHua['太陰'];birthHua[$('geng').value]=2}
+  if(GAN[ys]==='庚'){delete birthHua['太陰'];birthHua[geng]=2}
   const yang=ys%2===0, dir=(yang===(sex==='M'))?1:-1;
   const pal={};
   for(let i=0;i<12;i++){const b=m12(ming-i);pal[b]={b,name:PALACES[i],stem:stemOf(b),stars:[]}}
@@ -304,8 +303,14 @@ function build(){
   Object.entries(pos).sort((a,b)=>order[a[1].t]-order[b[1].t]).forEach(([s,p])=>pal[p.b].stars.push({name:s,t:p.t,bh:birthHua[s]}));
   const MINGZHU=['貪狼','巨門','祿存','文曲','廉貞','武曲','破軍','武曲','廉貞','文曲','祿存','巨門'];
   const SHENZHU=['火星','天相','天梁','天同','文昌','天機','火星','天相','天梁','天同','文昌','天機'];
-  chart={pal,pos,ming,shen,ju:ju[1],ys,yb,sex,yang,lunar,birthSolar,hi,month,day,leap,
+  const chart={pal,pos,ming,shen,ju:ju[1],ys,yb,sex,yang,lunar,birthSolar,hi,month,day,leap,
     mingzhu:MINGZHU[ming],shenzhu:SHENZHU[yb],lunarYear:lunar.getYear()};
+  return chart;
+}
+function build(){
+  const [y,mo,d]=$('date').value.split('-').map(Number);
+  chart=computeChart({y,mo,d,cal:$('cal').value,leapIn:$('leap').checked,hi:+hourSel.value,sex:$('sex').value,geng:$('geng').value});
+  const pal=chart.pal;
   active=null; records={}; ruin=null;
   const nowY=new Date().getFullYear(), age=nowY-chart.lunarYear+1;
   const dxList=Object.values(pal).sort((a,b)=>a.dx[0]-b.dx[0]);
@@ -580,17 +585,22 @@ function yearData(y){
 const sgn=(v,bad)=>v>0?`<span class="${bad?'dn':'up'}">+${v}</span>`:v<0?`<span class="${bad?'up':'dn'}">${v}</span>`:'0';
 function renderRuin(){
   const box=$('ruin'), nowY=new Date().getFullYear();
-  const rows=[]; for(let y=nowY;y<=nowY+9;y++) rows.push(yearData(y));
+  const y0=ruinMode==='all'?Math.max(1950,chart.lunarYear):nowY;
+  const rows=[]; for(let y=y0;y<=nowY+9;y++) rows.push(yearData(y));
+  const actual=loadActual();
   rows.forEach((r,i)=>{
     r.net=r.inc-r.ruin;
     if(!i) return;
     const p=rows[i-1]; r.dInc=r.inc-p.inc; r.dRuin=r.ruin-p.ruin; r.dNet=r.net-p.net;
     r.rate=p.net>0?Math.round(r.dNet/p.net*1000)/10:null});
-  const moves=rows.slice(1).filter(r=>r.rate!==null);
-  const maxR=Math.max(1,...moves.map(r=>Math.abs(r.rate)));
+  const maxR=Math.max(1,...rows.filter(r=>r.rate!=null).map(r=>Math.abs(r.rate)));
+  const moves=rows.filter(r=>r.y>=nowY&&r.rate!=null);
   const avg=moves.length?Math.round(moves.reduce((a,r)=>a+Math.abs(r.rate),0)/moves.length*10)/10:0;
   const worst=moves.reduce((a,r)=>!a||r.rate<a.rate?r:a,null), best=moves.reduce((a,r)=>!a||r.rate>a.rate?r:a,null);
-  const hi=rows.filter(r=>r.nian.lvl===3), sel=chart.pal[selDx], da=ruinOf(m12(selDx-4),'大財');
+  const pred=r=>r.rate==null?null:r.rate>=3?'好':r.rate<=-3?'差':'平';
+  const marked=rows.filter(r=>r.y<=nowY&&actual[r.y]&&pred(r)), hit=marked.filter(r=>pred(r)===actual[r.y]);
+  const ten=rows.filter(r=>r.y>=nowY);
+  const hi=ten.filter(r=>r.nian.lvl===3), sel=chart.pal[selDx], da=ruinOf(m12(selDx-4),'大財');
   const curDa=ruinOf(m12(dxOfAge(nowY-chart.lunarYear+1).b-4),'大財');
   const v=(curDa.lvl===3||hi.length>=3)?['', '近十年有明顯破財風險']:hi.length?['mid','近十年有幾個破財年要小心']:['ok','近十年破財風險偏低'];
   const pc=x=>`${x>0?'+':''}${x}%`, cls=x=>x>0?'up':x<0?'dn':'';
@@ -600,15 +610,21 @@ function renderRuin(){
       <button type="button" class="btn" data-ruin="dx" aria-pressed="${!!(ruin&&ruin.label==='大財')}"><i class="rlamp l${da.lvl}"></i>大財</button>
       <p><strong>${GAN[sel.stem]}${ZHI[sel.b]}大限（${sel.dx[0]}–${sel.dx[1]} 歲）</strong>的大限財帛在本命${chart.pal[m12(selDx-4)].name}（${da.st}干），化忌 <strong>${da.star}</strong> 入先天<strong style="color:var(--ji)">${da.natal}</strong>，沖${da.chong}：${da.txt} <span class="fine">破財風險：${LV[da.lvl]}。按「大財」在命盤上亮紅燈；上方切換大運可看其他十年。</span></p>
     </div>
-    <p class="fine" style="font-size:13px">淨財分＝財運分－破財分。波動率＝（今年淨財分－去年淨財分）÷ 去年淨財分，正數代表財務比去年好，負數代表比去年差。${nowY} 年為基準年。</p>
-    <div class="tbl"><table class="rt"><thead><tr><th>年份</th><th>年財化忌入先天（按下亮燈）</th><th>財運分</th><th>較去年</th><th>破財分</th><th>較去年</th><th>淨財分</th><th>較去年</th><th style="text-align:left">波動率</th><th>破財分依據</th></tr></thead><tbody>
+    <div class="btnrow" role="group" aria-label="顯示範圍">
+      <button type="button" class="btn${ruinMode==='ten'?'':' ghost'}" data-rmode="ten" aria-pressed="${ruinMode==='ten'}">近十年（${nowY}–${nowY+9}）</button>
+      <button type="button" class="btn${ruinMode==='all'?'':' ghost'}" data-rmode="all" aria-pressed="${ruinMode==='all'}">回測（${Math.max(1950,chart.lunarYear)} 起）</button>
+    </div>
+    ${ruinMode==='all'?`<div class="verdict ${marked.length&&hit.length/marked.length>=0.6?'ok':'mid'}"><b>回測命中率 ${marked.length?Math.round(hit.length/marked.length*100)+'%':'—'}</b><span>${marked.length?`你標記了 ${marked.length} 年的實際狀況，其中 ${hit.length} 年與波動率方向相符`:'在下表「實際狀況」欄標記過去每一年比前一年好、持平或差，就會算出命中率'}。波動率 ≥ +3% 視為「好」、≤ −3% 視為「差」，其餘為「平」。標記只存在這台裝置的瀏覽器。</span></div>`:''}
+    <p class="fine" style="font-size:13px">淨財分＝財運分－破財分。波動率＝（今年淨財分－去年淨財分）÷ 去年淨財分，正數代表財務比去年好，負數代表比去年差。${rows[0].y} 年為基準年。${ruinMode==='all'&&chart.lunarYear+Object.values(chart.pal).reduce((a,p)=>Math.min(a,p.dx[0]),99)-1>rows[0].y?'起運前的童限年份暫用第一個大限計算。':''}</p>
+    <div class="tbl"><table class="rt"><thead><tr><th>年份</th><th>年財化忌入先天（按下亮燈）</th><th>財運分</th><th>較去年</th><th>破財分</th><th>較去年</th><th>淨財分</th><th>較去年</th><th style="text-align:left">波動率</th>${ruinMode==='all'?'<th>實際狀況</th>':''}<th>破財分依據</th></tr></thead><tbody>
     ${rows.map((r,i)=>{const w=r.rate!=null?Math.round(Math.abs(r.rate)/maxR*100):0;
-      return `<tr class="${!i?'now':''}"><td>${r.y}${!i?'（基準）':''}<br><span class="fine">${GAN[(r.y-4)%10]}${ZHI[m12(r.y-4)]}・${r.age} 歲</span></td>
+      return `<tr class="${r.y===nowY?'now':!i?'base':''}"><td>${r.y}${!i?'（基準）':''}<br><span class="fine">${GAN[(r.y-4)%10]}${ZHI[m12(r.y-4)]}・${r.age} 歲</span></td>
       <td><button type="button" class="rbtn" data-ruin="${r.y}" aria-pressed="${!!(ruin&&ruin.y===r.y)}"><i class="rlamp l${r.nian.lvl}"></i>${r.nian.star}忌入${r.nian.natal}・沖${r.nian.chong}</button></td>
       <td>${r.inc}</td><td>${i?sgn(r.dInc):'—'}</td>
       <td>${r.ruin}</td><td>${i?sgn(r.dRuin,true):'—'}</td>
       <td><strong>${r.net}</strong></td><td>${i?sgn(r.dNet):'—'}</td>
       <td style="text-align:left">${i&&r.rate!=null?`<span class="wbar"><i class="${r.rate<0?'neg':'pos'}" style="width:${w}%"></i></span> <span class="${cls(r.rate)}">${pc(r.rate)}</span>`:'—'}</td>
+      ${ruinMode==='all'?`<td style="text-align:left">${i&&r.y<=nowY?`<select class="act" data-act="${r.y}" aria-label="${r.y} 實際狀況"><option value="">—</option>${['好','平','差'].map(o=>`<option${actual[r.y]===o?' selected':''}>${o}</option>`).join('')}</select>${actual[r.y]&&pred(r)?(pred(r)===actual[r.y]?' <span class="up">✓</span>':' <span class="dn">✗</span>'):''}`:''}</td>`:''}
       <td class="why">${r.why.join('、')}</td></tr>`}).join('')}
     </tbody></table></div>
     ${ruin?`<p style="margin:0;font-size:13px"><span class="rb">${ruin.label}${ruin.y?' '+ruin.y:''}</span> ${ruin.star}化忌入先天<strong style="color:var(--ji)">${ruin.natal}</strong>，沖${ruin.chong}：${ruin.txt}</p>`:''}`;
@@ -661,6 +677,13 @@ $('geng').addEventListener('change',()=>{if(chart){const keep=Object.keys(record
 $('flyAll').addEventListener('click',()=>{for(let i=11;i>=0;i--) fly(m12(chart.ming-i))});
 $('clear').addEventListener('click',()=>{records={};active=null;render()});
 
+const actKey=()=>'ziwei-actual:'+chart.birthSolar.toYmd()+':'+chart.hi+':'+chart.sex;
+function loadActual(){try{return JSON.parse(localStorage.getItem(actKey())||'{}')}catch(e){return {}}}
+function saveActual(o){try{localStorage.setItem(actKey(),JSON.stringify(o))}catch(e){}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-rmode]'); if(!b) return; ruinMode=b.dataset.rmode; renderRuin();});
+document.addEventListener('change',e=>{const t=e.target.closest('[data-act]'); if(!t) return; const o=loadActual(); if(t.value) o[t.dataset.act]=t.value; else delete o[t.dataset.act]; saveActual(o); renderRuin();});
+
+window.__ziwei={computeChart};
 build();
 $('flyAll').click();
 })();
