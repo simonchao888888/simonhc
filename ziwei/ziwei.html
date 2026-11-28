@@ -112,6 +112,41 @@ table.rank{width:100%;border-collapse:collapse;font-size:13px;font-variant-numer
 .gnote{font-size:12px;color:var(--muted)}
 .fine{font-size:12px;color:var(--muted);margin:0}
 .btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.ptag{display:inline-block;font-size:10px;font-weight:700;border-radius:2px;padding:0 3px;margin-left:4px;line-height:15px;border:1px solid var(--line);color:var(--muted)}
+.ptag.d{border-color:var(--accent);color:var(--accent)}
+.ptag.y{border-color:var(--ke);color:var(--ke)}
+.cell.curdx{background:linear-gradient(to bottom,var(--accent-soft),var(--paper) 40%)}
+.luck{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.luck h2{font-family:var(--f-display);font-size:20px;margin:0;letter-spacing:.08em}
+.luck .lbl{font-size:12px;color:var(--muted);letter-spacing:.06em;margin:0 0 4px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.chip{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-start;gap:1px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:5px;padding:6px 9px;font-size:12px;text-align:left;font-variant-numeric:tabular-nums}
+.chip b{font-family:var(--f-display);font-size:14px}
+.chip .sc{font-weight:700}
+.chip[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:var(--paper)}
+.chip.now{position:relative}
+.chip.now::after{content:"今";position:absolute;top:-7px;right:-5px;font-size:10px;background:var(--accent);color:var(--paper);border-radius:2px;padding:0 3px}
+.s-hi{color:var(--lu)}.s-mid{color:var(--accent)}.s-lo{color:var(--ji)}
+.lcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:860px){.lcards{grid-template-columns:minmax(0,1fr)}}
+.lcard{border:1px solid var(--line);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.lcard header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.lcard .eyebrow{font-size:12px;color:var(--muted);letter-spacing:.06em}
+.lcard h4{margin:2px 0 0;font-family:var(--f-display);font-size:17px}
+.score{display:flex;align-items:baseline;gap:2px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.score b{font-family:var(--f-display);font-size:36px;line-height:1}
+.score span{font-size:12px;color:var(--muted)}
+.score em{font-style:normal;font-weight:700;font-size:13px;margin-left:6px}
+.bar{height:6px;background:var(--hair);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:currentColor;border-radius:3px}
+.hua4{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;font-size:13px}
+.hua4 li{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.hua4 .d{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:700}
+.lcard details{font-size:12px;color:var(--muted)}
+.lcard details ul{margin:4px 0 0;padding-left:18px}
+.lcard h5{margin:4px 0 0;font-size:14px}
+.adv{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:5px;font-size:13px;max-width:70ch}
+.adv b.ji{color:var(--ji)}.adv b.lu{color:var(--lu)}.adv b.quan{color:var(--quan)}.adv b.ke{color:var(--ke)}
 </style>
 
 <div class="wrap">
@@ -148,7 +183,8 @@ table.rank{width:100%;border-collapse:collapse;font-size:13px;font-variant-numer
       <section id="god"></section>
     </aside>
   </div>
-  <p class="fine">排盤採三合派常用安星法（十四主星、六吉、六煞、祿存、天馬），四化採通行版本；閏月前半月算本月、後半月算下月。主星對應神明為民間流傳說法，各派不一，僅供參考。</p>
+  <section class="luck" id="luck" aria-label="大運流年財運"></section>
+  <p class="fine">排盤採三合派常用安星法（十四主星、六吉、六煞、祿存、天馬），四化採通行版本；閏月前半月算本月、後半月算下月。主星對應神明為民間流傳說法，各派不一，僅供參考。財運分數以 60 分為基準，依大限／流年四化落宮、財帛宮星曜與疊宮加減分，為簡化的參考模型。</p>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.7/lunar.js"></script>
@@ -188,7 +224,7 @@ const hourSel=$('hour');
 HOURS.forEach((h,i)=>{const o=document.createElement('option');o.value=i;o.textContent=h;if(i===4)o.selected=true;hourSel.appendChild(o)});
 $('cal').addEventListener('change',()=>{$('leapBox').hidden=$('cal').value!=='lunar'});
 
-let chart=null, active=null, records={};
+let chart=null, active=null, records={}, selDx=null, selYear=null;
 
 function sihua(){const t=JSON.parse(JSON.stringify(SIHUA_BASE));t['庚'][2]=$('geng').value;return t}
 
@@ -241,8 +277,12 @@ function build(){
   const MINGZHU=['貪狼','巨門','祿存','文曲','廉貞','武曲','破軍','武曲','廉貞','文曲','祿存','巨門'];
   const SHENZHU=['火星','天相','天梁','天同','文昌','天機','火星','天相','天梁','天同','文昌','天機'];
   chart={pal,pos,ming,shen,ju:ju[1],ys,yb,sex,yang,lunar,birthSolar,hi,month,day,leap,
-    mingzhu:MINGZHU[ming],shenzhu:SHENZHU[yb]};
+    mingzhu:MINGZHU[ming],shenzhu:SHENZHU[yb],lunarYear:lunar.getYear()};
   active=null; records={};
+  const nowY=new Date().getFullYear(), age=nowY-chart.lunarYear+1;
+  const dxList=Object.values(pal).sort((a,b)=>a.dx[0]-b.dx[0]);
+  const cur=dxList.find(p=>age>=p.dx[0]&&age<=p.dx[1])||(age<dxList[0].dx[0]?dxList[0]:dxList[11]);
+  selDx=cur.b; selYear=(age>=cur.dx[0]&&age<=cur.dx[1])?nowY:chart.lunarYear+cur.dx[0]-1;
   render();
 }
 
@@ -266,7 +306,7 @@ function render(){
   for(let b=0;b<12;b++){
     const p=chart.pal[b], [r,c]=GRID[b];
     const cell=document.createElement('div');
-    cell.className='cell'+(active===b?' src':'');
+    cell.className='cell'+(active===b?' src':'')+(selDx===b?' curdx':'');
     cell.style.gridRow=r;cell.style.gridColumn=c;
     const money=MONEY.includes(p.name);
     const stars=p.stars.map(s=>{
@@ -275,7 +315,7 @@ function render(){
       const fly=L?L.map(k=>`<span class="flytag">${HUA[k]}</span>`).join(''):'';
       return `<span class="star ${s.t}${L?' lit L'+L[0]:''}">${s.name}${bh}${fly}</span>`}).join('');
     cell.innerHTML=`<div class="stars">${stars}</div>
-      <div class="dx">${p.dx[0]}–${p.dx[1]} 歲</div>
+      <div class="dx">${p.dx[0]}–${p.dx[1]} 歲<span class="ptag d" title="大限${PALACES[m12(selDx-b)]}">限${ABBR[m12(selDx-b)]}</span><span class="ptag y" title="${selYear}流年${PALACES[m12(m12(selYear-4)-b)]}">年${ABBR[m12(m12(selYear-4)-b)]}</span></div>
       <div class="foot">
         <div><span class="pname${money?' money':''}">${p.name}</span>${chart.shen===b?'<span class="shen">身</span>':''}<br>
         <button type="button" class="fly" data-b="${b}" aria-label="從${p.name}宮干${GAN[p.stem]}飛化">
@@ -305,7 +345,176 @@ function render(){
   el.appendChild(center);
   el.querySelectorAll('.fly').forEach(btn=>btn.addEventListener('click',()=>fly(+btn.dataset.b)));
   renderSide();
+  renderLuck();
 }
+
+/* ===== 大運・流年財運 ===== */
+const ABBR=['命','兄','夫','子','財','疾','遷','友','官','田','福','父'];
+const W=[
+  {財帛:16,福德:12,田宅:10,命宮:9,官祿:9,遷移:5,交友:4,夫妻:4,子女:3,兄弟:3,疾厄:3,父母:3},
+  {財帛:9,官祿:7,命宮:6,田宅:5,福德:4,_:2},
+  {財帛:5,福德:4,命宮:4,官祿:4,田宅:4,_:2},
+  {財帛:-18,福德:-14,田宅:-12,命宮:-10,官祿:-9,交友:-7,疾厄:-6,遷移:-6,兄弟:-5,夫妻:-5,子女:-4,父母:-4}];
+const wOf=(k,role)=>W[k][role]??W[k]._??0;
+const JI_ADV={
+  '命宮':'自己的判斷容易失準、情緒化花錢。大額支出或投資先冷靜三天再決定。',
+  '兄弟':'兄弟、同事、合夥人之間容易有金錢糾紛。不要作保、不借大錢，合資要白紙黑字。',
+  '夫妻':'配偶或感情方面的開銷變多，也可能因錢起爭執。家庭財務要透明，重大支出兩人共同決定。',
+  '子女':'子女開銷增加，合夥與新投資項目不利。暫緩開分店、新合夥或加碼高風險部位。',
+  '財帛':'現金流吃緊、收入不穩。避免借貸與高槓桿，先守住本金，固定支出能砍就砍。',
+  '疾厄':'健康與體力是破財主因。預留醫療預備金、檢視保單，別為了賺錢透支身體。',
+  '遷移':'在外地或出差時容易破財，外地投資、遠距置產易虧。出門注意交通與財物安全。',
+  '交友':'朋友借錢、客戶倒帳、被人拖累的機率高。應收帳款要追緊，交易先收訂金。',
+  '官祿':'工作變動或事業受阻會影響收入。不要衝動離職創業，先穩住本業收入。',
+  '田宅':'財庫有破洞：房屋修繕、家庭支出大增。不宜貸款買房或加碼房貸，注意家中漏財。',
+  '福德':'投機心重、精神壓力大，容易因心情亂花錢。遠離賭博、短線與聽明牌。',
+  '父母':'文書、合約、信用與稅務容易出問題。簽約逐條看清楚，按時繳稅繳費，留意罰單與銀行信用。'};
+const LU_ADV={
+  '命宮':'自身人緣與機會變多，適合主動爭取加薪、升遷或開拓新客戶。',
+  '兄弟':'合夥人、同事帶財，可以嘗試小規模合作；兄弟宮也是財庫的氣數位，宜增加儲蓄。',
+  '夫妻':'配偶或伴侶帶財，適合兩人共同規劃理財、一起投資。',
+  '子女':'合作投資、副業或新事業有機會，子女也可能帶來好運。可小額試水溫。',
+  '財帛':'正財旺，收入來源增加。宜積極賺取，同時把多出的錢轉進投資或存款。',
+  '疾厄':'工作環境順、身體狀況好，適合提升專業技能來換取收入。',
+  '遷移':'往外發展有財：出差、外地市場、海外業務都有機會。',
+  '交友':'人脈帶財，經營客戶與社群會有回報，業務型收入佳。',
+  '官祿':'事業帶財，升遷、加薪、擴大營業的好時機。',
+  '田宅':'財庫進帳，適合置產、存錢、繳清房貸或增加資產。',
+  '福德':'財源與享受兼得，偏財有機會，但要守分寸、見好就收。',
+  '父母':'長輩、上司或公家機關提攜，申請貸款、補助、證照都比較順利。'};
+const QUAN_ADV={
+  '財帛':'對金錢的掌控力強，適合主導財務決策、談判報價，但別過度自信而加大槓桿。',
+  '官祿':'事業上有主導權，適合承接更大的職責或專案，收入隨權責提升。',
+  '命宮':'個人行動力強，適合主動出擊開創收入，但注意別太固執。',
+  '田宅':'對資產配置有主導權，適合整理房產、調整家庭財務結構。',
+  '福德':'有主見、敢投資，適合依自己的研究進場，但要設停損。'};
+const KE_ADV={
+  '財帛':'財務有貴人或好口碑，適合找專業理財顧問，收入穩定、不易大起大落。',
+  '官祿':'名聲帶來工作機會，適合考證照、經營個人品牌。',
+  '田宅':'家宅平順，適合做穩健的長期配置，如定期定額。',
+  '福德':'心態平穩，理財講求穩健，適合保本型商品。',
+  '命宮':'形象加分、貴人相助，遇到財務難題容易有人幫忙。'};
+const STAR_TIP={
+  '紫微':'適合靠管理職、領導位置拿高薪，不宜親自做小買賣。',
+  '天機':'動腦企劃、資訊顧問類收入佳，財來財去，宜做好預算。',
+  '太陽':'名聲與公眾型收入為主，賺得到也花得多，注意面子消費。',
+  '武曲':'正財星坐財，適合實業、金融，按部就班累積。',
+  '天同':'財來得輕鬆但缺衝勁，宜穩定薪資加定期定額。',
+  '廉貞':'靠人脈與交際取財，注意應酬與桃花開銷。',
+  '天府':'財庫穩，適合理財守成、資產配置。',
+  '太陰':'宜儲蓄與不動產，細水長流。',
+  '貪狼':'收入多元、偏財機會多，記得設停損，避免貪多。',
+  '巨門':'靠口才、專業賺錢，注意口舌是非影響收入。',
+  '天相':'靠信用與服務得財，適合穩定受薪或顧問。',
+  '天梁':'專業蔭財，醫療、保險、顧問類有利，不宜投機。',
+  '七殺':'收入起伏大，敢衝能賺，但要預留安全存款。',
+  '破軍':'大進大出、先花後賺，控制開銷以防破耗。'};
+const SHA_TIP={
+  '地空':'財帛逢地空：財來財去、想法不切實際。避免投機與高風險商品，用定存或保單鎖住部分資金。',
+  '地劫':'財帛逢地劫：容易突然破財。避免借貸給人與高槓桿，緊急預備金要足。',
+  '擎羊':'財帛逢擎羊：在競爭中取財，注意合約糾紛與衝動消費。',
+  '陀羅':'財帛逢陀羅：收入進帳拖延，應收帳款要追緊，不要壓太多資金在庫存。',
+  '火星':'財帛逢火星：財運暴起暴落，獲利要分批落袋。',
+  '鈴星':'財帛逢鈴星：容易有暗中的損失，定期對帳、檢查自動扣款。',
+  '祿存':'財帛有祿存：守得住錢，適合儲蓄型理財，宜提高存款比例。'};
+const CHONG_ADV={
+  '財帛':'收入來源被干擾，花錢容易失控，避免衝動購物與投機。',
+  '福德':'容易為錢煩心、睡不好。理財要量力而為，別讓投資影響生活品質。',
+  '田宅':'財庫被沖，容易因合夥、子女或投資動用存款，要緊守儲蓄。',
+  '官祿':'事業受家庭或感情牽動，工作收入可能不穩，保持本業專注。',
+  '命宮':'外在環境變動大，個人財務容易被外力影響，保守為上。'};
+const PAD=['每月記帳，檢查固定支出有沒有悄悄變多。','檢視保險與醫療預備金，避免意外支出打亂計畫。','有合夥或投資時，事先以書面約定權利義務與退出機制。','把收入的固定比例自動轉入投資或儲蓄帳戶。','重大財務決定避開化忌所入宮位相關的事項。'];
+const grade=s=>s>=85?'大旺':s>=70?'旺':s>=55?'平穩':s>=40?'偏弱':'低迷';
+const scls=s=>s>=70?'s-hi':s>=50?'s-mid':'s-lo';
+
+function analyze(mingB,stemIdx,label,ctx){
+  const roleAt=b=>PALACES[m12(mingB-b)], bOf=r=>m12(mingB-PALACES.indexOf(r));
+  let score=60; const factors=[], A=[];
+  const hua=sihua()[GAN[stemIdx]].map((star,k)=>{
+    const t=chart.pos[star].b, role=roleAt(t), natal=chart.pal[t].name;
+    let d=wOf(k,role);
+    if(MONEY.includes(natal)&&(k===0||k===3)) d+=k===0?4:-4;
+    score+=d; factors.push([`化${HUA[k]} ${star} 入${label}${role}（本命${natal}）`,d]);
+    const bs=chart.pal[t].stars.find(s=>s.name===star);
+    if(k===3&&bs&&bs.bh===0){score-=4;factors.push([`化忌沖到生年化祿的${star}（祿忌相沖）`,-4]);
+      A.push({p:95,t:`<b class="ji">祿忌相沖</b>：${label}化忌打到本命生年化祿的${star}，原本的財源容易中斷，別把錢集中在單一收入或單一投資。`})}
+    return {k,star,t,role,natal,d}});
+  const cb=bOf('財帛'), cbP=chart.pal[cb];
+  cbP.stars.forEach(s=>{let d=0;
+    if(s.name==='祿存')d=6; else if(['武曲','天府','太陰'].includes(s.name))d=3;
+    else if(['地空','地劫'].includes(s.name))d=-5; else if(['擎羊','陀羅','火星','鈴星'].includes(s.name))d=-3;
+    if(s.bh===0)d+=4; if(s.bh===3)d-=4;
+    if(d){score+=d;factors.push([`${label}財帛（${ZHI[cb]}宮）有${s.name}${s.bh!==undefined?'（生年化'+HUA[s.bh]+'）':''}`,d])}
+    if(SHA_TIP[s.name]) A.push({p:s.name==='祿存'?55:80,t:SHA_TIP[s.name]});});
+  chart.pal[bOf('福德')].stars.forEach(s=>{if(['地空','地劫'].includes(s.name)){score-=2;factors.push([`${label}福德有${s.name}`,-2])}});
+  if(ctx){
+    const carry=Math.round((ctx.score-60)*0.35);
+    if(carry){score+=carry;factors.push([`所在大限財運 ${ctx.score} 分的帶動`,carry])}
+    if(hua[0].t===ctx.hua[0].t){score+=5;factors.push(['流年祿與大限祿同宮（雙祿交會）',5]);
+      A.push({p:92,t:`<b class="lu">雙祿交會</b>：流年祿和大限祿同入本命${hua[0].natal}，是這十年裡的進財高點，可在能承受的範圍內加碼。`})}
+    if(hua[3].t===ctx.hua[3].t){score-=6;factors.push(['流年忌與大限忌同宮（忌疊）',-6]);
+      A.push({p:99,t:`<b class="ji">忌疊</b>：流年忌和大限忌同入本命${hua[3].natal}，壓力加倍，這一年凡涉及${hua[3].natal}的財務都要保守。`})}
+    if(hua[3].t===m12(ctx.mingB-4)){score-=5;factors.push(['流年忌入大限財帛',-5]);
+      A.push({p:97,t:'流年化忌落在大限財帛宮：這一年是整個大運裡現金流最緊的時候，先存 6 個月生活費再談投資。'})}
+    if(hua[3].t===ctx.hua[0].t){score-=4;factors.push(['流年忌沖大限祿',-4]);
+      A.push({p:93,t:'流年化忌打到大限化祿的宮位：大運裡的主要財源今年會受干擾，提早分散收入來源。'})}
+  }
+  score=Math.max(8,Math.min(98,Math.round(score)));
+  const [L,Q,K,J]=hua;
+  A.push({p:100,t:`<b class="ji">化忌</b> ${J.star}入${label}${J.role}（本命${J.natal}）：${JI_ADV[J.role]}`});
+  A.push({p:90,t:`<b class="lu">化祿</b> ${L.star}入${label}${L.role}（本命${L.natal}）：${LU_ADV[L.role]}`});
+  A.push({p:65,t:`<b class="quan">化權</b> ${Q.star}入${label}${Q.role}：${QUAN_ADV[Q.role]||`在${Q.role}相關的事務上掌握主導權，可藉此爭取資源與話語權，但別太強勢。`}`});
+  A.push({p:58,t:`<b class="ke">化科</b> ${K.star}入${label}${K.role}：${KE_ADV[K.role]||`${K.role}方面有貴人與好名聲，遇到財務問題可以向這方面的人請益。`}`});
+  const opp=PALACES[(PALACES.indexOf(J.role)+6)%12];
+  if(CHONG_ADV[opp]) A.push({p:96,t:`<b class="ji">化忌沖${opp}</b>：忌入${J.role}會沖對面的${label}${opp}。${CHONG_ADV[opp]}`});
+  if(MONEY.includes(L.natal)) A.push({p:85,t:`化祿落在本命${L.natal}：天生的財源在這段時間被啟動，適合把握本業或長期投資的獲利。`});
+  let mains=cbP.stars.filter(s=>s.t==='m').map(s=>s.name), borrow=false;
+  if(!mains.length){mains=chart.pal[m12(cb+6)].stars.filter(s=>s.t==='m').map(s=>s.name);borrow=true}
+  A.push({p:70,t:`${label}財帛宮${borrow?'為空宮，借對宮':'是'}${mains.join('、')}：${mains.map(s=>STAR_TIP[s]).join('')}${borrow?'空宮的財運較受外在環境影響，宜保留彈性。':''}`});
+  A.push({p:75,t:score>=80?'整體財運旺，可在能承受的範圍內擴大布局：談加薪、增加投資部位、開發新的收入來源。'
+    :score>=60?'財運穩中有進，維持收支紀律，把多出來的收入固定撥進投資或存款。'
+    :score>=45?'財運平平，先求穩再求進，建立至少 6 個月生活費的緊急預備金。'
+    :'財運偏弱，以守為主：暫緩大額投資與借貸，優先還債、控管現金流。'});
+  A.sort((a,b)=>b.p-a.p);
+  const adv=A.map(a=>a.t).slice(0,10);
+  for(let i=0;adv.length<7&&i<PAD.length;i++) adv.push(PAD[i]);
+  return {score,hua,factors,adv,mingB,label};
+}
+
+function card(res,eyebrow,title){
+  return `<article class="lcard ${scls(res.score)}"><header><div><span class="eyebrow">${eyebrow}</span><h4 style="color:var(--ink)">${title}</h4></div>
+    <div class="score"><b>${res.score}</b><span>/100</span><em>${grade(res.score)}</em></div></header>
+    <div class="bar"><i style="width:${res.score}%"></i></div>
+    <ul class="hua4" style="color:var(--ink)">${res.hua.map(h=>`<li><span class="bh h${h.k}">化${HUA[h.k]}</span>${h.star} → ${res.label}${h.role}<span class="note" style="color:var(--muted)">（本命${h.natal}）</span><span class="d ${h.d>0?'s-hi':h.d<0?'s-lo':''}">${h.d>0?'+':''}${h.d}</span></li>`).join('')}</ul>
+    <details><summary>計分明細（基準 60 分）</summary><ul>${res.factors.map(f=>`<li>${f[0]}：${f[1]>0?'+':''}${f[1]}</li>`).join('')}</ul></details>
+    <h5 style="color:var(--ink)">${res.adv.length} 個建議</h5>
+    <ol class="adv" style="color:var(--ink)">${res.adv.map(a=>`<li>${a}</li>`).join('')}</ol></article>`;
+}
+
+function renderLuck(){
+  const box=$('luck'), Y=chart.lunarYear, nowY=new Date().getFullYear(), age=nowY-Y+1;
+  const dxs=Object.values(chart.pal).sort((a,b)=>a.dx[0]-b.dx[0]);
+  const dxRes={}; dxs.forEach(p=>dxRes[p.b]=analyze(p.b,p.stem,'大限'));
+  const sel=chart.pal[selDx], dr=dxRes[selDx];
+  const years=[]; for(let a=sel.dx[0];a<=sel.dx[1];a++){const y=Y+a-1;years.push({y,a,res:analyze(m12(y-4),(y-4)%10,'流年',dr)})}
+  if(!years.some(v=>v.y===selYear)) selYear=years[0].y;
+  const yr=years.find(v=>v.y===selYear);
+  box.innerHTML=`<h2>大運流年財運</h2>
+    <div><p class="lbl">大運（十年一限，點選切換）</p><div class="chips">${dxs.map(p=>{const s=dxRes[p.b].score;
+      return `<button type="button" class="chip${age>=p.dx[0]&&age<=p.dx[1]?' now':''}" data-dx="${p.b}" aria-pressed="${p.b===selDx}"><b>${GAN[p.stem]}${ZHI[p.b]}・${p.name}</b><span>${p.dx[0]}–${p.dx[1]} 歲</span><span>${Y+p.dx[0]-1}–${Y+p.dx[1]-1}</span><span class="sc ${scls(s)}">${s} 分</span></button>`}).join('')}</div></div>
+    <div><p class="lbl">流年（${sel.dx[0]}–${sel.dx[1]} 歲這一限）</p><div class="chips">${years.map(v=>
+      `<button type="button" class="chip${v.y===nowY?' now':''}" data-yr="${v.y}" aria-pressed="${v.y===selYear}"><b>${v.y}</b><span>${GAN[(v.y-4)%10]}${ZHI[m12(v.y-4)]}年・${v.a} 歲</span><span class="sc ${scls(v.res.score)}">${v.res.score} 分</span></button>`).join('')}</div></div>
+    <div class="lcards">
+      ${card(dr,`大限 ${sel.dx[0]}–${sel.dx[1]} 歲・${Y+sel.dx[0]-1}–${Y+sel.dx[1]-1}`,`${GAN[sel.stem]}${ZHI[sel.b]}大限（命在本命${sel.name}）`)}
+      ${card(yr.res,`流年 ${yr.y}・虛歲 ${yr.a}`,`${GAN[(yr.y-4)%10]}${ZHI[m12(yr.y-4)]}年（流年命在本命${chart.pal[m12(yr.y-4)].name}）`)}
+    </div>`;
+}
+document.addEventListener('click',e=>{
+  const c=e.target.closest('#luck .chip'); if(!c) return;
+  if(c.dataset.dx!==undefined){selDx=+c.dataset.dx;selYear=chart.lunarYear+chart.pal[selDx].dx[0]-1}
+  if(c.dataset.yr!==undefined) selYear=+c.dataset.yr;
+  render();
+});
 
 function attribute(r){
   if(MAIN.includes(r.star)) return {stars:[r.star],how:''};
