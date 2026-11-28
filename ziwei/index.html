@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body>
+<title>紫微飛化財神盤</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: 4×4 traditional 命盤 grid (12 palaces around a 2×2 center), record + 財神 result panel beside it */
+:root{
+  --bg:#eef0f4; --paper:#ffffff; --ink:#1d2433; --muted:#646d80; --line:#c9cfdb; --hair:#e3e7ee;
+  --accent:#8a5a14; --accent-soft:#f6ecd9; --main:#9a1f2c; --sha:#4d5566;
+  --lu:#16a34a; --quan:#8b3fd1; --ke:#2563eb; --ji:#dc2626;
+  --lamp-off:#d6dae3;
+  --f-display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12151c; --paper:#1b2029; --ink:#e7e9ee; --muted:#9aa3b5; --line:#3a4252; --hair:#2a313d;
+  --accent:#e0b36a; --accent-soft:#33291a; --main:#f08b93; --sha:#a9b1c1;
+  --lu:#34d27a; --quan:#b27cf0; --ke:#5b93ff; --ji:#ff5b5b; --lamp-off:#3a4150; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151c; --paper:#1b2029; --ink:#e7e9ee; --muted:#9aa3b5; --line:#3a4252; --hair:#2a313d;
+  --accent:#e0b36a; --accent-soft:#33291a; --main:#f08b93; --sha:#a9b1c1;
+  --lu:#34d27a; --quan:#b27cf0; --ke:#5b93ff; --ji:#ff5b5b; --lamp-off:#3a4150; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
+.wrap{max-width:1280px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h1{font-family:var(--f-display);font-weight:900;font-size:26px;margin:0;letter-spacing:.06em;text-wrap:balance}
+.sub{color:var(--muted);margin:2px 0 0}
+form.input{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+.fld{display:flex;flex-direction:column;gap:3px}
+.fld label{font-size:12px;color:var(--muted);letter-spacing:.04em}
+.fld input,.fld select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:5px 8px;min-height:34px}
+.chk{display:flex;align-items:center;gap:5px;min-height:34px}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--ink);color:var(--paper);border:0;border-radius:4px;padding:7px 16px;min-height:34px;font-weight:700}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+@media (max-width:1000px){.main{grid-template-columns:minmax(0,1fr)}}
+.chart-scroll{overflow-x:auto;min-width:0}
+.chart{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));grid-template-rows:repeat(4,minmax(190px,auto));border:2px solid var(--ink);background:var(--line);gap:1px;min-width:640px}
+.cell{background:var(--paper);padding:6px 7px 5px;display:flex;flex-direction:column;gap:4px;position:relative;min-width:0;transition:box-shadow .2s}
+.cell.src{box-shadow:inset 0 0 0 3px var(--accent)}
+.cell.money{background:linear-gradient(var(--paper),var(--paper)) padding-box}
+.cell.tgt-lu{box-shadow:inset 0 0 0 2px var(--lu)}
+.stars{display:flex;flex-wrap:wrap;gap:2px 8px;align-content:flex-start;flex:1}
+.star{display:inline-flex;align-items:center;gap:3px;font-family:var(--f-display);font-size:13px;line-height:1.35;border-radius:3px;padding:0 2px}
+.star.m{font-size:16px;font-weight:900;color:var(--main)}
+.star.a{color:var(--ink);font-weight:700}
+.star.s{color:var(--sha);font-weight:500}
+.bh{font-family:var(--f-body);font-size:10px;font-weight:700;color:#fff;border-radius:2px;padding:0 3px;line-height:15px}
+.h0{background:var(--lu)}.h1{background:var(--quan)}.h2{background:var(--ke)}.h3{background:var(--ji)}
+.star.lit{color:#fff!important;animation:pop .35s ease-out}
+.star.lit.L0{background:var(--lu);box-shadow:0 0 10px var(--lu)}
+.star.lit.L1{background:var(--quan);box-shadow:0 0 10px var(--quan)}
+.star.lit.L2{background:var(--ke);box-shadow:0 0 10px var(--ke)}
+.star.lit.L3{background:var(--ji);box-shadow:0 0 10px var(--ji)}
+.star.lit .bh{background:rgba(255,255,255,.28)}
+.flytag{font-family:var(--f-body);font-size:10px;font-weight:700;background:#fff;border-radius:2px;padding:0 3px;line-height:15px}
+.L0 .flytag{color:var(--lu)}.L1 .flytag{color:var(--quan)}.L2 .flytag{color:var(--ke)}.L3 .flytag{color:var(--ji)}
+@keyframes pop{0%{transform:scale(.8)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.star.lit{animation:none}}
+.foot{display:flex;align-items:flex-end;justify-content:space-between;gap:4px;border-top:1px dashed var(--hair);padding-top:4px}
+.pname{font-family:var(--f-display);font-weight:900;font-size:15px;letter-spacing:.08em}
+.pname.money{color:var(--accent)}
+.shen{font-size:10px;background:var(--accent);color:var(--paper);border-radius:2px;padding:0 3px;margin-left:3px;vertical-align:2px}
+.gz{font-family:var(--f-display);font-size:14px;color:var(--muted);writing-mode:vertical-rl;line-height:1}
+.dx{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.fly{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:3px 8px 3px 6px;font-size:12px;font-weight:700}
+.fly:hover{border-color:var(--accent)}
+.lamps{display:inline-flex;gap:3px}
+.lamp{width:10px;height:10px;border-radius:50%;background:var(--lamp-off);transition:background .2s,box-shadow .2s}
+.src .lamp.on0{background:var(--lu);box-shadow:0 0 6px var(--lu)}
+.src .lamp.on1{background:var(--quan);box-shadow:0 0 6px var(--quan)}
+.src .lamp.on2{background:var(--ke);box-shadow:0 0 6px var(--ke)}
+.src .lamp.on3{background:var(--ji);box-shadow:0 0 6px var(--ji)}
+.center{grid-column:2/4;grid-row:2/4;background:var(--paper);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.center h2{font-family:var(--f-display);font-size:20px;margin:0;letter-spacing:.1em}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:13px;margin:0}
+.kv dt{color:var(--muted)}.kv dd{margin:0;font-variant-numeric:tabular-nums}
+.flyinfo{border-top:1px solid var(--hair);padding-top:8px;font-size:13px}
+.flyinfo .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.panel h3{margin:0;font-family:var(--f-display);font-size:16px;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.panel h3 small{font-family:var(--f-body);font-weight:400;font-size:12px;color:var(--muted);letter-spacing:0}
+.log{max-height:260px;overflow:auto;display:flex;flex-direction:column;gap:4px;font-size:13px;margin:0;padding:0;list-style:none}
+.log li{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:3px 0;border-bottom:1px solid var(--hair)}
+.log .note{color:var(--muted);font-size:12px}
+.empty{color:var(--muted);font-size:13px}
+table.rank{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.rank th,.rank td{padding:4px 4px;border-bottom:1px solid var(--hair);text-align:center}
+.rank th:first-child,.rank td:first-child{text-align:left}
+.rank td:first-child{font-family:var(--f-display);font-weight:900;color:var(--main)}
+.rank tr.top td{background:var(--accent-soft)}
+.god{border:2px solid var(--accent);border-radius:6px;padding:14px;background:var(--accent-soft);display:flex;flex-direction:column;gap:6px}
+.god .eyebrow{font-size:12px;letter-spacing:.12em;color:var(--accent);font-weight:700}
+.god .gname{font-family:var(--f-display);font-weight:900;font-size:26px;line-height:1.2;text-wrap:balance}
+.god .gstar{font-family:var(--f-display);font-size:15px}
+.god p{margin:0;font-size:13px;max-width:65ch}
+.fine{font-size:12px;color:var(--muted);margin:0}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>紫微飛化財神盤</h1>
+    <p class="sub">按宮位的「飛化」鈕，從該宮宮干飛出祿、權、科、忌四盞燈。落在財帛宮、福德宮的星會被記下，最後找出你的命定財神。</p>
+  </header>
+
+  <form class="input" id="f">
+    <div class="fld"><label for="cal">曆法</label><select id="cal"><option value="solar">國曆</option><option value="lunar">農曆</option></select></div>
+    <div class="fld"><label for="date">出生日期</label><input type="date" id="date" value="1990-05-15" min="1901-01-01" max="2099-12-31"></div>
+    <div class="chk" id="leapBox" hidden><input type="checkbox" id="leap"><label for="leap">閏月</label></div>
+    <div class="fld"><label for="hour">時辰</label><select id="hour"></select></div>
+    <div class="fld"><label for="sex">性別</label><select id="sex"><option value="M">男</option><option value="F">女</option></select></div>
+    <div class="fld"><label for="geng">庚干化科</label><select id="geng"><option value="太陰">太陰（常用）</option><option value="天府">天府</option></select></div>
+    <button class="btn" type="submit">排盤</button>
+  </form>
+
+  <div class="main">
+    <div class="chart-scroll"><div class="chart" id="chart"></div></div>
+    <aside class="side">
+      <section class="panel">
+        <h3>財帛・福德亮燈紀錄 <small id="logCount"></small></h3>
+        <div class="btnrow">
+          <button class="btn" type="button" id="flyAll">一鍵飛化十二宮</button>
+          <button class="btn ghost" type="button" id="clear">清除紀錄</button>
+        </div>
+        <ul class="log" id="log"></ul>
+      </section>
+      <section class="panel">
+        <h3>主星得燈統計 <small>輔星燈歸同宮主星</small></h3>
+        <div id="rank"></div>
+      </section>
+      <section id="god"></section>
+    </aside>
+  </div>
+  <p class="fine">排盤採三合派常用安星法（十四主星、六吉、六煞、祿存、天馬），四化採通行版本；閏月前半月算本月、後半月算下月。主星對應神明為民間流傳說法，各派不一，僅供參考。</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.7/lunar.js"></script>
+<script>
+(function(){
+const GAN='甲乙丙丁戊己庚辛壬癸', ZHI='子丑寅卯辰巳午未申酉戌亥';
+const PALACES=['命宮','兄弟','夫妻','子女','財帛','疾厄','遷移','交友','官祿','田宅','福德','父母'];
+const HUA=['祿','權','科','忌'];
+const MONEY=['財帛','福德'];
+const MAIN=['紫微','天機','太陽','武曲','天同','廉貞','天府','太陰','貪狼','巨門','天相','天梁','七殺','破軍'];
+const SIHUA_BASE={
+  '甲':['廉貞','破軍','武曲','太陽'],'乙':['天機','天梁','紫微','太陰'],'丙':['天同','天機','文昌','廉貞'],
+  '丁':['太陰','天同','天機','巨門'],'戊':['貪狼','太陰','右弼','天機'],'己':['武曲','貪狼','天梁','文曲'],
+  '庚':['太陽','武曲','太陰','天同'],'辛':['巨門','太陽','文曲','文昌'],'壬':['天梁','紫微','左輔','武曲'],
+  '癸':['破軍','巨門','太陰','貪狼']};
+const GODS={
+  '紫微':['紫微大帝','北極紫微大帝','帝星主貴氣與統御。財從權位、名望與管理而來，越站上檯面越旺。'],
+  '天機':['陶朱公 范蠡','智慧之神','智謀之星。靠企劃、眼光與時機判斷生財，像范蠡三致千金。'],
+  '太陽':['太陽星君','日宮太陽帝君','光明博愛之星。財從名聲、公眾事務與貴人提攜而來，越分享越有。'],
+  '武曲':['武財神 趙公明','玄壇元帥','正財星。主實業、金融與行動力，財靠紀律與執行力一分一分賺來。'],
+  '天同':['福德正神','土地公','福星。財來自福氣與人和，安穩累積、知足常樂，適合長期守成。'],
+  '廉貞':['五路財神','東西南北中五方財神','交際與企圖心之星。財走四方人脈與多元管道，適合跨領域經營。'],
+  '天府':['財帛星君','增福財神 李詭祖','財庫星。善守財、聚財、理財，財富靠穩健配置與累積。'],
+  '太陰':['太陰娘娘','月宮太陰星君','田宅財星。主儲蓄、不動產與細水長流，財藏於家宅與長期持有。'],
+  '貪狼':['偏財神 韓信爺','韓信將軍','慾望與機會之星。主偏財、業務獎金與投資機會，把握時機見好就收。'],
+  '巨門':['劉海蟾仙','金蟾招財','口才之星。靠說話、教學、諮詢與溝通生財，口吐金錢。'],
+  '天相':['文財神 比干','比干丞相','宰相印星。以公正與信用取財，輔佐他人、服務業與契約中得財。'],
+  '天梁':['太上老君','道德天尊','蔭星。靠專業、照顧他人與受長輩庇蔭得財，醫療保險顧問類尤佳。'],
+  '七殺':['關聖帝君','武財神 關公','將星。開創衝刺、以義取財，越挑戰越能打下財富江山。'],
+  '破軍':['中壇元帥','哪吒三太子','耗星主先破後立。改革創新、大破大立之中得財，忌守舊。']};
+const HOURS=['早子時 00–01','丑時 01–03','寅時 03–05','卯時 05–07','辰時 07–09','巳時 09–11','午時 11–13','未時 13–15','申時 15–17','酉時 17–19','戌時 19–21','亥時 21–23','晚子時 23–24'];
+const GRID={5:[1,1],6:[1,2],7:[1,3],8:[1,4],9:[2,4],10:[3,4],11:[4,4],0:[4,3],1:[4,2],2:[4,1],3:[3,1],4:[2,1]};
+const m12=n=>((n%12)+12)%12;
+const $=id=>document.getElementById(id);
+
+const hourSel=$('hour');
+HOURS.forEach((h,i)=>{const o=document.createElement('option');o.value=i;o.textContent=h;if(i===4)o.selected=true;hourSel.appendChild(o)});
+$('cal').addEventListener('change',()=>{$('leapBox').hidden=$('cal').value!=='lunar'});
+
+let chart=null, active=null, records={};
+
+function sihua(){const t=JSON.parse(JSON.stringify(SIHUA_BASE));t['庚'][2]=$('geng').value;return t}
+
+function build(){
+  const [y,mo,d]=$('date').value.split('-').map(Number);
+  const hi=+hourSel.value, sex=$('sex').value;
+  let solar;
+  if($('cal').value==='lunar'){solar=Lunar.fromYmd(y,$('leap').checked?-mo:mo,d).getSolar()}
+  else solar=Solar.fromYmd(y,mo,d);
+  const birthSolar=solar;
+  if(hi===12) solar=solar.next(1);
+  const lunar=solar.getLunar();
+  const h=hi%12;
+  const ys=lunar.getYearGanIndex(), yb=lunar.getYearZhiIndex();
+  let month=lunar.getMonth(), leap=month<0; month=Math.abs(month);
+  const day=lunar.getDay();
+  if(leap && day>15) month=month%12+1;
+  const ming=m12(2+(month-1)-h), shen=m12(2+(month-1)+h);
+  const yinStem=(ys%5*2+2)%10;
+  const stemOf=b=>(yinStem+m12(b-2))%10;
+  const ns=Math.floor(stemOf(ming)/2)+1, nb=[0,0,1,1,2,2][ming%6];
+  const wx=(ns+nb-1)%5+1; // 1金2水3火4土5木
+  const ju={1:[4,'金四局'],2:[2,'水二局'],3:[6,'火六局'],4:[5,'土五局'],5:[3,'木三局']}[wx];
+  const n=ju[0];
+  let x=0; while((day+x)%n) x++;
+  const q=(day+x)/n;
+  const z=m12(2+q-1+(x%2?-x:x));
+  const f=m12(4-z);
+  const pos={};
+  const put=(name,b,t)=>{pos[name]={b:m12(b),t}};
+  [['紫微',0],['天機',-1],['太陽',-3],['武曲',-4],['天同',-5],['廉貞',-8]].forEach(([s,o])=>put(s,z+o,'m'));
+  [['天府',0],['太陰',1],['貪狼',2],['巨門',3],['天相',4],['天梁',5],['七殺',6],['破軍',10]].forEach(([s,o])=>put(s,f+o,'m'));
+  put('文昌',10-h,'a');put('文曲',4+h,'a');put('左輔',4+month-1,'a');put('右弼',10-(month-1),'a');
+  const kui={0:[1,7],4:[1,7],6:[1,7],1:[0,8],5:[0,8],2:[11,9],3:[11,9],7:[6,2],8:[3,5],9:[3,5]}[ys];
+  put('天魁',kui[0],'a');put('天鉞',kui[1],'a');
+  const lucun=[2,3,5,6,5,6,8,9,11,0][ys];
+  put('祿存',lucun,'a');put('擎羊',lucun+1,'s');put('陀羅',lucun-1,'s');
+  put('天馬',{2:8,6:8,10:8,8:2,0:2,4:2,5:11,9:11,1:11,11:5,3:5,7:5}[yb],'a');
+  const fl={2:[1,3],6:[1,3],10:[1,3],8:[2,10],0:[2,10],4:[2,10],5:[3,10],9:[3,10],1:[3,10],11:[9,10],3:[9,10],7:[9,10]}[yb];
+  put('火星',fl[0]+h,'s');put('鈴星',fl[1]+h,'s');
+  put('地空',11-h,'s');put('地劫',11+h,'s');
+  const birthHua={};SIHUA_BASE[GAN[ys]].forEach((s,i)=>birthHua[s]=i);
+  if(GAN[ys]==='庚'){delete birthHua['太陰'];birthHua[$('geng').value]=2}
+  const yang=ys%2===0, dir=(yang===(sex==='M'))?1:-1;
+  const pal={};
+  for(let i=0;i<12;i++){const b=m12(ming-i);pal[b]={b,name:PALACES[i],stem:stemOf(b),stars:[]}}
+  for(let k=0;k<12;k++){const b=m12(ming+dir*k);pal[b].dx=[n+10*k,n+10*k+9]}
+  const order={m:0,a:1,s:2};
+  Object.entries(pos).sort((a,b)=>order[a[1].t]-order[b[1].t]).forEach(([s,p])=>pal[p.b].stars.push({name:s,t:p.t,bh:birthHua[s]}));
+  const MINGZHU=['貪狼','巨門','祿存','文曲','廉貞','武曲','破軍','武曲','廉貞','文曲','祿存','巨門'];
+  const SHENZHU=['火星','天相','天梁','天同','文昌','天機','火星','天相','天梁','天同','文昌','天機'];
+  chart={pal,pos,ming,shen,ju:ju[1],ys,yb,sex,yang,lunar,birthSolar,hi,month,day,leap,
+    mingzhu:MINGZHU[ming],shenzhu:SHENZHU[yb]};
+  active=null; records={};
+  render();
+}
+
+function flyTargets(b){
+  const stem=GAN[chart.pal[b].stem];
+  return sihua()[stem].map((star,i)=>({hua:i,star,to:chart.pos[star].b}));
+}
+
+function fly(b){
+  active=b;
+  const tg=flyTargets(b);
+  const hits=tg.filter(t=>MONEY.includes(chart.pal[t.to].name));
+  records[b]=hits.map(t=>({...t,from:b}));
+  render();
+}
+
+function render(){
+  const el=$('chart'); el.innerHTML='';
+  const lit={}; let tg=[];
+  if(active!==null){tg=flyTargets(active);tg.forEach(t=>{(lit[t.star]=lit[t.star]||[]).push(t.hua)})}
+  for(let b=0;b<12;b++){
+    const p=chart.pal[b], [r,c]=GRID[b];
+    const cell=document.createElement('div');
+    cell.className='cell'+(active===b?' src':'');
+    cell.style.gridRow=r;cell.style.gridColumn=c;
+    const money=MONEY.includes(p.name);
+    const stars=p.stars.map(s=>{
+      const L=lit[s.name];
+      const bh=s.bh!==undefined?`<span class="bh h${s.bh}" title="生年化${HUA[s.bh]}">${HUA[s.bh]}</span>`:'';
+      const fly=L?L.map(k=>`<span class="flytag">${HUA[k]}</span>`).join(''):'';
+      return `<span class="star ${s.t}${L?' lit L'+L[0]:''}">${s.name}${bh}${fly}</span>`}).join('');
+    cell.innerHTML=`<div class="stars">${stars}</div>
+      <div class="dx">${p.dx[0]}–${p.dx[1]} 歲</div>
+      <div class="foot">
+        <div><span class="pname${money?' money':''}">${p.name}</span>${chart.shen===b?'<span class="shen">身</span>':''}<br>
+        <button type="button" class="fly" data-b="${b}" aria-label="從${p.name}宮干${GAN[p.stem]}飛化">
+          <span class="lamps">${[0,1,2,3].map(k=>`<i class="lamp on${k}"></i>`).join('')}</span>飛化</button></div>
+        <div class="gz">${GAN[p.stem]}${ZHI[b]}</div>
+      </div>`;
+    el.appendChild(cell);
+  }
+  const c=chart, lu=c.lunar;
+  const center=document.createElement('div');center.className='center';
+  const ages=c.birthSolar.toYmd();
+  let flyHtml='<span class="empty">按任一宮的「飛化」鈕，從該宮宮干飛出四化。</span>';
+  if(active!==null){
+    const p=c.pal[active];
+    flyHtml=`<strong>${p.name}（${GAN[p.stem]}干）飛化：</strong>`+tg.map(t=>
+      `<div class="row"><span class="bh h${t.hua}">化${HUA[t.hua]}</span>${t.star} → 入<strong${MONEY.includes(c.pal[t.to].name)?' style="color:var(--accent)"':''}>${c.pal[t.to].name}</strong></div>`).join('');
+  }
+  center.innerHTML=`<h2>${c.sex==='M'?(c.yang?'陽男':'陰男'):(c.yang?'陽女':'陰女')}・${c.ju}</h2>
+    <dl class="kv">
+      <dt>國曆</dt><dd>${ages} ${HOURS[c.hi].split(' ')[0]}</dd>
+      <dt>農曆</dt><dd>${GAN[c.ys]}${ZHI[c.yb]}年 ${c.leap?'閏':''}${lu.getMonthInChinese()}月${lu.getDayInChinese()}</dd>
+      <dt>命主／身主</dt><dd>${c.mingzhu}／${c.shenzhu}</dd>
+      <dt>命宮／身宮</dt><dd>${GAN[c.pal[c.ming].stem]}${ZHI[c.ming]}／${ZHI[c.shen]}</dd>
+    </dl>
+    <div class="legend"><span><i style="background:var(--lu)"></i>化祿</span><span><i style="background:var(--quan)"></i>化權</span><span><i style="background:var(--ke)"></i>化科</span><span><i style="background:var(--ji)"></i>化忌</span></div>
+    <div class="flyinfo">${flyHtml}</div>`;
+  el.appendChild(center);
+  el.querySelectorAll('.fly').forEach(btn=>btn.addEventListener('click',()=>fly(+btn.dataset.b)));
+  renderSide();
+}
+
+function attribute(r){
+  if(MAIN.includes(r.star)) return {stars:[r.star],how:''};
+  const here=chart.pal[r.to].stars.filter(s=>s.t==='m').map(s=>s.name);
+  if(here.length) return {stars:here,how:'同宮主星'};
+  const opp=chart.pal[m12(r.to+6)].stars.filter(s=>s.t==='m').map(s=>s.name);
+  return {stars:opp,how:'空宮借對宮'};
+}
+
+function renderSide(){
+  const all=[];
+  Object.keys(records).sort((a,b)=>m12(chart.ming-a)-m12(chart.ming-b)).forEach(k=>all.push(...records[k]));
+  const log=$('log');
+  $('logCount').textContent=`已飛 ${Object.keys(records).length}/12 宮・${all.length} 盞燈`;
+  if(!all.length){log.innerHTML='<li class="empty">尚無紀錄。飛化時只要燈亮在財帛宮或福德宮，就會記在這裡。</li>'}
+  else log.innerHTML=all.map(r=>{
+    const a=attribute(r);
+    return `<li><span class="bh h${r.hua}">化${HUA[r.hua]}</span>${chart.pal[r.from].name}(${GAN[chart.pal[r.from].stem]}) → <strong>${r.star}</strong> 入${chart.pal[r.to].name}${a.how?`<span class="note">（${a.how}：${a.stars.join('、')}）</span>`:''}</li>`}).join('');
+  const tally={};
+  all.forEach(r=>attribute(r).stars.forEach(s=>{const t=tally[s]=tally[s]||{s,n:0,h:[0,0,0,0]};t.n++;t.h[r.hua]++}));
+  const list=Object.values(tally).sort((a,b)=>b.n-a.n||b.h[0]-a.h[0]||b.h[1]-a.h[1]||b.h[2]-a.h[2]||a.h[3]-b.h[3]||MAIN.indexOf(a.s)-MAIN.indexOf(b.s));
+  $('rank').innerHTML=list.length?`<table class="rank"><thead><tr><th>主星</th><th>總燈</th><th style="color:var(--lu)">祿</th><th style="color:var(--quan)">權</th><th style="color:var(--ke)">科</th><th style="color:var(--ji)">忌</th></tr></thead><tbody>`+
+    list.map((t,i)=>`<tr class="${i===0?'top':''}"><td>${t.s}</td><td>${t.n}</td>${t.h.map(v=>`<td>${v||'·'}</td>`).join('')}</tr>`).join('')+'</tbody></table>'
+    :'<p class="empty">還沒有星在財帛、福德亮燈。</p>';
+  const god=$('god');
+  if(!list.length){god.innerHTML='';return}
+  const top=list[0], g=GODS[top.s];
+  god.innerHTML=`<div class="god"><span class="eyebrow">命定財神爺</span>
+    <span class="gname">${g[0]}</span>
+    <span class="gstar">代表主星：<strong style="color:var(--main)">${top.s}</strong>・${g[1]}</span>
+    <p>${g[2]}</p>
+    <p class="fine">依據：${top.s} 在財帛、福德共亮 ${top.n} 盞燈（祿${top.h[0]}・權${top.h[1]}・科${top.h[2]}・忌${top.h[3]}），同分時以化祿多者優先。${Object.keys(records).length<12?'建議按「一鍵飛化十二宮」看完整結果。':''}</p></div>`;
+}
+
+$('f').addEventListener('submit',e=>{e.preventDefault();build();});
+$('geng').addEventListener('change',()=>{if(chart){const keep=Object.keys(records).map(Number),a=active;records={};keep.forEach(fly);active=a;render()}});
+$('flyAll').addEventListener('click',()=>{for(let i=11;i>=0;i--) fly(m12(chart.ming-i))});
+$('clear').addEventListener('click',()=>{records={};active=null;render()});
+
+build();
+$('flyAll').click();
+})();
+</script>
+
+</body>
+</html>
